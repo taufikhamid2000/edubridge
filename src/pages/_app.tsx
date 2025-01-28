@@ -1,6 +1,5 @@
 import '@/styles/globals.css';
 import '@/styles/shared.css';
-import '@/styles/QnA.module.css';
 
 import { AppProps } from 'next/app';
 

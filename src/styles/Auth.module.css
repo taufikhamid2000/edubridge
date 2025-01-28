@@ -1,0 +1,81 @@
+/* Auth Page Styling */
+
+/* Auth Section */
+.authSection {
+    padding: 3rem 1rem;
+    text-align: center;
+    background-color: #1a202c; /* bg-gray-900 */
+    color: #f7fafc; /* text-gray-100 */
+  }
+  
+  .authSection h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #63b3ed; /* text-blue-400 */
+    margin-bottom: 1rem;
+  }
+  
+  .authSection p {
+    max-width: 40rem;
+    margin: 0 auto;
+    font-size: 1.125rem;
+    color: #e2e8f0; /* text-gray-300 */
+    margin-bottom: 2rem;
+  }
+  
+  /* Auth Form */
+  .authForm {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 25rem;
+    margin: 0 auto;
+  }
+  
+  .authForm label {
+    font-size: 1rem;
+    color: #63b3ed; /* text-blue-400 */
+  }
+  
+  .authForm input {
+    padding: 0.5rem;
+    border: 1px solid #4a5568; /* gray-600 */
+    border-radius: 0.375rem;
+    background-color: #1a202c; /* bg-gray-900 */
+    color: #f7fafc; /* text-gray-100 */
+  }
+  
+  .authForm input::placeholder {
+    color: #a0aec0; /* text-gray-400 */
+  }
+  
+  .authForm button {
+    margin-top: 1rem;
+    background-color: #3182ce; /* bg-blue-600 */
+    color: #ffffff; /* text-white */
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.375rem;
+    transition: transform 0.3s, background-color 0.3s;
+  }
+  
+  .authForm button:hover {
+    background-color: #2b6cb0; /* hover:bg-blue-700 */
+    transform: scale(1.05);
+  }
+  
+  /* Switch Links */
+  .switch {
+    margin-top: 1.5rem;
+    font-size: 1rem;
+    color: #a0aec0; /* text-gray-400 */
+  }
+  
+  .switch a {
+    color: #63b3ed; /* text-blue-400 */
+    text-decoration: none;
+  }
+  
+  .switch a:hover {
+    text-decoration: underline;
+  }
+  
