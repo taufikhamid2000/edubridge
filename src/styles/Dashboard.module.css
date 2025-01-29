@@ -1,0 +1,82 @@
+.dashboardContainer {
+    width: 100%;
+    min-height: 100vh;
+    background-color: #1a202c;
+    color: #f7fafc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+  }
+  
+  .dashboardContent {
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+  
+  /* User Overview */
+  .userOverview {
+    background: #2d3748;
+    padding: 20px;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    text-align: center;
+  }
+  
+  /* Quick Actions */
+  .quickActions {
+    display: flex;
+    gap: 20px;
+  }
+  
+  .card {
+    flex: 1;
+    background: #2d3748;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+  }
+  
+  .card:hover {
+    transform: scale(1.05);
+    background: #3b4759;
+  }
+  
+  /* Recent Activity */
+  .activity {
+    background: #2d3748;
+    padding: 20px;
+    border-radius: 8px;
+  }
+  
+  .activity ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .activity li {
+    padding: 8px 0;
+    border-bottom: 1px solid #4a5568;
+  }
+  
+  /* Announcements */
+  .announcements {
+    background: #2d3748;
+    padding: 20px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    text-align: center;
+  }
+  
+  /* Mobile Responsive */
+  @media (max-width: 768px) {
+    .quickActions {
+      flex-direction: column;
+    }
+  }
+  
