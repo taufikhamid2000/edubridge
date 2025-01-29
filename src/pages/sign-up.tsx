@@ -1,48 +1,59 @@
+import { useState } from 'react';
+import { signUp } from '@/lib/auth';
+import { useRouter } from 'next/router';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import styles from '@/styles/Auth.module.css';
 import Link from 'next/link';
 
 export default function SignUp() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    try {
+      const session = await signUp(email, password);
+      if (session) {
+        router.push('/dashboard');
+      }
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An unknown error occurred');
+      }
+    }
+
+    setLoading(false);
+  };
+
   return (
     <div>
       <Header />
-
       <section className={styles.authSection}>
-        <h1>Join EduBridge</h1>
-        <p>Welcome to the club. Let’s get you set up in no time.</p>
-        <form className={styles.authForm}>
-          <label htmlFor="username">Username</label>
-          <input
-            type="text"
-            id="username"
-            name="username"
-            placeholder="Create a unique username"
-          />
+        <h1>Join Edubridge</h1>
+        <p>Welcome to the club. Let’s get you set up.</p>
+        {error && <p className={styles.error}>{error}</p>}
+        <form className={styles.authForm} onSubmit={handleSignUp}>
+          <label>Email</label>
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
 
-          <label htmlFor="email">Email</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            placeholder="Enter your email"
-          />
+          <label>Password</label>
+          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
 
-          <label htmlFor="password">Password</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            placeholder="Create a secure password"
-          />
-
-          <button type="submit">Sign Up</button>
+          <button type="submit" disabled={loading}>{loading ? 'Signing Up...' : 'Sign Up'}</button>
         </form>
         <p className={styles.switch}>
           Already have an account? <Link href="/sign-in">Sign In</Link>
         </p>
       </section>
-
       <Footer />
     </div>
   );
