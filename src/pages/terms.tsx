@@ -3,7 +3,7 @@
 
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import styles from '@/styles/Terms.module.css';
+import styles from '@/styles/Shared.module.css';
 import Link from 'next/link';
 
 export default function Terms() {
@@ -17,18 +17,18 @@ export default function Terms() {
         <p>
           Welcome to the legal mumbo-jumbo page. Don’t worry, we’ve made it as
           painless as possible. Here’s what you need to know before you dive
-          into Edubridge.
+          into EduBridge.
         </p>
       </section>
 
       {/* Q&A */}
-    <section className={styles.qaSection}>
+      <section className={styles.qaSection}>
         <div className={styles.question}>
           <h2>1. Don’t Do Dumb Stuff</h2>
         </div>
         <div className={styles.answer}>
           <p>
-            Use Edubridge responsibly. Don’t hack it, spam it, or use it to do
+            Use EduBridge responsibly. Don’t hack it, spam it, or use it to do
             shady things. We’re not your babysitters, but we will kick you out
             if you ruin the vibe.
           </p>
@@ -39,8 +39,8 @@ export default function Terms() {
         </div>
         <div className={styles.answer}>
           <p>
-            If you don’t become a millionaire using Edubridge, that’s on you.
-            We provide tools, not magic spells.
+            If you don’t become a millionaire using EduBridge, that’s on you. We
+            provide tools, not magic spells.
           </p>
         </div>
 
@@ -70,7 +70,7 @@ export default function Terms() {
         <div className={styles.answer}>
           <p>
             We might change these terms from time to time. When we do, we’ll let
-            you know. If you keep using Edubridge after that, congrats—you agree
+            you know. If you keep using EduBridge after that, congrats—you agree
             to the new terms!
           </p>
         </div>
@@ -80,23 +80,22 @@ export default function Terms() {
         </div>
         <div className={styles.answer}>
           <p>
-            If your cat deletes your project while you’re using Edubridge, don’t
+            If your cat deletes your project while you’re using EduBridge, don’t
             sue us. We’re not responsible for any losses, damages, or your
             questionable life choices.
           </p>
         </div>
-    </section>
-
+      </section>
 
       {/* CTA */}
       <section className={styles.ctaSection}>
         <h2>Got More Questions?</h2>
         <p>
-          We’re here, and we’re not shy. Reach out if you want more details—or if you just
-          wanna rant. We can handle it.
+          We’re here, and we’re not shy. Reach out if you want more details—or
+          if you just wanna rant. We can handle it.
         </p>
         <Link href="/contact" passHref>
-            <button>Contact Us</button>
+          <button>Contact Us</button>
         </Link>
       </section>
 

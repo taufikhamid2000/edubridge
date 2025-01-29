@@ -9,7 +9,7 @@ export default function SignUp() {
       <Header />
 
       <section className={styles.authSection}>
-        <h1>Join Edubridge</h1>
+        <h1>Join EduBridge</h1>
         <p>Welcome to the club. Let’s get you set up in no time.</p>
         <form className={styles.authForm}>
           <label htmlFor="username">Username</label>
@@ -21,7 +21,12 @@ export default function SignUp() {
           />
 
           <label htmlFor="email">Email</label>
-          <input type="email" id="email" name="email" placeholder="Enter your email" />
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="Enter your email"
+          />
 
           <label htmlFor="password">Password</label>
           <input

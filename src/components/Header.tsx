@@ -7,8 +7,12 @@ export default function Header() {
         EduBridge
       </Link>
       <nav>
-        <Link href="/sign-in"><button className="btn">Sign In</button></Link>
-        <Link href="/sign-up"><button className="btn join">Join Now</button></Link>
+        <Link href="/sign-in">
+          <button className="btn">Sign In</button>
+        </Link>
+        <Link href="/sign-up">
+          <button className="btn join">Join Now</button>
+        </Link>
       </nav>
     </header>
   );

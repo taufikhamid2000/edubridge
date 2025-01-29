@@ -13,7 +13,12 @@ export default function SignIn() {
         <p>Log in and continue where you left off.</p>
         <form className={styles.authForm}>
           <label htmlFor="email">Email</label>
-          <input type="email" id="email" name="email" placeholder="Enter your email" />
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="Enter your email"
+          />
 
           <label htmlFor="password">Password</label>
           <input

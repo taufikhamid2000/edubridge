@@ -18,6 +18,8 @@ button {
   @apply transition-transform duration-200 ease-in-out;
 }
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   @apply font-bold;
 }

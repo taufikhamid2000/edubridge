@@ -8,31 +8,31 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Edubridge | Empowering Students and Educators</title>
+        <title>EduBridge | Empowering Students and Educators</title>
         <meta
           name="description"
-          content="Edubridge connects students and educators with tools to learn, earn, and grow. Join a thriving community today!"
+          content="EduBridge connects students and educators with tools to learn, earn, and grow. Join a thriving community today!"
         />
         <meta
           name="keywords"
-          content="education platform, student tools, earn while learning, Edubridge features"
+          content="education platform, student tools, earn while learning, EduBridge features"
         />
-        <meta name="author" content="Edubridge Team" />
+        <meta name="author" content="EduBridge Team" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta charSet="UTF-8" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Organization",
-              "name": "Edubridge",
-              "url": "https://www.edubridge.com",
-              "description":
-                "Empowering students and educators with tools to learn, earn, and grow.",
-              "sameAs": [
-                "https://www.facebook.com/edubridge",
-                "https://www.twitter.com/edubridge",
+              '@context': 'https://schema.org',
+              '@type': 'Organization',
+              name: 'EduBridge',
+              url: 'https://edubridge-sigma.vercel.app/',
+              description:
+                'Empowering students and educators with tools to learn, earn, and grow.',
+              sameAs: [
+                'https://www.facebook.com/edubridge',
+                'https://www.twitter.com/edubridge',
               ],
             }),
           }}
@@ -48,12 +48,14 @@ export default function Home() {
             Discover tools, resources, and a community to support learning,
             entrepreneurship, and career growth.
           </p>
-          <Link href="/sign-up"><button>Get Started Today</button></Link>
+          <Link href="/sign-up">
+            <button>Get Started Today</button>
+          </Link>
         </section>
 
         {/* Features Section */}
         <section className="featuresSection">
-          <h2>Why Choose Edubridge?</h2>
+          <h2>Why Choose EduBridge?</h2>
           <div className="features">
             <div className="feature">
               <h3>UYE</h3>
@@ -98,7 +100,9 @@ export default function Home() {
             Be part of a growing community of students and educators making a
             difference.
           </p>
-          <Link href="/sign-up"><button data-aos="zoom-in">Sign Up Now</button></Link>
+          <Link href="/sign-up">
+            <button data-aos="zoom-in">Sign Up Now</button>
+          </Link>
         </section>
 
         <Footer />
