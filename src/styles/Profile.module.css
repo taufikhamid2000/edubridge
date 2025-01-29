@@ -1,0 +1,133 @@
+/* Shared Page Container */
+.pageContainer {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  background: #1a202c;
+  color: #f7fafc;
+}
+
+/* Shared Content Container */
+.contentContainer {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  min-height: 100vh;
+}
+
+/* Shared Profile/Settings/Resources Content */
+.mainContent {
+  max-width: 600px;
+  margin: auto;
+  padding: 40px;
+  background: #2d3748;
+  border-radius: 8px;
+  text-align: center;
+}
+
+/* Footer Styling */
+.footerContainer {
+  margin-top: auto;
+  background: #1a202c;
+  text-align: center;
+  color: #cbd5e0;
+}
+
+/* Upload Section (Specific for Resources) */
+.uploadSection {
+  margin: 20px 0;
+}
+
+.uploadSection input {
+  margin-bottom: 10px;
+}
+
+.uploadSection button {
+  padding: 10px 15px;
+  background-color: #3182ce;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.uploadSection button:hover {
+  background-color: #2b6cb0;
+}
+
+/* File List (Specific for Resources) */
+.fileList {
+  list-style: none;
+  padding: 0;
+  margin-top: 20px;
+}
+
+.fileItem {
+  padding: 10px;
+  background: #2d3748;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.fileItem a {
+  color: #63b3ed;
+  text-decoration: none;
+}
+
+.fileItem a:hover {
+  text-decoration: underline;
+}
+
+/* Buttons (Shared Across Profile/Settings/Resources) */
+.actionButton {
+  margin-top: 20px;
+  padding: 10px 15px;
+  background-color: #3182ce;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.actionButton:hover {
+  background-color: #2b6cb0;
+}
+
+/* Marketplace Grid */
+.marketplaceGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+/* Product Card */
+.productCard {
+  background: #2d3748;
+  padding: 15px;
+  border-radius: 8px;
+  text-align: center;
+  transition: transform 0.2s ease-in-out;
+}
+
+.productCard:hover {
+  transform: scale(1.05);
+}
+
+/* Product Image */
+.productImage {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+/* Product Price */
+.productPrice {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #63b3ed;
+  margin-top: 5px;
+}
