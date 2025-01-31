@@ -2,14 +2,14 @@
 
 /* Auth Section */
 .authSection {
-  padding: 3rem 1rem;
+  padding: 2rem 35%; /* Adjusted padding for mobile */
   text-align: center;
   background-color: #1a202c; /* bg-gray-900 */
   color: #f7fafc; /* text-gray-100 */
 }
 
 .authSection h1 {
-  font-size: 2rem;
+  font-size: 1.75rem; /* Smaller heading for mobile */
   font-weight: 700;
   color: #63b3ed; /* text-blue-400 */
   margin-bottom: 1rem;
@@ -18,7 +18,7 @@
 .authSection p {
   max-width: 40rem;
   margin: 0 auto;
-  font-size: 1.125rem;
+  font-size: 1rem; /* Smaller paragraph text for mobile */
   color: #e2e8f0; /* text-gray-300 */
   margin-bottom: 2rem;
 }
@@ -28,7 +28,7 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  max-width: 25rem;
+  max-width: 90%; /* Allow form to take 90% of the screen width */
   margin: 0 auto;
 }
 
@@ -80,3 +80,31 @@
 .switch a:hover {
   text-decoration: underline;
 }
+
+/* Media Queries for Mobile */
+@media (max-width: 768px) {
+  .authSection {
+    padding: 1.5rem 5%; /* Further reduce padding for smaller screens */
+  }
+
+  .authSection h1 {
+    font-size: 1.5rem; /* Smaller heading for mobile */
+  }
+
+  .authSection p {
+    font-size: 0.875rem; /* Smaller paragraph text for mobile */
+  }
+
+  .authForm {
+    max-width: 100%; /* Allow form to take full width on mobile */
+  }
+
+  .authForm input {
+    padding: 0.5rem; /* Adjust input padding for mobile */
+  }
+
+  .authForm button {
+    padding: 0.5rem 1rem; /* Smaller button padding for mobile */
+  }
+}
+
