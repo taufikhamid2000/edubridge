@@ -3,8 +3,32 @@
 @tailwind utilities;
 
 /* Global Styles */
+/* Light Mode (default) */
+:root {
+  --bg-primary: #f7fafc;
+  --bg-secondary: #1a202c;
+  --bg-accent: #2b6cb0;
+  --text-primary: #1a202c;
+  --text-secondary: #e2e8f0;
+  --text-accent: #63b3ed;
+  --button-bg: #3182ce;
+  --button-hover: #2b6cb0;
+}
+
+/* Dark Mode */
+.dark {
+  --bg-primary: #1a202c;
+  --bg-secondary: #2d3748;
+  --bg-accent: #2b6cb0;
+  --text-primary: #f7fafc;
+  --text-secondary: #e2e8f0;
+  --text-accent: #63b3ed;
+  --button-bg: #3182ce;
+  --button-hover: #2b6cb0;
+}
+
 body {
-  @apply bg-gray-900 text-gray-100; /* Default to dark mode */
+  @apply bg-gray-900 text-gray-100;
   font-family: 'Inter', sans-serif;
   margin: 0;
   padding: 0;

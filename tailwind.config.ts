@@ -1,6 +1,7 @@
 import type { Config } from 'tailwindcss';
 
-export default {
+const config: Config = {
+  darkMode: 'class', // Enables dark mode using a class
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
@@ -11,9 +12,12 @@ export default {
       colors: {
         background: 'var(--background)',
         foreground: 'var(--foreground)',
+        headerBg: 'var(--header-bg)',
+        primaryText: 'var(--primary-text)',
       },
     },
   },
-  darkMode: 'class', // Enables dark mode using the 'class' strategy
   plugins: [],
-} satisfies Config;
+};
+
+export default config;

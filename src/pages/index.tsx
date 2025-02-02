@@ -82,26 +82,26 @@ export default function Home() {
         </section>
 
         {/* Testimonials Section */}
-        <section className="testimonialsSection" data-aos="fade-up">
-          <h2 data-aos="zoom-in">What Our Users Say</h2>
-          <p data-aos="slide-left" data-aos-delay="200">
+        <section className="testimonialsSection">
+          <h2>What Our Users Say</h2>
+          <p>
             "StudentHub helped me start my own business while still in college!"
             - Aiman
           </p>
-          <p data-aos="slide-right" data-aos-delay="400">
+          <p>
             "I love how easy it is to share notes and earn rewards." - Sarah
           </p>
         </section>
 
         {/* Call-to-Action Section */}
-        <section className="ctaSection" data-aos="fade-up">
-          <h2 data-aos="slide-right">Join Us Today</h2>
-          <p data-aos="slide-left">
+        <section className="ctaSection">
+          <h2>Join Us Today</h2>
+          <p>
             Be part of a growing community of students and educators making a
             difference.
           </p>
           <Link href="/sign-up">
-            <button data-aos="zoom-in">Sign Up Now</button>
+            <button>Sign Up Now</button>
           </Link>
         </section>
 

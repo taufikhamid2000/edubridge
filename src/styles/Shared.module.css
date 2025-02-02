@@ -4,14 +4,14 @@
 .introSection {
   padding: 3rem 1rem;
   text-align: center;
-  background-color: #1a202c; /* bg-gray-900 */
-  color: #f7fafc; /* text-gray-100 */
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
 }
 
 .introSection h1 {
   font-size: 2rem;
   font-weight: 700;
-  color: #63b3ed; /* text-blue-400 */
+  color: var(--text-accent);
   margin-bottom: 1rem;
 }
 
@@ -19,22 +19,23 @@
   max-width: 40rem;
   margin: 0 auto;
   font-size: 1.125rem;
-  color: #e2e8f0; /* text-gray-300 */
+  color: var(--text-secondary);
 }
 
 /* Q&A Section */
 .qaSection {
   width: 100%;
-  max-width: 50rem; /* Adjust the max width as needed */
-  margin: 0 auto; /* Centers the section */
-  padding: 3rem 1rem; /* Less padding for better responsiveness */
-  color: #f7fafc; /* text-gray-100 */
+  max-width: 50rem;
+  margin: 0 auto;
+  padding: 3rem 1rem;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
 }
 
 @media (max-width: 768px) {
   .qaSection {
-    max-width: 90%; /* Make it slightly wider on smaller screens */
-    padding: 2rem 1rem; /* Reduce padding for better fit */
+    max-width: 90%;
+    padding: 2rem 1rem;
   }
 }
 
@@ -45,7 +46,7 @@
 .qaSection .question h2 {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #63b3ed; /* text-blue-400 */
+  color: var(--text-accent);
 }
 
 .qaSection .answer {
@@ -54,21 +55,21 @@
 
 .qaSection .answer p {
   font-size: 1.125rem;
-  color: #e2e8f0; /* text-gray-300 */
+  color: var(--text-secondary);
 }
 
 /* Call-to-Action Section */
 .ctaSection {
   padding: 3rem 1rem;
   text-align: center;
-  background-color: #2b6cb0; /* bg-blue-900 */
-  color: #f7fafc; /* text-gray-100 */
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
 }
 
 .ctaSection h2 {
   font-size: 2rem;
   font-weight: 700;
-  color: #63b3ed; /* text-blue-400 */
+  color: var(--text-accent);
   margin-bottom: 1rem;
 }
 
@@ -76,13 +77,13 @@
   max-width: 40rem;
   margin: 0 auto;
   font-size: 1.125rem;
-  color: #e2e8f0; /* text-gray-200 */
+  color: var(--text-secondary);
 }
 
 .ctaSection button {
   margin-top: 1.5rem;
-  background-color: #3182ce; /* bg-blue-600 */
-  color: #ffffff; /* text-white */
+  background-color: var(--button-bg);
+  color: var(--button-text);
   padding: 0.5rem 1.5rem;
   border-radius: 0.375rem;
   transition:
@@ -91,6 +92,6 @@
 }
 
 .ctaSection button:hover {
-  background-color: #2b6cb0; /* hover:bg-blue-700 */
+  background-color: var(--button-hover);
   transform: scale(1.05);
 }
