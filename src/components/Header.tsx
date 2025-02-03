@@ -54,7 +54,7 @@ export default function Header() {
           <>
             <button
               onClick={toggleTheme}
-              className="p-2 bg-gray-200 dark:bg-gray-800 rounded-full"
+              className="btn"
             >
               {theme === 'dark' ? '🌞' : '🌙'}{' '}
               {/* Change icon based on theme */}
@@ -63,7 +63,7 @@ export default function Header() {
               <button className="btn">Sign In</button>
             </Link>
             <Link href="/sign-up">
-              <button className="btn join">Join Now</button>
+              <button className="btn">Join Now</button>
             </Link>
           </>
         )}
