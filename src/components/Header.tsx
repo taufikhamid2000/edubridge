@@ -37,8 +37,8 @@ export default function Header() {
       <nav>
         {user ? (
           <>
-            <Link href="/dashboard">
-              <button className="btn">Dashboard</button>
+            <Link href="/dashboard" className="btn">
+              Dashboard
             </Link>
             <button
               className="btn"
@@ -52,21 +52,18 @@ export default function Header() {
           </>
         ) : (
           <>
-            <button
-              onClick={toggleTheme}
-              className="btn"
-            >
-              {theme === 'dark' ? '🌞' : '🌙'}{' '}
-              {/* Change icon based on theme */}
-            </button>
-            <Link href="/sign-in">
-              <button className="btn">Sign In</button>
+            <Link href="/sign-in" className="btn">
+              Sign In
             </Link>
-            <Link href="/sign-up">
-              <button className="btn">Join Now</button>
+            <Link href="/sign-up" className="btn">
+              Join Now
             </Link>
           </>
         )}
+
+        <button onClick={toggleTheme} className="btn" aria-label="Toggle theme">
+          {theme === 'dark' ? '🌞' : '🌙'}
+        </button>
       </nav>
     </header>
   );
