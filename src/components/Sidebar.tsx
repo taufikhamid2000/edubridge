@@ -9,6 +9,8 @@ import {
   FiMessageCircle,
   FiSettings,
   FiLogOut,
+  FiSun,
+  FiMoon,
 } from 'react-icons/fi';
 import { signOut } from '@/lib/auth';
 import styles from '@/styles/Sidebar.module.css';
@@ -20,6 +22,14 @@ export default function Sidebar({
 }) {
   const [isOpen, setIsOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
+
+  // ✅ Fix: Set theme from localStorage immediately to prevent flicker
+  const [theme, setTheme] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('theme') || 'dark';
+    }
+    return 'dark'; // Default if localStorage is unavailable
+  });
 
   useEffect(() => {
     const handleResize = () => {
@@ -37,6 +47,18 @@ export default function Sidebar({
   useEffect(() => {
     onToggle(isOpen);
   }, [isOpen, onToggle]);
+
+  // ✅ Apply dark mode class based on state
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+  }, [theme]);
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+    document.documentElement.classList.toggle('dark', newTheme === 'dark');
+  };
 
   return (
     <>
@@ -74,6 +96,13 @@ export default function Sidebar({
           <Link href="/settings">
             <FiSettings /> Settings
           </Link>
+
+          {/* ✅ Dark Mode Toggle Button */}
+          <button className={styles.themeToggle} onClick={toggleTheme}>
+            {theme === 'dark' ? <FiSun /> : <FiMoon />}
+            {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+          </button>
+
           <button className={styles.logout} onClick={signOut}>
             <FiLogOut /> Sign Out
           </button>

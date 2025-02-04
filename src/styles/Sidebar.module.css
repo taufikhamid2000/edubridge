@@ -2,22 +2,22 @@
 .sidebar {
   width: 250px;
   height: 100vh;
-  background: #1a202c;
-  color: #f7fafc;
+  background: var(--bg-color);
+  color: var(--fg-color);
   display: flex;
   flex-direction: column;
   padding: 20px;
   position: fixed;
-  left: -250px;
   top: 0;
-  transition: transform 0.3s ease-in-out;
+  left: -250px; /* Initially positioned off-screen */
+  transition: transform 0.3s ease-in-out; /* Transition for sliding effect */
   z-index: 1000;
 }
 
 /* Sidebar Open */
 .sidebar.open {
-  transform: translateX(0px);
-  left: 0;
+  transform: translateX(250px); /* Slide the sidebar into view */
+  left: 10; /* Optional, not necessary if transform is used */
 }
 
 /* Sidebar Links */
@@ -26,37 +26,64 @@
   flex-direction: column;
 }
 
+/* Sidebar Links */
 .sidebar nav a {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 10px;
   padding: 10px 15px;
-  color: #cbd5e0;
+  color: var(--link-color);
   text-decoration: none;
-  transition: background 0.2s;
+  transition:
+    background 0.2s,
+    color 0.2s;
 }
 
 .sidebar nav a:hover {
-  background: #2d3748;
-  color: #fff;
+  background: var(--hover-bg);
+  color: var(--hover-color);
 }
 
-/* Logout Button */
-.logout {
-  margin-top: auto;
+/* ✅ Dark Mode Toggle */
+.themeToggle {
+  margin-top: 15px;
   padding: 10px;
-  background: #e53e3e;
-  color: white;
+  background: var(--button-bg);
+  color: var(--text-secondary);
   border: none;
   cursor: pointer;
   text-align: left;
   display: flex;
   align-items: center;
   gap: 10px;
+  border-radius: 5px;
+  font-size: 1rem;
+  transition: background 0.2s;
+}
+
+.themeToggle:hover {
+  background: var(--button-hover-bg);
+  color: var(--text-secondary);
+}
+
+/* Logout Button */
+.logout {
+  margin-top: auto;
+  padding: 10px;
+  background: var(--danger-bg);
+  color: var(--danger-text);
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 5px;
+  transition: background 0.2s;
 }
 
 .logout:hover {
-  background: #c53030;
+  background: var(--danger-hover-bg);
 }
 
 /* Overlay Effect */
@@ -88,8 +115,8 @@
   }
 
   .sidebar.open {
-    transform: translateX(0px);
-    left: 0;
+    transform: translateX(0px); /* Slide in from left */
+    left: 0; /* Align with the left edge */
   }
 }
 
@@ -98,9 +125,8 @@
   position: fixed;
   top: 15px;
   left: 15px;
-  background: #2d3748;
-  color: #fff;
-  border: none;
+  color: var(--menu-color);
+  border: steelblue;
   padding: 10px;
   cursor: pointer;
   font-size: 1.5rem;
@@ -109,12 +135,12 @@
   transition: opacity 0.3s ease-in-out;
 }
 
+.menuButton:hover {
+  background: var(--bg-accent);
+}
+
 /* Hide the menu button when the sidebar is open */
 .sidebar.open ~ .menuButton {
   opacity: 0;
-  pointer-events: none; /* Prevent clicks while hidden */
-}
-
-.menuButton:hover {
-  background: #4a5568;
+  pointer-events: none;
 }
