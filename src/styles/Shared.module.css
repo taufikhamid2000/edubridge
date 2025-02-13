@@ -84,7 +84,7 @@
   border: 1px solid var(--text-accent);
   border-radius: 0.375rem;
   background-color: var(--bg-color);
-  color: var(--text-secondary);
+  color: var(--fg-color);
 }
 
 .contactForm textarea {
