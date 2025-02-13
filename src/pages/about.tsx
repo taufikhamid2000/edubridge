@@ -4,6 +4,7 @@
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import styles from '@/styles/Shared.module.css';
+import Link from 'next/link';
 
 export default function About() {
   return (
@@ -123,7 +124,9 @@ export default function About() {
           We’re here, and we’re not shy. Reach out if you want more details—or
           if you just wanna rant. We can handle it.
         </p>
-        <button>Contact Us</button>
+        <Link href="/contact" passHref>
+          <button>Contact Us</button>
+        </Link>
       </section>
 
       <Footer />

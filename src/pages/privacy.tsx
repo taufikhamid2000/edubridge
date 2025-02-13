@@ -4,6 +4,7 @@
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import styles from '@/styles/Shared.module.css';
+import Link from 'next/link';
 
 export default function Privacy() {
   return (
@@ -93,7 +94,9 @@ export default function Privacy() {
           If you’re still paranoid, feel free to reach out. We’ll clear up your
           concerns—or at least make you feel slightly better about trusting us.
         </p>
-        <button>Contact Us</button>
+        <Link href="/contact" passHref>
+          <button className="btn">Contact Us</button>
+        </Link>
       </section>
 
       <Footer />
