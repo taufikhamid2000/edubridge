@@ -6,7 +6,7 @@ import { User } from '@supabase/supabase-js';
 
 export default function Header() {
   const [user, setUser] = useState<User | null>(null);
-  const [theme, setTheme] = useState('dark'); // Default to dark mode
+  const [theme, setTheme] = useState('dark');
 
   useEffect(() => {
     const checkUser = async () => {
@@ -16,9 +16,9 @@ export default function Header() {
 
     checkUser();
 
-    const savedTheme = localStorage.getItem('theme') || 'dark'; // Get theme from local storage
+    const savedTheme = localStorage.getItem('theme') || 'dark';
     setTheme(savedTheme);
-    document.documentElement.classList.toggle('dark', savedTheme === 'dark'); // Apply dark mode on load
+    document.documentElement.classList.toggle('dark', savedTheme === 'dark');
   }, []);
 
   const toggleTheme = () => {

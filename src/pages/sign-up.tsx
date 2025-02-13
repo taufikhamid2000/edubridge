@@ -45,61 +45,65 @@ export default function SignUp() {
   };
 
   return (
-    <div>
+    <div className={styles.pageContainer}>
       <Header />
-      <section className={styles.authSection}>
-        <h1>Join EduBridge</h1>
-        <p>Welcome to the club. Let’s get you set up.</p>
-        {error && <p className={styles.error}>{error}</p>}
-        <form className={styles.authForm} onSubmit={handleSignUp}>
-          <label>Email</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
 
-          <label>Password</label>
-          <div className={styles.passwordInputContainer}>
+      <main className={styles.content}>
+        <section className={styles.authSection}>
+          <h1>Join EduBridge</h1>
+          <p>Welcome to the club. Let’s get you set up.</p>
+          {error && <p className={styles.error}>{error}</p>}
+          <form className={styles.authForm} onSubmit={handleSignUp}>
+            <label>Email</label>
             <input
-              type={showPassword ? 'text' : 'password'}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
             />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-            >
-              {showPassword ? <FaEyeSlash /> : <FaEye />}
-            </button>
-          </div>
 
-          <label>Retype Password</label>
-          <div className={styles.passwordInputContainer}>
-            <input
-              type={showPassword ? 'text' : 'password'}
-              value={retypePassword}
-              onChange={(e) => setRetypePassword(e.target.value)}
-              required
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-            >
-              {showPassword ? <FaEyeSlash /> : <FaEye />}
-            </button>
-          </div>
+            <label>Password</label>
+            <div className={styles.passwordInputContainer}>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
+            </div>
 
-          <button type="submit" disabled={loading}>
-            {loading ? 'Signing Up...' : 'Sign Up'}
-          </button>
-        </form>
-        <p className={styles.switch}>
-          Already have an account? <Link href="/sign-in">Sign In</Link>
-        </p>
-      </section>
+            <label>Retype Password</label>
+            <div className={styles.passwordInputContainer}>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={retypePassword}
+                onChange={(e) => setRetypePassword(e.target.value)}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
+            </div>
+
+            <button type="submit" disabled={loading}>
+              {loading ? 'Signing Up...' : 'Sign Up'}
+            </button>
+          </form>
+          <p className={styles.switch}>
+            Already have an account? <Link href="/sign-in">Sign In</Link>
+          </p>
+        </section>
+      </main>
+
       <Footer />
     </div>
   );

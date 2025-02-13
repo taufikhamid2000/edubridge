@@ -1,11 +1,11 @@
-/* QnA Page Styling */
+/* About, Privacy and Terms Page Styling */
 
 /* Introduction Section */
 .introSection {
   padding: 3rem 1rem;
   text-align: center;
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
+  background-color: var(--fg-color);
+  color: var(--text-secondary);
 }
 
 .introSection h1 {
@@ -19,15 +19,15 @@
   max-width: 40rem;
   margin: 0 auto;
   font-size: 1.125rem;
-  color: var(--text-primary);
+  color: var(--text-secondary);
 }
 
 /* Q&A Section */
 .qaSection {
   width: 100%;
   padding: 3rem 6rem 1rem 6rem;
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
+  background-color: var(--fg-color);
+  color: var(--text-secondary);
 }
 
 @media (max-width: 768px) {
@@ -53,15 +53,15 @@
 
 .qaSection .answer p {
   font-size: 1.125rem;
-  color: var(--text-primary);
+  color: var(--text-secondary);
 }
 
 /* Call-to-Action Section */
 .ctaSection {
   padding: 3rem 1rem;
   text-align: center;
-  background-color: var(--bg-secondary);
-  color: var(--text-primary);
+  background-color: var(--fg-color);
+  color: var(--text-secondary);
 }
 
 .ctaSection h2 {

@@ -3,7 +3,7 @@
   display: flex;
   width: 100%;
   min-height: 100vh;
-  background: var(--bg-primary);
+  background: var(--fg-color);
   color: var(--text-secondary);
 }
 

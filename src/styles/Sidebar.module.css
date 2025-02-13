@@ -9,15 +9,15 @@
   padding: 20px;
   position: fixed;
   top: 0;
-  left: -250px; /* Initially positioned off-screen */
-  transition: transform 0.3s ease-in-out; /* Transition for sliding effect */
+  left: -250px;
+  transition: transform 0.3s ease-in-out;
   z-index: 1000;
 }
 
 /* Sidebar Open */
 .sidebar.open {
-  transform: translateX(250px); /* Slide the sidebar into view */
-  left: 10; /* Optional, not necessary if transform is used */
+  transform: translateX(250px);
+  left: 10;
 }
 
 /* Sidebar Links */
@@ -115,8 +115,8 @@
   }
 
   .sidebar.open {
-    transform: translateX(0px); /* Slide in from left */
-    left: 0; /* Align with the left edge */
+    transform: translateX(0px);
+    left: 0;
   }
 }
 

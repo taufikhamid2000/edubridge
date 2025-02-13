@@ -1,5 +1,4 @@
-/* eslint-disable react/no-unescaped-entities */
-// pages/QnA.tsx
+// pages/terms.tsx
 
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';

@@ -33,13 +33,21 @@ export default function Profile() {
     <div className={styles.pageContainer}>
       <Sidebar onToggle={(open) => setIsSidebarOpen(open)} />
       <div className={styles.contentContainer}>
-        <main className={styles.mainContent}> {/* Updated to match generic styling */}
+        <main className={styles.mainContent}>
           <h1>My Profile</h1>
-          <div className={styles.userInfo}> {/* Updated class name */}
-            <p><strong>Email:</strong> {user?.email}</p>
-            <p><strong>Username:</strong> {user?.user_metadata?.username || 'Not set'}</p>
+          <div className={styles.userInfo}>
+            <p>
+              <strong>Email: </strong> {user?.email}
+            </p>
+            <p>
+              <strong>Username: </strong>{' '}
+              {user?.user_metadata?.username || 'Not set'}
+            </p>
           </div>
-          <button onClick={() => router.push('/settings')} className={styles.actionButton}> {/* Updated class */}
+          <button
+            onClick={() => router.push('/settings')}
+            className={styles.actionButton}
+          >
             Edit Profile
           </button>
         </main>

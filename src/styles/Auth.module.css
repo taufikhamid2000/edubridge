@@ -1,58 +1,68 @@
-/* Auth Page Styling */
+/* Main container for layout */
+.pageContainer {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Full viewport height */
+}
 
-/* Auth Section */
+/* Ensures content pushes footer down */
+.content {
+  flex: 1; 
+}
+
+/* Authentication section styling */
 .authSection {
-  padding: 2rem 35%; /* Adjusted padding for mobile */
+  padding: 2rem 35%;
   text-align: center;
-  background-color: #1a202c; /* bg-gray-900 */
-  color: #f7fafc; /* text-gray-100 */
+  background-color: var(--bg-color);
+  color: var(--fg-color);
 }
 
 .authSection h1 {
-  font-size: 1.75rem; /* Smaller heading for mobile */
+  font-size: 1.75rem;
   font-weight: 700;
-  color: #63b3ed; /* text-blue-400 */
+  color: var(--primary-color);
   margin-bottom: 1rem;
 }
 
 .authSection p {
   max-width: 40rem;
   margin: 0 auto;
-  font-size: 1rem; /* Smaller paragraph text for mobile */
-  color: #e2e8f0; /* text-gray-300 */
+  font-size: 1rem;
+  color: var(--fg-color);
   margin-bottom: 2rem;
 }
 
-/* Auth Form */
+/* Form styling */
 .authForm {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  max-width: 90%; /* Allow form to take 90% of the screen width */
+  max-width: 90%;
   margin: 0 auto;
 }
 
 .authForm label {
   font-size: 1rem;
-  color: #63b3ed; /* text-blue-400 */
+  color: var(--primary-color);
 }
 
 .authForm input {
   padding: 0.5rem;
-  border: 1px solid #4a5568; /* gray-600 */
+  border: 1px solid var(--secondary-color);
   border-radius: 0.375rem;
-  background-color: #1a202c; /* bg-gray-900 */
-  color: #f7fafc; /* text-gray-100 */
+  background-color: var(--bg-color);
+  color: var(--fg-color);
 }
 
 .authForm input::placeholder {
-  color: #a0aec0; /* text-gray-400 */
+  color: var(--secondary-color);
 }
 
 .authForm button {
   margin-top: 1rem;
-  background-color: #3182ce; /* bg-blue-600 */
-  color: #ffffff; /* text-white */
+  background-color: var(--button-bg);
+  color: var(--text-color);
   padding: 0.75rem 1.5rem;
   border-radius: 0.375rem;
   transition:
@@ -61,19 +71,43 @@
 }
 
 .authForm button:hover {
-  background-color: #2b6cb0; /* hover:bg-blue-700 */
+  background-color: var(--button-hover-bg);
   transform: scale(1.05);
 }
 
-/* Switch Links */
+/* Password input with toggle visibility button */
+.passwordInputContainer {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--secondary-color);
+  border-radius: 0.375rem;
+}
+
+.passwordInputContainer input {
+  flex: 1;
+  border: none;
+  padding: 0.5rem;
+  background-color: var(--bg-color);
+  color: var(--fg-color);
+}
+
+.passwordInputContainer button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  color: var(--primary-color);
+}
+
+/* Switch between sign in & sign up */
 .switch {
   margin-top: 1.5rem;
   font-size: 1rem;
-  color: #a0aec0; /* text-gray-400 */
+  color: var(--secondary-color);
 }
 
 .switch a {
-  color: #63b3ed; /* text-blue-400 */
+  color: var(--primary-color);
   text-decoration: none;
 }
 
@@ -81,30 +115,38 @@
   text-decoration: underline;
 }
 
-/* Media Queries for Mobile */
+/* Footer styles */
+.footer {
+  background: #333;
+  color: white;
+  text-align: center;
+  padding: 10px;
+  width: 100%;
+}
+
+/* Responsive design */
 @media (max-width: 768px) {
   .authSection {
-    padding: 1.5rem 5%; /* Further reduce padding for smaller screens */
+    padding: 1.5rem 5%;
   }
 
   .authSection h1 {
-    font-size: 1.5rem; /* Smaller heading for mobile */
+    font-size: 1.5rem;
   }
 
   .authSection p {
-    font-size: 0.875rem; /* Smaller paragraph text for mobile */
+    font-size: 0.875rem;
   }
 
   .authForm {
-    max-width: 100%; /* Allow form to take full width on mobile */
+    max-width: 100%;
   }
 
   .authForm input {
-    padding: 0.5rem; /* Adjust input padding for mobile */
+    padding: 0.5rem;
   }
 
   .authForm button {
-    padding: 0.5rem 1rem; /* Smaller button padding for mobile */
+    padding: 0.5rem 1rem;
   }
 }
-
