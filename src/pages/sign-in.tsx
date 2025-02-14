@@ -3,7 +3,7 @@ import { signIn } from '@/lib/auth';
 import { useRouter } from 'next/router';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import styles from '@/styles/Auth.module.css';
+import sharedStyles from '@/styles/Shared.module.css';
 import Link from 'next/link';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
@@ -26,58 +26,70 @@ export default function SignIn() {
         router.push('/dashboard');
       }
     } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('An unknown error occurred');
-      }
+      setError(
+        err instanceof Error ? err.message : 'An unknown error occurred'
+      );
     }
 
     setLoading(false);
   };
 
   return (
-    <div className={styles.pageContainer}>
+    <div>
       <Header />
-      <main className={styles.content}>
-        <section className={styles.authSection}>
-          <h1>Welcome Back</h1>
-          <p>Log in and continue where you left off.</p>
-          {error && <p className={styles.error}>{error}</p>}
-          <form className={styles.authForm} onSubmit={handleSignIn}>
-            <label>Email</label>
+
+      {/* Introduction (Reusing Shared Styles) */}
+      <section className={sharedStyles.introSection}>
+        <h1>Welcome Back</h1>
+        <p>Log in and continue where you left off.</p>
+      </section>
+
+      {/* Sign In Form (Reusing Shared Styles) */}
+      <section className={sharedStyles.contactSection}>
+        {error && <p className={sharedStyles.error}>{error}</p>}
+        <form className={sharedStyles.contactForm} onSubmit={handleSignIn}>
+          <label>Email</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+
+          <label>Password</label>
+          <div className={sharedStyles.passwordContainer}>
             <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               required
             />
-
-            <label>Password</label>
-            <div className={styles.passwordInputContainer}>
-              <input
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? <FaEyeSlash /> : <FaEye />}
-              </button>
-            </div>
-
-            <button type="submit" disabled={loading}>
-              {loading ? 'Signing In...' : 'Sign In'}
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className={sharedStyles.passwordToggle}
+            >
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
             </button>
-          </form>
-          <p className={styles.switch}>
-            Don’t have an account? <Link href="/sign-up">Sign Up</Link>
-          </p>
-        </section>
-      </main>
+          </div>
+
+          <button
+            type="submit"
+            className={sharedStyles.ctaSection}
+            disabled={loading}
+          >
+            {loading ? 'Signing In...' : 'Sign In'}
+          </button>
+        </form>
+      </section>
+
+      {/* Call-to-Action (Reusing Shared Styles) */}
+      <section className={sharedStyles.ctaSection}>
+        <p>
+          Don’t have an account? <Link href="/sign-up">Sign Up</Link>
+        </p>
+      </section>
+
       <Footer />
     </div>
   );
