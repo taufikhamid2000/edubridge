@@ -1,295 +1,214 @@
 @tailwind base;
-@tailwind components;
+@tailtail components;
 @tailwind utilities;
 
-/* Global Styles */
-/* Light Mode Variables */
+/* -------------------------------------------------- */
+/* Enhanced Premium Variables */
+/* -------------------------------------------------- */
 :root {
-  --bg-color: #ffffff;
-  --both: #ffffff;
-  --fg-color: #101524;
-  --bg-secondary: #000000;
-  --primary-color: #3182ce;
-  --secondary-color: #edf2f7;
-  --text-color: #f7fafc;
-  --button-bg: #3182ce;
-  --button-hover-bg: #2b6cb0;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --color-bg: #ffffff;
+  --color-bg-alt: #f7f7f8;
+  --color-text: #1d1d1f;
+  --color-subtext: #6b6b73;
+  --color-accent: #0071e3;
+  --color-card-bg: #ffffff;
+  --shadow: rgba(0, 0, 0, 0.1) 0px 4px 16px;
+  --shadow-hover: rgba(0, 0, 0, 0.15) 0px 8px 24px;
+  --border-radius: 1rem;
+  --max-width: 72rem;
 }
 
-/* Dark Mode Variables */
+/* -------------------------------------------------- */
+/* Dark Mode Overrides */
+/* -------------------------------------------------- */
 .dark {
-  --bg-color: #1a202c;
-  --both: #ffffff;
-  --fg-color: #f7fafc;
-  --bg-secondary: #ffffff;
-  --primary-color: #63b3ed;
-  --secondary-color: #2d3748;
-  --text-color: #1a202c;
-  --button-bg: #2b6cb0;
-  --button-hover-bg: #3182ce;
+  --color-bg: #1a1a1a;
+  --color-bg-alt: #111111;
+  --color-text: #f0f0f0;
+  --color-subtext: #aaaaaa;
+  --color-accent: #1e90ff;
+  --color-card-bg: rgba(26, 26, 26, 0.6);
+  --shadow: rgba(0, 0, 0, 0.3) 0px 4px 16px;
+  --shadow-hover: rgba(0, 0, 0, 0.5) 0px 8px 24px;
 }
 
-@keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
+/* -------------------------------------------------- */
+/* Global Styles */
+/* -------------------------------------------------- */
+html {
+  scroll-behavior: smooth;
 }
-
-@keyframes slideInFromLeft {
-  0% {
-    transform: translateX(-50%);
-    opacity: 0;
-  }
-  100% {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-@keyframes slideInFromRight {
-  0% {
-    transform: translateX(50%);
-    opacity: 0;
-  }
-  100% {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-@keyframes zoomIn {
-  0% {
-    transform: scale(0.5);
-    opacity: 0;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-@keyframes bounce {
-  0%,
-  20%,
-  50%,
-  80%,
-  100% {
-    transform: translateY(0);
-  }
-  40% {
-    transform: translateY(-10px);
-  }
-  60% {
-    transform: translateY(-5px);
-  }
-}
-
 body {
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  font-family: 'Inter', sans-serif;
-  margin: 0;
-  padding: 0;
+  @apply font-sans antialiased bg-[var(--color-bg)] text-[var(--color-text)] leading-relaxed;
 }
-
 a {
-  color: var(--primary-color);
-  text-decoration: none;
+  @apply text-[var(--color-accent)] no-underline transition-colors duration-200 ease-in-out;
+}
+a:hover {
+  @apply text-blue-600;
 }
 
-button {
-  background-color: var(--button-bg);
-  color: var(--fg-color);
-  padding: 10px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+/* -------------------------------------------------- */
+/* Container */
+/* -------------------------------------------------- */
+.container {
+  @apply mx-auto px-2 sm:px-4 max-w-[var(--max-width)];
 }
 
-button:hover {
-  background-color: var(--button-hover-bg);
+/* -------------------------------------------------- */
+/* Header & Footer */
+/* -------------------------------------------------- */
+header,
+footer {
+  @apply container flex flex-col sm:flex-row items-center justify-between py-6 sm:py-8;
+}
+footer {
+  @apply text-sm text-[var(--color-subtext)];
 }
 
-.heroSection,
-.featuresSection,
-.testimonialsSection,
-.ctaSection {
-  background-color: var(--fg-color);
-  color: var(--text-color);
-  padding: 3rem;
-  text-align: center;
-  animation: fadeIn 1.5s ease-in;
+/* -------------------------------------------------- */
+/* Header Layout Override */
+/* Applies after default CSS to ensure alignment */
+header {
+  /* Remove any container/flex from header itself */
+  position: sticky;
+  top: 0;
+  background-color: var(--color-bg);
+  backdrop-filter: blur(8px);
+  z-index: 50;
+  display: block;
 }
-
-.heroSection h1 {
-  font-size: 2.5rem;
-  color: var(--primary-color);
-  font-weight: bold;
-  animation: slideInFromLeft 1.5s ease-out;
-}
-
-.heroSection p {
-  max-width: 32rem;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 1rem;
-  font-size: 1.125rem;
-  color: var(--text-color);
-  animation: slideInFromRight 1.5s ease-out;
-}
-
-.heroSection button {
-  margin-top: 1rem;
-  color: #ffffff;
-}
-
-.featuresSection h2,
-.testimonialsSection h2,
-.ctaSection h2 {
-  margin-bottom: 1rem;
-  font-size: 2rem;
-  font-weight: bold;
-  color: var(--primary-color);
-}
-
-.features {
+header > .container {
+  /* Ensure only inner container is flex layout */
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 1rem;
-}
-
-.feature {
-  background-color: var(--primary-color);
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  transition:
-    transform 0.3s ease,
-    background-color 0.3s ease;
-}
-
-.feature:hover {
-  background-color: var(--primary-color);
-  transform: scale(1.05) translateY(-5px);
-}
-
-.testimonialsSection p {
-  font-style: italic;
-  animation: slideInFromRight 1.5s ease-out;
-}
-
-.ctaSection p {
-  font-size: 1.25rem;
-  animation: slideInFromRight 1.5s ease-out;
-}
-
-.ctaSection button {
-  margin-top: 1rem;
-  color: white;
-}
-
-/* Header Styling */
-.header {
-  display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: center;
   padding: 1rem 1.5rem;
-  background-color: var(--bg-secondary);
-  color: var(--text-secondary);
-  border-bottom: 1px solid var(--border-color);
 }
 
-/* Logo */
-.logo {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: var(--text-accent);
-  text-decoration: none;
+/* -------------------------------------------------- */
+/* Sections */
+/* -------------------------------------------------- */
+section {
+  @apply container py-16 sm:py-24;
+  text-align: left;
+}
+section:nth-of-type(even) {
+  @apply bg-[var(--color-bg-alt)];
 }
 
-/* Navigation */
-nav {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+/* -------------------------------------------------- */
+/* Hero Section */
+/* -------------------------------------------------- */
+.heroSection {
+  @apply py-24 sm:py-32 text-center;
+  background: linear-gradient(135deg, var(--color-bg-alt), var(--color-bg));
+}
+.heroSection h1 {
+  @apply text-[clamp(2.5rem,5vw,3.5rem)] font-semibold mb-4 tracking-tight relative;
+}
+.heroSection h1::after {
+  content: '';
+  @apply block w-24 h-1 bg-[var(--color-accent)] mx-auto mt-2 rounded;
+}
+.heroSection p {
+  @apply mb-6 text-base sm:text-xl max-w-2xl mx-auto text-[var(--color-subtext)];
 }
 
-/* Buttons */
+/* -------------------------------------------------- */
+/* Headings with Accent Underline */
+/* -------------------------------------------------- */
+h1,
+h2 {
+  @apply relative;
+}
+h1 {
+  @apply text-[clamp(2rem,5vw,3.5rem)] font-semibold mb-6 tracking-tight;
+}
+h1::after {
+  content: '';
+  @apply block w-20 sm:w-24 h-1 bg-[var(--color-accent)] mx-0 mt-2 rounded;
+}
+h2 {
+  @apply text-[clamp(1.75rem,4vw,2.5rem)] font-semibold mb-4;
+}
+h2::after {
+  content: '';
+  @apply block w-16 sm:w-20 h-1 bg-[var(--color-accent)] mx-0 mt-1 rounded;
+}
+h3 {
+  @apply text-xl sm:text-2xl font-semibold mb-3;
+}
+p {
+  @apply mb-6 text-base sm:text-lg text-[var(--color-subtext)];
+}
+
+/* -------------------------------------------------- */
+/* Features Grid */
+/* -------------------------------------------------- */
+.features {
+  @apply grid gap-8 sm:gap-12 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3;
+}
+.feature {
+  @apply bg-[var(--color-card-bg)] rounded-[var(--border-radius)] p-6 sm:p-8 shadow transition-shadow duration-300 ease-in-out text-left;
+  box-shadow: var(--shadow);
+}
+.feature:hover {
+  @apply shadow-lg;
+  transform: translateY(-2px);
+}
+
+/* -------------------------------------------------- */
+/* Lists */
+/* -------------------------------------------------- */
+ul {
+  @apply list-none p-0 m-0;
+}
+ul li {
+  @apply relative pl-5 mb-4 text-base sm:text-lg;
+}
+ul li::before {
+  content: '';
+  @apply absolute left-0 top-2 w-3 h-3 bg-[var(--color-accent)] rounded-full;
+}
+
+/* -------------------------------------------------- */
+/* Buttons with Subtle Gradient & Focus Ring */
+/* -------------------------------------------------- */
 .btn {
-  background-color: var(--button-bg);
-  color: var(--both);
-  cursor: pointer;
-  padding: 0.5rem 1rem;
-  font-size: 1rem;
-  border-radius: 0.375rem;
-  transition:
-    transform 0.3s,
-    background-color 0.3s;
+  @apply inline-block font-medium uppercase tracking-wide rounded-full shadow-md transition-all duration-300 ease-in-out px-6 py-2 sm:px-8 sm:py-3;
+  background: linear-gradient(135deg, var(--color-text), #333333);
+  color: var(--color-bg);
 }
-
 .btn:hover {
-  background-color: var(--button-hover-bg);
-  transform: scale(1.05);
+  @apply shadow-lg;
+  transform: translateY(-1px) scale(1.01);
+}
+.btn:focus {
+  @apply outline-none ring-4 ring-[var(--color-accent)];
 }
 
-.btn.join {
-  background-color: var(--bg-accent);
-  color: var(--text-primary);
+/* -------------------------------------------------- */
+/* Tables (Risks) */
+/* -------------------------------------------------- */
+.risksSection {
+  @apply overflow-x-auto;
+}
+.risksSection table {
+  @apply w-full table-auto mt-8 border-collapse;
+}
+.risksSection th,
+.risksSection td {
+  @apply px-4 sm:px-6 py-3 border-b border-gray-200;
+}
+.risksSection th {
+  @apply bg-[var(--color-bg-alt)] font-medium;
 }
 
-/* Responsive Styling */
-@media (max-width: 768px) {
-  .btn {
-    padding: 0.4rem 0.8rem;
-    font-size: 0.875rem;
-  }
-
-  .logo {
-    font-size: 1.25rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .btn {
-    padding: 0.3rem 0.6rem;
-    font-size: 0.75rem;
-  }
-
-  .logo {
-    font-size: 1rem;
-  }
-
-  nav {
-    gap: 0.5rem;
-  }
-}
-
-.footer {
-  background-color: var(--bg-secondary);
-  color: var(--text-secondary);
-  padding: 3rem;
-  text-align: center;
-}
-
-.footer p {
-  font-size: 1rem;
-}
-
-.footer a {
-  color: var(--primary-color);
-  text-decoration: none;
-  padding: 0 0.5rem;
-}
-
-.footer a:hover {
-  text-decoration: underline;
-}
-
-.footer nav {
-  justify-content: center;
-  margin-top: 1rem;
+/* -------------------------------------------------- */
+/* Footer Additional */
+/* -------------------------------------------------- */
+footer {
+  @apply text-center py-6 sm:py-8;
 }
