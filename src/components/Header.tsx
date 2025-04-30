@@ -1,41 +1,44 @@
 // src/components/Header.tsx
-import Link from 'next/link'
-import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
-import { signOut } from '@/lib/auth'
-import type { User } from '@supabase/supabase-js'
-import { JSX } from 'react/jsx-dev-runtime'
+import Link from 'next/link';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
+import { signOut } from '@/lib/auth';
+import type { User } from '@supabase/supabase-js';
+import { JSX } from 'react/jsx-dev-runtime';
 
 export default function Header(): JSX.Element {
-  const [user, setUser] = useState<User | null>(null)
-  const [theme, setTheme] = useState<'light' | 'dark'>('dark')
+  const [user, setUser] = useState<User | null>(null);
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
 
   useEffect(() => {
     async function init() {
       const {
         data: { session },
-      } = await supabase.auth.getSession()
-      setUser(session?.user ?? null)
+      } = await supabase.auth.getSession();
+      setUser(session?.user ?? null);
 
-      const saved = localStorage.getItem('theme') as 'light' | 'dark' | null
-      const initial = saved ?? 'dark'
-      setTheme(initial)
-      document.documentElement.classList.toggle('dark', initial === 'dark')
+      const saved = localStorage.getItem('theme') as 'light' | 'dark' | null;
+      const initial = saved ?? 'dark';
+      setTheme(initial);
+      document.documentElement.classList.toggle('dark', initial === 'dark');
     }
-    init()
-  }, [])
+    init();
+  }, []);
 
   const toggleTheme = () => {
-    const next = theme === 'dark' ? 'light' : 'dark'
-    setTheme(next)
-    localStorage.setItem('theme', next)
-    document.documentElement.classList.toggle('dark', next === 'dark')
-  }
+    const next = theme === 'dark' ? 'light' : 'dark';
+    setTheme(next);
+    localStorage.setItem('theme', next);
+    document.documentElement.classList.toggle('dark', next === 'dark');
+  };
 
   return (
     <header className="sticky top-0 bg-[var(--color-bg)] bg-opacity-70 backdrop-blur-sm z-50">
       <div className="container mx-auto flex items-center py-4 px-4">
-        <Link href="/" className="text-5xl md:text-6xl font-extrabold">
+        <Link
+          href="/"
+          className="text-8xl md:text-6xl font-extrabold"
+        >
           EduBridge
         </Link>
 
@@ -49,8 +52,8 @@ export default function Header(): JSX.Element {
                 type="button"
                 className="btn"
                 onClick={() => {
-                  signOut()
-                  setUser(null)
+                  signOut();
+                  setUser(null);
                 }}
               >
                 Sign Out
@@ -73,5 +76,5 @@ export default function Header(): JSX.Element {
         </nav>
       </div>
     </header>
-  )
+  );
 }

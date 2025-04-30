@@ -96,142 +96,91 @@ export default function Dashboard() {
       <Header />
 
       <main className="container py-8">
-        <div className="flex flex-col gap-8">
-          {/* Welcome & Progress Section */}
-          <section className="bg-[var(--color-card-bg)] rounded-[var(--border-radius)] p-8 shadow">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div className="flex flex-col gap-12">
+          {/* Welcome Section */}
+          <section className="bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg p-8 shadow-lg">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-6">
               <div>
-                <h1 className="text-2xl font-semibold mb-2">
-                  Welcome back, {user?.email}
-                </h1>
-                <p className="text-[var(--color-subtext)]">
-                  Choose a subject to start learning
-                </p>
+                <h1 className="text-3xl font-bold mb-2">Welcome back, {user?.email}</h1>
+                <p className="text-lg">Ready to continue your learning journey?</p>
               </div>
-              <div className="flex gap-6">
+              <div className="flex gap-8">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-[var(--color-accent)]">
-                    {user?.streak}
-                  </div>
-                  <div className="text-sm text-[var(--color-subtext)]">
-                    Day Streak
-                  </div>
+                  <div className="text-4xl font-bold">{user?.streak}</div>
+                  <div className="text-sm">Day Streak</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-[var(--color-accent)]">
-                    {user?.level}
-                  </div>
-                  <div className="text-sm text-[var(--color-subtext)]">
-                    Level
-                  </div>
+                  <div className="text-4xl font-bold">{user?.level}</div>
+                  <div className="text-sm">Level</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-[var(--color-accent)]">
-                    {user?.xp}
-                  </div>
-                  <div className="text-sm text-[var(--color-subtext)]">
-                    Total XP
-                  </div>
+                  <div className="text-4xl font-bold">{user?.xp}</div>
+                  <div className="text-sm">Total XP</div>
                 </div>
               </div>
             </div>
           </section>
 
           {/* Subjects Section */}
-          <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {error ? (
-              <div className="col-span-2 text-red-500 bg-red-100 p-4 rounded">
-                Error loading subjects: {error}
-              </div>
-            ) : subjects.length === 0 ? (
-              <div className="col-span-2 text-center p-4">
-                <p className="text-[var(--color-subtext)]">
-                  No subjects available yet.
-                </p>
-                <p className="text-sm mt-2">
-                  Please check back later or contact support if this persists.
-                </p>
-              </div>
-            ) : (
-              subjects.map((subject) => (
-                <div
-                  key={subject.id}
-                  className="bg-[var(--color-card-bg)] rounded-[var(--border-radius)] p-8 shadow cursor-pointer hover:shadow-lg transition-shadow"
-                  onClick={() => handleSubjectClick(subject.slug)}
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="text-4xl">{subject.icon}</div>
-                    <div>
-                      <h2 className="text-xl font-semibold mb-2">
-                        {subject.name}
-                      </h2>
-                      <p className="text-[var(--color-subtext)]">
-                        {subject.description}
-                      </p>
+          <section>
+            <h2 className="text-2xl font-semibold mb-6">Subjects</h2>
+            <div className="flex overflow-x-auto gap-6 scrollbar-hide">
+              {error ? (
+                <div className="text-red-500 bg-red-100 p-4 rounded">
+                  Error loading subjects: {error}
+                </div>
+              ) : subjects.length === 0 ? (
+                <div className="text-center p-4">
+                  <p>No subjects available yet. Please check back later.</p>
+                </div>
+              ) : (
+                subjects.map((subject) => (
+                  <div
+                    key={subject.id}
+                    className="bg-white rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow cursor-pointer min-w-[250px]"
+                    onClick={() => handleSubjectClick(subject.slug)}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="text-4xl">{subject.icon}</div>
+                      <div>
+                        <h3 className="text-xl font-semibold text-blue-500">{subject.name}</h3>
+                        <p className="text-sm text-gray-600">{subject.description}</p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))
-            )}
+                ))
+              )}
+            </div>
           </section>
 
-          {/* Weekly Progress */}
-          <section className="bg-[var(--color-card-bg)] rounded-[var(--border-radius)] p-8 shadow">
-            <h2 className="text-xl font-semibold mb-6">Weekly Progress</h2>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-[var(--color-bg-alt)] rounded-lg">
-                <div>
-                  <p className="font-medium">Quizzes This Week</p>
-                  <p className="text-[var(--color-subtext)] text-sm">
-                    8/10 completed
-                  </p>
+          {/* Weekly Progress Section */}
+          <section className="bg-gray-100 rounded-lg p-8 shadow-md">
+            <h2 className="text-2xl font-semibold mb-6">Weekly Progress</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="bg-white p-4 rounded-lg shadow">
+                <p className="font-medium">Quizzes This Week</p>
+                <p className="text-sm text-gray-600">8/10 completed</p>
+                <div className="mt-2 h-2 bg-gray-200 rounded-full">
+                  <div className="h-2 bg-blue-500 rounded-full" style={{ width: '80%' }}></div>
                 </div>
-                <span className="text-[var(--color-subtext)]">80%</span>
               </div>
-              <div className="flex items-center justify-between p-4 bg-[var(--color-bg-alt)] rounded-lg">
-                <div>
-                  <p className="font-medium">Average Score</p>
-                  <p className="text-[var(--color-subtext)] text-sm">7.5/10</p>
-                </div>
-                <span className="text-[var(--color-subtext)]">
-                  +0.5 from last week
-                </span>
+              <div className="bg-white p-4 rounded-lg shadow">
+                <p className="font-medium">Average Score</p>
+                <p className="text-sm text-gray-600">7.5/10</p>
+                <span className="text-sm text-green-500">+0.5 from last week</span>
               </div>
             </div>
           </section>
 
-          {/* Recent Achievements */}
-          <section className="bg-[var(--color-card-bg)] rounded-[var(--border-radius)] p-8 shadow">
-            <h2 className="text-xl font-semibold mb-6">Recent Achievements</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {[
-                {
-                  title: '5-Day Streak',
-                  description: 'Maintained streak for 5 days',
-                  date: 'Today',
-                },
-                {
-                  title: 'Quick Learner',
-                  description: 'Completed 10 quizzes in one day',
-                  date: 'Yesterday',
-                },
-                {
-                  title: 'Subject Master',
-                  description: 'Scored 90% in Bahasa Melayu',
-                  date: '2 days ago',
-                },
-              ].map((achievement, index) => (
-                <div
-                  key={index}
-                  className="flex flex-col p-4 bg-[var(--color-bg-alt)] rounded-lg"
-                >
-                  <p className="font-medium">{achievement.title}</p>
-                  <p className="text-[var(--color-subtext)] text-sm">
-                    {achievement.description}
-                  </p>
-                  <span className="text-[var(--color-subtext)] text-sm mt-2">
-                    {achievement.date}
-                  </span>
+          {/* Recent Achievements Section */}
+          <section className="bg-gray-100 rounded-lg p-8 shadow-md">
+            <h2 className="text-2xl font-semibold mb-6">Recent Achievements</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {[...Array(3)].map((_, index) => (
+                <div key={index} className="bg-white p-4 rounded-lg shadow">
+                  <p className="font-medium">Achievement {index + 1}</p>
+                  <p className="text-sm text-gray-600">Description of achievement</p>
+                  <span className="text-sm text-gray-500">Date</span>
                 </div>
               ))}
             </div>

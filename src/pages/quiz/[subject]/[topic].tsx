@@ -37,31 +37,43 @@ export default function TopicQuiz() {
   const [topicData, setTopicData] = useState<Topic | null>(null);
   const [chapterData, setChapterData] = useState<Chapter | null>(null);
 
+  // Updated useEffect to wait for router.query to be populated
   useEffect(() => {
-    const fetchData = async () => {
-      if (!subject || !topic) return;
+    if (!router.isReady || !subject || !topic) {
+      console.warn('Router query not ready or missing subject/topic');
+      return;
+    }
 
+    const fetchData = async () => {
       try {
-        // Fetch subject data
+        console.log('Fetching subject data for:', subject);
         const { data: subjectData, error: subjectError } = await supabase
           .from('subjects')
           .select('*')
           .eq('slug', subject)
           .single();
 
-        if (subjectError) throw subjectError;
+        if (subjectError) {
+          console.error('Error fetching subject data:', subjectError);
+          throw subjectError;
+        }
         setSubjectData(subjectData);
 
-        // Fetch topic data
+        console.log('Fetching topic data for:', topic);
         const { data: topicData, error: topicError } = await supabase
           .from('topics')
           .select('*, chapters(*)')
           .eq('id', topic)
           .single();
 
-        if (topicError) throw topicError;
+        if (topicError) {
+          console.error('Error fetching topic data:', topicError);
+          throw topicError;
+        }
         setTopicData(topicData);
         setChapterData(topicData.chapters);
+
+        console.log('Fetched data:', { subjectData, topicData, chapterData: topicData.chapters });
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
@@ -70,7 +82,7 @@ export default function TopicQuiz() {
     };
 
     fetchData();
-  }, [subject, topic]);
+  }, [router.isReady, subject, topic]);
 
   if (loading) {
     return (
@@ -127,6 +139,50 @@ export default function TopicQuiz() {
                 </div>
               )}
             </div>
+          </div>
+
+          {/* Added a table between the "Time" and the buttons */}
+          <div className="mt-6">
+            <table className="table-auto w-full border-collapse border border-gray-300">
+              <thead>
+                <tr className="bg-gray-100">
+                  <th className="border border-gray-300 px-4 py-2 text-left">Name</th>
+                  <th className="border border-gray-300 px-4 py-2 text-left">Created by</th>
+                  <th className="border border-gray-300 px-4 py-2 text-left">Created at</th>
+                  <th className="border border-gray-300 px-4 py-2 text-left">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className="border border-gray-300 px-4 py-2">Quiz 1</td>
+                  <td className="border border-gray-300 px-4 py-2">John Doe</td>
+                  <td className="border border-gray-300 px-4 py-2">April 28, 2025</td>
+                  <td className="border border-gray-300 px-4 py-2 text-yellow-500">Unverified</td>
+                </tr>
+                <tr>
+                  <td className="border border-gray-300 px-4 py-2">Quiz 2</td>
+                  <td className="border border-gray-300 px-4 py-2">Jane Smith</td>
+                  <td className="border border-gray-300 px-4 py-2">April 29, 2025</td>
+                  <td className="border border-gray-300 px-4 py-2 text-green-500">Verified</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          {/* Added a "Generate using AI" button next to the "Create a Quiz" button */}
+          <div className="flex justify-end mb-4 gap-6">
+            <button
+              className="create-quiz-btn"
+              onClick={() => router.push(`/quiz/${subject}/${topic}/create`)}
+            >
+              Create a Quiz
+            </button>
+            <button
+              className="create-quiz-btn"
+              onClick={() => router.push(`/quiz/${subject}/${topic}/generate`)}
+            >
+              Generate using AI
+            </button>
           </div>
 
           {/* Quiz content will go here */}

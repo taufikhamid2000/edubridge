@@ -213,3 +213,69 @@ footer {
   background: linear-gradient(90deg, var(--color-bg-alt), #e3f0ff 80%);
   border-left: 4px solid var(--color-accent);
 }
+
+/* Added styles for redesigned dashboard */
+
+/* Welcome Section */
+.bg-gradient-to-r {
+  background: linear-gradient(to right, var(--color-accent), #6a5acd);
+}
+
+/* Subject Cards */
+.subject-card {
+  transition:
+    transform 0.2s ease-in-out,
+    box-shadow 0.2s ease-in-out;
+}
+.subject-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-hover);
+}
+
+/* Progress Bars */
+.progress-bar {
+  height: 0.5rem;
+  background-color: var(--color-bg-alt);
+  border-radius: 0.25rem;
+  overflow: hidden;
+}
+.progress-bar-fill {
+  height: 100%;
+  background-color: var(--color-accent);
+}
+
+/* Achievements */
+.achievement-card {
+  transition:
+    transform 0.2s ease-in-out,
+    box-shadow 0.2s ease-in-out;
+}
+.achievement-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-hover);
+}
+
+/* Added styles for horizontally scrollable subject cards */
+
+/* Horizontal Scroll Container */
+.overflow-x-auto {
+  display: flex;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+  gap: 1.5rem;
+}
+
+/* Subject Card */
+.subject-card {
+  flex: 0 0 auto;
+  min-width: 250px;
+  scroll-snap-align: start;
+  transition:
+    transform 0.2s ease-in-out,
+    box-shadow 0.2s ease-in-out;
+}
+.subject-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-hover);
+}
