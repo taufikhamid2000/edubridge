@@ -101,8 +101,12 @@ export default function Dashboard() {
           <section className="bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg p-8 shadow-lg">
             <div className="flex flex-col md:flex-row justify-between items-center gap-6">
               <div>
-                <h1 className="text-3xl font-bold mb-2">Welcome back, {user?.email}</h1>
-                <p className="text-lg">Ready to continue your learning journey?</p>
+                <h1 className="text-3xl font-bold mb-2">
+                  Welcome back, {user?.email}
+                </h1>
+                <p className="text-lg">
+                  Ready to continue your learning journey?
+                </p>
               </div>
               <div className="flex gap-8">
                 <div className="text-center">
@@ -143,8 +147,12 @@ export default function Dashboard() {
                     <div className="flex items-center gap-4">
                       <div className="text-4xl">{subject.icon}</div>
                       <div>
-                        <h3 className="text-xl font-semibold text-blue-500">{subject.name}</h3>
-                        <p className="text-sm text-gray-600">{subject.description}</p>
+                        <h3 className="text-xl font-semibold text-blue-500">
+                          {subject.name}
+                        </h3>
+                        <p className="text-sm text-gray-600">
+                          {subject.description}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -161,13 +169,18 @@ export default function Dashboard() {
                 <p className="font-medium">Quizzes This Week</p>
                 <p className="text-sm text-gray-600">8/10 completed</p>
                 <div className="mt-2 h-2 bg-gray-200 rounded-full">
-                  <div className="h-2 bg-blue-500 rounded-full" style={{ width: '80%' }}></div>
+                  <div
+                    className="h-2 bg-blue-500 rounded-full"
+                    style={{ width: '80%' }}
+                  ></div>
                 </div>
               </div>
               <div className="bg-white p-4 rounded-lg shadow">
                 <p className="font-medium">Average Score</p>
                 <p className="text-sm text-gray-600">7.5/10</p>
-                <span className="text-sm text-green-500">+0.5 from last week</span>
+                <span className="text-sm text-green-500">
+                  +0.5 from last week
+                </span>
               </div>
             </div>
           </section>
@@ -179,7 +192,9 @@ export default function Dashboard() {
               {[...Array(3)].map((_, index) => (
                 <div key={index} className="bg-white p-4 rounded-lg shadow">
                   <p className="font-medium">Achievement {index + 1}</p>
-                  <p className="text-sm text-gray-600">Description of achievement</p>
+                  <p className="text-sm text-gray-600">
+                    Description of achievement
+                  </p>
                   <span className="text-sm text-gray-500">Date</span>
                 </div>
               ))}

@@ -73,7 +73,11 @@ export default function TopicQuiz() {
         setTopicData(topicData);
         setChapterData(topicData.chapters);
 
-        console.log('Fetched data:', { subjectData, topicData, chapterData: topicData.chapters });
+        console.log('Fetched data:', {
+          subjectData,
+          topicData,
+          chapterData: topicData.chapters,
+        });
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
@@ -146,24 +150,42 @@ export default function TopicQuiz() {
             <table className="table-auto w-full border-collapse border border-gray-300">
               <thead>
                 <tr className="bg-gray-100">
-                  <th className="border border-gray-300 px-4 py-2 text-left">Name</th>
-                  <th className="border border-gray-300 px-4 py-2 text-left">Created by</th>
-                  <th className="border border-gray-300 px-4 py-2 text-left">Created at</th>
-                  <th className="border border-gray-300 px-4 py-2 text-left">Status</th>
+                  <th className="border border-gray-300 px-4 py-2 text-left">
+                    Name
+                  </th>
+                  <th className="border border-gray-300 px-4 py-2 text-left">
+                    Created by
+                  </th>
+                  <th className="border border-gray-300 px-4 py-2 text-left">
+                    Created at
+                  </th>
+                  <th className="border border-gray-300 px-4 py-2 text-left">
+                    Status
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
                   <td className="border border-gray-300 px-4 py-2">Quiz 1</td>
                   <td className="border border-gray-300 px-4 py-2">John Doe</td>
-                  <td className="border border-gray-300 px-4 py-2">April 28, 2025</td>
-                  <td className="border border-gray-300 px-4 py-2 text-yellow-500">Unverified</td>
+                  <td className="border border-gray-300 px-4 py-2">
+                    April 28, 2025
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2 text-yellow-500">
+                    Unverified
+                  </td>
                 </tr>
                 <tr>
                   <td className="border border-gray-300 px-4 py-2">Quiz 2</td>
-                  <td className="border border-gray-300 px-4 py-2">Jane Smith</td>
-                  <td className="border border-gray-300 px-4 py-2">April 29, 2025</td>
-                  <td className="border border-gray-300 px-4 py-2 text-green-500">Verified</td>
+                  <td className="border border-gray-300 px-4 py-2">
+                    Jane Smith
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2">
+                    April 29, 2025
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2 text-green-500">
+                    Verified
+                  </td>
                 </tr>
               </tbody>
             </table>
