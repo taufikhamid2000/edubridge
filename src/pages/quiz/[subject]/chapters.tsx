@@ -131,15 +131,10 @@ export default function Chapters() {
                 </h3>
                 <div className="space-y-0.5">
                   {chapter.topics.map((topic) => (
-                    <Link
-                      key={topic.id}
-                      href={`/quiz/${subject}/${topic.id}`}                      
-                    >
+                    <Link key={topic.id} href={`/quiz/${subject}/${topic.id}`}>
                       <div>
-                        <span>
-                          {topic.title}
-                        </span>                        
-                      </div>                      
+                        <span>{topic.title}</span>
+                      </div>
                     </Link>
                   ))}
                 </div>
@@ -160,7 +155,7 @@ export default function Chapters() {
                     <Link
                       key={topic.id}
                       href={`/quiz/${subject}/${topic.id}`}
-                      className="flex items-center justify-between py-1.5 px-2 hover:bg-[var(--color-card-bg)] rounded-[var(--border-radius)] transition-colors"
+                      className="flex items-center justify-between py-1.5 px-2 table-row-hover rounded-transition"
                     >
                       <div>
                         <span className="text-sm text-[var(--color-text)]">

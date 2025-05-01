@@ -284,3 +284,123 @@ footer {
 .text-dashboard-blue {
   color: #3b82f6; /* Tailwind's blue-500 */
 }
+
+/* Add table border styles globally */
+.table-auto th,
+.table-auto td {
+  border: 1px solid #d1d5db; /* Tailwind's gray-300 */
+}
+
+/* Add table cell padding globally */
+.table-auto th,
+.table-auto td {
+  padding: 0.5rem 1rem; /* Tailwind's px-4 py-2 equivalent */
+}
+
+.table-auto {
+  border-collapse: collapse;
+}
+
+/* Add button styles globally */
+.create-quiz-btn {
+  background-color: #3b82f6; /* Tailwind's blue-500 */
+  color: white;
+  padding: 0.5rem 1rem; /* Tailwind's px-4 py-2 equivalent */
+  border-radius: 0.375rem; /* Tailwind's rounded-md */
+  transition: background-color 0.2s ease-in-out;
+}
+
+.create-quiz-btn:hover {
+  background-color: #2563eb; /* Tailwind's blue-600 */
+}
+
+/* Global styles for dashboard */
+.dashboard-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  color: var(--color-subtext);
+}
+
+.dashboard-section {
+  padding: 2rem;
+  border-radius: 0.5rem;
+  box-shadow: var(--shadow);
+}
+
+.dashboard-section.welcome {
+  background: linear-gradient(to right, #3b82f6, #6a5acd);
+  color: white;
+}
+
+.dashboard-section.progress {
+  background-color: #f3f4f6; /* Tailwind's gray-100 */
+}
+
+.dashboard-section.achievements {
+  background-color: #f3f4f6; /* Tailwind's gray-100 */
+}
+
+.subject-card {
+  background-color: white;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+  transition: box-shadow 0.3s;
+  cursor: pointer;
+  min-width: 250px;
+}
+
+.subject-card:hover {
+  box-shadow: var(--shadow-hover);
+}
+
+.subject-card .icon {
+  font-size: 2rem;
+}
+
+.subject-card .title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.subject-card .description {
+  font-size: 0.875rem;
+  color: #6b7280; /* Tailwind's gray-600 */
+}
+
+/* Add a global class for unverified text */
+.text-unverified {
+  color: #f59e0b; /* Tailwind's yellow-500 */
+}
+
+/* Add a global class for verified text */
+.text-verified {
+  color: #10b981; /* Tailwind's green-500 */
+}
+
+/* Add a global class for table row hover effect */
+.table-row-hover {
+  transition: background-color 0.2s ease-in-out;
+}
+
+.table-row-hover:hover {
+  background-color: var(--color-card-bg);
+}
+
+/* Add a global class for rounded corners and transition */
+.rounded-transition {
+  border-radius: var(--border-radius);
+  transition: background-color 0.2s ease-in-out;
+}
+
+/* Add a global class for flex container with justify-end and gap */
+.flex-justify-end-gap {
+  display: flex;
+  /* justify-content: flex-end; */
+  margin-top: 1rem;
+  margin-bottom: 1rem; /* Tailwind's mb-4 */
+  gap: 1.5rem; /* Tailwind's gap-6 */
+}

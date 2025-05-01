@@ -79,11 +79,7 @@ export default function Dashboard() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-[var(--color-subtext)]">Loading...</div>
-      </div>
-    );
+    return <div className="dashboard-loading">Loading...</div>;
   }
 
   return (
@@ -98,30 +94,10 @@ export default function Dashboard() {
       <main className="container py-8">
         <div className="flex flex-col gap-12">
           {/* Welcome Section */}
-          <section className="bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg p-8 shadow-lg">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-              <div>
-                <h1 className="text-3xl font-bold mb-2">
-                  Welcome back, {user?.email}
-                </h1>
-                <p className="text-lg">
-                  Ready to continue your learning journey?
-                </p>
-              </div>
-              <div className="flex gap-8">
-                <div className="text-center">
-                  <div className="text-4xl font-bold">{user?.streak}</div>
-                  <div className="text-sm">Day Streak</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-4xl font-bold">{user?.level}</div>
-                  <div className="text-sm">Level</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-4xl font-bold">{user?.xp}</div>
-                  <div className="text-sm">Total XP</div>
-                </div>
-              </div>
+          <section className="dashboard-section welcome">
+            <div>
+              <h1>Welcome back, {user?.email}</h1>
+              <p>Ready to continue your learning journey?</p>
             </div>
           </section>
 
@@ -147,7 +123,9 @@ export default function Dashboard() {
                     <div className="flex items-center gap-4">
                       <div className="text-4xl">{subject.icon}</div>
                       <div>
-                        <h3 className="text-xl font-semibold text-dashboard-blue">{subject.name}</h3>
+                        <h3 className="text-xl font-semibold text-dashboard-blue">
+                          {subject.name}
+                        </h3>
                         <p className="text-sm text-gray-600">
                           {subject.description}
                         </p>
@@ -160,43 +138,18 @@ export default function Dashboard() {
           </section>
 
           {/* Weekly Progress Section */}
-          <section className="bg-gray-100 rounded-lg p-8 shadow-md">
-            <h2 className="text-2xl font-semibold mb-6">Weekly Progress</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="bg-white p-4 rounded-lg shadow">
-                <p className="font-medium">Quizzes This Week</p>
-                <p className="text-sm text-gray-600">8/10 completed</p>
-                <div className="mt-2 h-2 bg-gray-200 rounded-full">
-                  <div
-                    className="h-2 bg-blue-500 rounded-full"
-                    style={{ width: '80%' }}
-                  ></div>
-                </div>
-              </div>
-              <div className="bg-white p-4 rounded-lg shadow">
-                <p className="font-medium">Average Score</p>
-                <p className="text-sm text-gray-600">7.5/10</p>
-                <span className="text-sm text-green-500">
-                  +0.5 from last week
-                </span>
-              </div>
+          <section className="dashboard-section progress">
+            <h2>Weekly Progress</h2>
+            <div>
+              <div>Quizzes This Week</div>
+              <div>Average Score</div>
             </div>
           </section>
 
           {/* Recent Achievements Section */}
-          <section className="bg-gray-100 rounded-lg p-8 shadow-md">
-            <h2 className="text-2xl font-semibold mb-6">Recent Achievements</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {[...Array(3)].map((_, index) => (
-                <div key={index} className="bg-white p-4 rounded-lg shadow">
-                  <p className="font-medium">Achievement {index + 1}</p>
-                  <p className="text-sm text-gray-600">
-                    Description of achievement
-                  </p>
-                  <span className="text-sm text-gray-500">Date</span>
-                </div>
-              ))}
-            </div>
+          <section className="dashboard-section achievements">
+            <h2>Recent Achievements</h2>
+            <div>Achievement Cards</div>
           </section>
         </div>
       </main>
