@@ -108,7 +108,7 @@ export default function TopicQuiz() {
     <>
       <Head>
         <title>
-          {topicData.title} · {subjectData.name} · EduBridge
+          {topicData.title} · Topic
         </title>
       </Head>
       <Header />

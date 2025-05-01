@@ -114,7 +114,7 @@ export default function Chapters() {
   return (
     <>
       <Head>
-        <title>{subjectData.name} · EduBridge</title>
+        <title>{subjectData.name} · Chapter</title>
       </Head>
       <Header />
       <main className="container py-8">
@@ -133,31 +133,13 @@ export default function Chapters() {
                   {chapter.topics.map((topic) => (
                     <Link
                       key={topic.id}
-                      href={`/quiz/${subject}/${topic.id}`}
-                      className="flex items-center justify-between py-1.5 px-2 hover:bg-[var(--color-card-bg)] rounded-[var(--border-radius)] transition-colors"
+                      href={`/quiz/${subject}/${topic.id}`}                      
                     >
                       <div>
-                        <span className="text-sm text-[var(--color-text)]">
+                        <span>
                           {topic.title}
-                        </span>
-                        {topic.description && (
-                          <span className="text-xs text-[var(--color-subtext)] ml-2">
-                            ({topic.description})
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2 text-xs">
-                        {topic.difficulty_level && (
-                          <span className="text-[var(--color-subtext)]">
-                            {Array(topic.difficulty_level).fill('⭐').join('')}
-                          </span>
-                        )}
-                        {topic.time_estimate_minutes && (
-                          <span className="text-[var(--color-subtext)]">
-                            {topic.time_estimate_minutes} min
-                          </span>
-                        )}
-                      </div>
+                        </span>                        
+                      </div>                      
                     </Link>
                   ))}
                 </div>

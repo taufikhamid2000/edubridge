@@ -147,9 +147,7 @@ export default function Dashboard() {
                     <div className="flex items-center gap-4">
                       <div className="text-4xl">{subject.icon}</div>
                       <div>
-                        <h3 className="text-xl font-semibold text-blue-500">
-                          {subject.name}
-                        </h3>
+                        <h3 className="text-xl font-semibold text-dashboard-blue">{subject.name}</h3>
                         <p className="text-sm text-gray-600">
                           {subject.description}
                         </p>

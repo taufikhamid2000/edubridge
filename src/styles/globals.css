@@ -279,3 +279,8 @@ footer {
   transform: translateY(-5px);
   box-shadow: var(--shadow-hover);
 }
+
+/* Add a specific class for blue text in the dashboard */
+.text-dashboard-blue {
+  color: #3b82f6; /* Tailwind's blue-500 */
+}
