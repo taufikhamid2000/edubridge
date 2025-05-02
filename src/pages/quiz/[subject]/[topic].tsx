@@ -181,7 +181,11 @@ export default function TopicQuiz() {
                     <td>{quiz.name}</td>
                     <td>{quiz.created_by}</td>
                     <td>{new Date(quiz.created_at).toLocaleDateString()}</td>
-                    <td className={quiz.verified ? 'text-verified' : 'text-unverified'}>
+                    <td
+                      className={
+                        quiz.verified ? 'text-verified' : 'text-unverified'
+                      }
+                    >
                       {quiz.verified ? 'Verified' : 'Unverified'}
                     </td>
                   </tr>
