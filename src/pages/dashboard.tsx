@@ -97,7 +97,9 @@ export default function Dashboard() {
           <section className="dashboard-section welcome">
             <div>
               <h1>Welcome back, {user?.email}</h1>
-              <p>Ready to continue your learning journey?</p>
+              <p className="text-[var(--color-subtext)]">
+                Ready to continue your learning journey?
+              </p>
             </div>
           </section>
 
