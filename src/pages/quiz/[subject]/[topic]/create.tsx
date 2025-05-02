@@ -22,7 +22,11 @@ export default function CreateQuiz() {
     setQuestions([...questions, { text: '', type: 'radio', options: [] }]);
   };
 
-  const handleQuestionChange = (index: number, field: keyof Question, value: string) => {
+  const handleQuestionChange = (
+    index: number,
+    field: keyof Question,
+    value: string
+  ) => {
     const updatedQuestions = [...questions];
     if (field === 'text' || field === 'type') {
       if (field === 'type' && (value === 'radio' || value === 'checkbox')) {
@@ -40,7 +44,11 @@ export default function CreateQuiz() {
     setQuestions(updatedQuestions);
   };
 
-  const handleOptionChange = (questionIndex: number, optionIndex: number, value: string) => {
+  const handleOptionChange = (
+    questionIndex: number,
+    optionIndex: number,
+    value: string
+  ) => {
     const updatedQuestions = [...questions];
     updatedQuestions[questionIndex].options![optionIndex] = value;
     setQuestions(updatedQuestions);
@@ -70,7 +78,11 @@ export default function CreateQuiz() {
       router.push(`/quiz/${subject}/${topic}`);
     } catch (err) {
       console.error('Error creating quiz:', err);
-      setError((err instanceof Error ? err.message : 'An error occurred while creating the quiz.'));
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'An error occurred while creating the quiz.'
+      );
     } finally {
       setLoading(false);
     }
