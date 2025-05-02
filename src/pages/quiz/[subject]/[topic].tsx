@@ -37,6 +37,10 @@ interface Quiz {
   verified: boolean;
 }
 
+interface QuizWithEmail extends Quiz {
+  email: string; // Directly include the email field from the view
+}
+
 export default function TopicQuiz() {
   const router = useRouter();
   const { subject, topic } = router.query;
@@ -44,7 +48,7 @@ export default function TopicQuiz() {
   const [subjectData, setSubjectData] = useState<Subject | null>(null);
   const [topicData, setTopicData] = useState<Topic | null>(null);
   const [chapterData, setChapterData] = useState<Chapter | null>(null);
-  const [quizzes, setQuizzes] = useState<Quiz[]>([]);
+  const [quizzes, setQuizzes] = useState<QuizWithEmail[]>([]);
 
   // Updated useEffect to wait for router.query to be populated
   useEffect(() => {
@@ -83,16 +87,25 @@ export default function TopicQuiz() {
         setChapterData(topicData.chapters);
 
         console.log('Fetching quizzes for topic:', topic);
+        console.log('Reintroducing join with auth.identities to fetch email');
+
         const { data: quizzesData, error: quizzesError } = await supabase
-          .from('quizzes')
+          .from('quizzes_with_email')
           .select('*')
-          .eq('topic_id', topic);
+          .eq('topic_id', topic)
+          .neq('created_by', null)
+          .neq('created_by', '')
+          .ilike('created_by', '%-%-%-%-%');
 
         if (quizzesError) {
-          console.error('Error fetching quizzes:', quizzesError);
+          console.error(
+            'Error fetching quizzes after filtering invalid created_by:',
+            quizzesError
+          );
           throw quizzesError;
         }
-        setQuizzes(quizzesData);
+
+        setQuizzes(quizzesData as QuizWithEmail[]);
 
         console.log('Fetched data:', {
           subjectData,
@@ -179,7 +192,8 @@ export default function TopicQuiz() {
                 {quizzes.map((quiz) => (
                   <tr key={quiz.id}>
                     <td>{quiz.name}</td>
-                    <td>{quiz.created_by}</td>
+                    <td>{quiz.email?.split('@')[0] || 'Unknown'}</td>{' '}
+                    {/* Updated to use email */}
                     <td>{new Date(quiz.created_at).toLocaleDateString()}</td>
                     <td
                       className={
@@ -197,7 +211,11 @@ export default function TopicQuiz() {
           <div className="flex-justify-end-gap">
             <button
               className="create-quiz-btn"
-              onClick={() => router.push(`/quiz/${subject}/${topic}/create`)}
+              onClick={() =>
+                router.push(
+                  `/quiz/${subject}/${topic}/create?chapter=${chapterData?.title}`
+                )
+              }
             >
               Create a Quiz
             </button>

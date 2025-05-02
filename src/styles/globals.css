@@ -76,8 +76,6 @@ section:nth-of-type(even) {
   @apply bg-[var(--color-bg-alt)];
 }
 
-/* Removed duplicate foundational styles already moved to base.css */
-
 .heroSection {
   @apply py-24 sm:py-32 text-center;
   background: linear-gradient(135deg, var(--color-bg-alt), var(--color-bg));
@@ -192,13 +190,11 @@ footer {
   @apply w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded bg-[var(--color-bg)] dark:bg-[var(--color-bg-alt)] text-[var(--color-text)];
 }
 
-/* Custom focus ring for accessibility */
 :focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
 
-/* Quiz option button enhancements */
 .quiz-option-btn {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   transition:
@@ -211,20 +207,15 @@ footer {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
 
-/* Quiz explanation box */
 .quiz-explanation {
   background: linear-gradient(90deg, var(--color-bg-alt), #e3f0ff 80%);
   border-left: 4px solid var(--color-accent);
 }
 
-/* Added styles for redesigned dashboard */
-
-/* Welcome Section */
 .bg-gradient-to-r {
   background: linear-gradient(to right, var(--color-accent), #6a5acd);
 }
 
-/* Subject Cards */
 .subject-card {
   transition:
     transform 0.2s ease-in-out,
@@ -235,7 +226,6 @@ footer {
   box-shadow: var(--shadow-hover);
 }
 
-/* Progress Bars */
 .progress-bar {
   height: 0.5rem;
   background-color: var(--color-bg-alt);
@@ -247,7 +237,6 @@ footer {
   background-color: var(--color-accent);
 }
 
-/* Achievements */
 .achievement-card {
   transition:
     transform 0.2s ease-in-out,
@@ -258,9 +247,6 @@ footer {
   box-shadow: var(--shadow-hover);
 }
 
-/* Added styles for horizontally scrollable subject cards */
-
-/* Horizontal Scroll Container */
 .overflow-x-auto {
   display: flex;
   overflow-x: auto;
@@ -269,7 +255,6 @@ footer {
   gap: 1.5rem;
 }
 
-/* Subject Card */
 .subject-card {
   flex: 0 0 auto;
   min-width: 250px;
@@ -283,45 +268,40 @@ footer {
   box-shadow: var(--shadow-hover);
 }
 
-/* Add a specific class for blue text in the dashboard */
 .text-dashboard-blue {
-  color: #3b82f6; /* Tailwind's blue-500 */
+  color: #3b82f6;
 }
 
-/* Add table border styles globally */
 .table-auto th,
 .table-auto td {
-  border: 1px solid #d1d5db; /* Tailwind's gray-300 */
+  border: 1px solid #d1d5db;
 }
 
-/* Add table cell padding globally */
 .table-auto th,
 .table-auto td {
-  padding: 0.5rem 1rem; /* Tailwind's px-4 py-2 equivalent */
+  padding: 0.5rem 1rem;
 }
 
 .table-auto {
   border-collapse: collapse;
 }
 
-/* Add button styles globally */
 .create-quiz-btn {
-  background-color: #3b82f6; /* Tailwind's blue-500 */
+  background-color: #3b82f6;
   color: white;
-  padding: 0.5rem 1rem; /* Tailwind's px-4 py-2 equivalent */
-  border-radius: 0.375rem; /* Tailwind's rounded-md */
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
   transition: background-color 0.2s ease-in-out;
 }
 
 .create-quiz-btn:hover {
-  background-color: #2563eb; /* Tailwind's blue-600 */
+  background-color: #2563eb;
 }
 
 .create-quiz-btn {
-  @apply px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50;
+  @apply px-4 py-2 mt-2 ml-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50;
 }
 
-/* Global styles for dashboard */
 .dashboard-loading {
   display: flex;
   align-items: center;
@@ -375,20 +355,17 @@ footer {
 
 .subject-card .description {
   font-size: 0.875rem;
-  color: #6b7280; /* Tailwind's gray-600 */
+  color: #6b7280;
 }
 
-/* Add a global class for unverified text */
 .text-unverified {
-  color: #f59e0b; /* Tailwind's yellow-500 */
+  color: #f59e0b;
 }
 
-/* Add a global class for verified text */
 .text-verified {
-  color: #10b981; /* Tailwind's green-500 */
+  color: #10b981;
 }
 
-/* Add a global class for table row hover effect */
 .table-row-hover {
   transition: background-color 0.2s ease-in-out;
 }
@@ -397,19 +374,17 @@ footer {
   background-color: var(--color-card-bg);
 }
 
-/* Add a global class for rounded corners and transition */
 .rounded-transition {
   border-radius: var(--border-radius);
   transition: background-color 0.2s ease-in-out;
 }
 
-/* Add a global class for flex container with justify-end and gap */
 .flex-justify-end-gap {
   display: flex;
-  /* justify-content: flex-end; */
+
   margin-top: 1rem;
-  margin-bottom: 1rem; /* Tailwind's mb-4 */
-  gap: 1.5rem; /* Tailwind's gap-6 */
+  margin-bottom: 1rem;
+  gap: 1.5rem;
 }
 
 #quizName {
@@ -434,4 +409,16 @@ footer {
 
 select {
   @apply w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded bg-[var(--color-bg)] dark:bg-[var(--color-bg-alt)] text-[var(--color-text)];
+}
+
+.text-error {
+  @apply text-red-500 mb-4;
+}
+
+.button-spacing {
+  @apply mb-4;
+}
+
+.button-full-width {
+  @apply w-full mt-4;
 }
