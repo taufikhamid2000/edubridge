@@ -29,6 +29,14 @@ interface Subject {
   icon: string;
 }
 
+interface Quiz {
+  id: string;
+  name: string;
+  created_by: string;
+  created_at: string;
+  verified: boolean;
+}
+
 export default function TopicQuiz() {
   const router = useRouter();
   const { subject, topic } = router.query;
@@ -36,6 +44,7 @@ export default function TopicQuiz() {
   const [subjectData, setSubjectData] = useState<Subject | null>(null);
   const [topicData, setTopicData] = useState<Topic | null>(null);
   const [chapterData, setChapterData] = useState<Chapter | null>(null);
+  const [quizzes, setQuizzes] = useState<Quiz[]>([]);
 
   // Updated useEffect to wait for router.query to be populated
   useEffect(() => {
@@ -73,10 +82,23 @@ export default function TopicQuiz() {
         setTopicData(topicData);
         setChapterData(topicData.chapters);
 
+        console.log('Fetching quizzes for topic:', topic);
+        const { data: quizzesData, error: quizzesError } = await supabase
+          .from('quizzes')
+          .select('*')
+          .eq('topic_id', topic);
+
+        if (quizzesError) {
+          console.error('Error fetching quizzes:', quizzesError);
+          throw quizzesError;
+        }
+        setQuizzes(quizzesData);
+
         console.log('Fetched data:', {
           subjectData,
           topicData,
           chapterData: topicData.chapters,
+          quizzes: quizzesData,
         });
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -143,7 +165,6 @@ export default function TopicQuiz() {
             </div>
           </div>
 
-          {/* Added a table between the "Time" and the buttons */}
           <div className="mt-6">
             <table className="table-auto w-full">
               <thead>
@@ -155,23 +176,20 @@ export default function TopicQuiz() {
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>Quiz 1</td>
-                  <td>John Doe</td>
-                  <td>April 28, 2025</td>
-                  <td className="text-unverified">Unverified</td>
-                </tr>
-                <tr>
-                  <td>Quiz 2</td>
-                  <td>Jane Smith</td>
-                  <td>April 29, 2025</td>
-                  <td className="text-verified">Verified</td>
-                </tr>
+                {quizzes.map((quiz) => (
+                  <tr key={quiz.id}>
+                    <td>{quiz.name}</td>
+                    <td>{quiz.created_by}</td>
+                    <td>{new Date(quiz.created_at).toLocaleDateString()}</td>
+                    <td className={quiz.verified ? 'text-verified' : 'text-unverified'}>
+                      {quiz.verified ? 'Verified' : 'Unverified'}
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
 
-          {/* Added a "Generate using AI" button next to the "Create a Quiz" button */}
           <div className="flex-justify-end-gap">
             <button
               className="create-quiz-btn"
@@ -181,9 +199,23 @@ export default function TopicQuiz() {
             </button>
             <button
               className="create-quiz-btn"
-              onClick={() => router.push(`/quiz/${subject}/${topic}/generate`)}
+              onClick={() => {
+                const descriptionPrompt = `Generate a description for the subject '${subjectData?.name}', tingkatan '${chapterData?.form}', chapter '${chapterData?.title}', and topic '${topicData?.title}' based on the KSSM syllabus.`;
+                const chatGPTUrl = `https://chat.openai.com/?prompt=${encodeURIComponent(descriptionPrompt)}`;
+                window.open(chatGPTUrl, '_blank');
+              }}
             >
-              Generate using AI
+              Generate Description with AI
+            </button>
+            <button
+              className="create-quiz-btn"
+              onClick={() => {
+                const quizPrompt = `Generate a quiz for the subject '${subjectData?.name}', tingkatan '${chapterData?.form}', chapter '${chapterData?.title}', and topic '${topicData?.title}' based on the KSSM syllabus.`;
+                const chatGPTUrl = `https://chat.openai.com/?prompt=${encodeURIComponent(quizPrompt)}`;
+                window.open(chatGPTUrl, '_blank');
+              }}
+            >
+              Generate Quiz with AI
             </button>
           </div>
 
