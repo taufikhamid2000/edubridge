@@ -2,7 +2,6 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 import { supabase } from '@/lib/supabase';
 
 interface Topic {
@@ -249,7 +248,6 @@ export default function TopicQuiz() {
           </div>
         </div>
       </main>
-      <Footer />
     </>
   );
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useRouter } from 'next/router';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { useMutation } from 'react-query';
 import { createQuiz } from '@/services/quizService'; // Corrected import path
@@ -13,7 +13,9 @@ interface QuizData {
 
 export default function CreateQuizPage() {
   const router = useRouter();
-  const { subject, topic } = router.query;
+  const searchParams = useSearchParams();
+  const subject = searchParams?.get('subject') || '';
+  const topic = searchParams?.get('topic') || '';
   const {
     register,
     handleSubmit,

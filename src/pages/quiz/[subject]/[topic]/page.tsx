@@ -3,14 +3,18 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 import { supabase } from '@/lib/supabase';
 
 export default function TopicPage() {
   const router = useRouter();
   const { subject, topic } = router.query;
   const [loading, setLoading] = useState(true);
-  const [topicData, setTopicData] = useState(null);
+  interface TopicData {
+    title: string;
+    description: string;
+  }
+
+  const [topicData, setTopicData] = useState<TopicData | null>(null);
 
   useEffect(() => {
     if (!router.isReady || !subject || !topic) return;
@@ -50,7 +54,6 @@ export default function TopicPage() {
         <h1>{topicData.title}</h1>
         <p>{topicData.description}</p>
       </main>
-      <Footer />
     </>
   );
 }
