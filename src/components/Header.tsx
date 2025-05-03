@@ -1,3 +1,5 @@
+'use client';
+
 // src/components/Header.tsx
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
@@ -35,10 +37,7 @@ export default function Header(): JSX.Element {
   return (
     <header className="sticky top-0 bg-[var(--color-bg)] bg-opacity-70 backdrop-blur-sm z-50">
       <div className="container mx-auto flex items-center py-4 px-4">
-        <Link
-          href="/"
-          className="text-8xl md:text-6xl font-extrabold"
-        >
+        <Link href="/" className="text-8xl md:text-6xl font-extrabold">
           EduBridge
         </Link>
 
