@@ -1,5 +1,6 @@
 import { Suspense, ReactNode } from 'react';
 import { notFound } from 'next/navigation';
+// Ensure correct case for the import
 import ClientTopicPage from './client-page';
 import type { Metadata } from 'next';
 
