@@ -5,9 +5,24 @@ const nextConfig = {
   output: 'standalone',
   // Enable source maps in production for better error tracing
   productionBrowserSourceMaps: true,
-  // Remove invalid options and use only valid ones
+  // Make App Router the priority for route resolution
   experimental: {
     // Empty but keeping for future use
+  },
+  // Add redirects from old Pages Router routes to new App Router routes
+  async redirects() {
+    return [
+      {
+        source: '/pages/quiz/:subject/:topic',
+        destination: '/quiz/:subject/:topic',
+        permanent: true,
+      },
+      {
+        source: '/pages/quiz/:subject/chapters',
+        destination: '/quiz/:subject/chapters',
+        permanent: true,
+      },
+    ];
   },
 };
 
