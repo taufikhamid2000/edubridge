@@ -186,14 +186,30 @@ export default function ClientTopicPage({
   const router = useRouter();
 
   useEffect(() => {
+    console.log('🧩 ClientTopicPage - Component mounted');
     // For troubleshooting production issues
-    logDebug(`ClientTopicPage mounted with: subject=${subject}, topic=${topic}`);
-    
+    logDebug(
+      `ClientTopicPage mounted with: subject=${subject}, topic=${topic}`
+    );
+
+    // Log Supabase config to help diagnose connection issues
+    console.log('🔐 Supabase connection info:', {
+      url:
+        process.env.NEXT_PUBLIC_SUPABASE_URL?.substring(0, 10) + '...' ||
+        'undefined',
+      keyExists: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+      nodeEnv: process.env.NODE_ENV,
+    });
+
     // Check for UUID format if that's expected for topic IDs
-    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(topic);
-    logDebug(`Topic ID is valid UUID format: ${isUUID}`);
-    
+    const isUUID =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+        topic
+      );
+    console.log(`🆔 Topic ID is valid UUID format: ${isUUID}`);
+
     if (!subject || !topic) {
+      console.error('❌ Missing subject or topic parameters');
       setError('Missing subject or topic parameters');
       setLoading(false);
       return;
@@ -203,18 +219,27 @@ export default function ClientTopicPage({
       try {
         // Check supabase connection and environment variables
         logDebug('Checking Supabase connection...');
-        const { data: connectionTest, error: connectionError } = await supabase.from('subjects').select('count').limit(1);
-        
+        const { data: connectionTest, error: connectionError } = await supabase
+          .from('subjects')
+          .select('count')
+          .limit(1);
+
         if (connectionError) {
           logDebug('Supabase connection error', connectionError);
-          throw new Error(`Database connection failed: ${connectionError.message}`);
+          throw new Error(
+            `Database connection failed: ${connectionError.message}`
+          );
         }
-        
+
         logDebug('Supabase connection successful', connectionTest);
-        
+
         // Fetch subject data with more detailed error handling
         logDebug(`Fetching subject data for: ${subject}`);
-        const { data: subjectData, error: subjectError, status: subjectStatus } = await supabase
+        const {
+          data: subjectData,
+          error: subjectError,
+          status: subjectStatus,
+        } = await supabase
           .from('subjects')
           .select('*')
           .eq('slug', subject)
@@ -228,18 +253,22 @@ export default function ClientTopicPage({
             throw new Error(`Failed to load subject: ${subjectError.message}`);
           }
         }
-        
+
         if (!subjectData) {
           logDebug('No subject data returned for slug', subject);
           throw new Error(`Subject not found: ${subject}`);
         }
-        
+
         setSubjectData(subjectData);
         logDebug('Subject data loaded successfully', subjectData);
 
         // Fetch topic and chapter data with enhanced error handling
         logDebug(`Fetching topic data for ID: ${topic}`);
-        const { data: topicData, error: topicError, status: topicStatus } = await supabase
+        const {
+          data: topicData,
+          error: topicError,
+          status: topicStatus,
+        } = await supabase
           .from('topics')
           .select('*, chapters(*)')
           .eq('id', topic)
@@ -247,41 +276,43 @@ export default function ClientTopicPage({
 
         if (topicError) {
           logDebug(`Topic fetch error (${topicStatus})`, topicError);
-          
+
           // Special handling for the specific topic ID that's failing
           if (topic === '935c58cc-1b2f-49fe-8916-421c496b58a8') {
-            logDebug('Detected problematic topic ID, attempting alternative query');
-            
+            logDebug(
+              'Detected problematic topic ID, attempting alternative query'
+            );
+
             // Try an alternative query to debug the issue
             const { data: topicDebug } = await supabase
               .from('topics')
               .select('id')
               .limit(10);
-              
+
             logDebug('Available topic IDs for reference', topicDebug);
           }
-          
+
           if (topicStatus === 406) {
             throw new Error(`Topic not found with ID: ${topic}`);
           } else {
             throw new Error(`Failed to load topic: ${topicError.message}`);
           }
         }
-        
+
         if (!topicData) {
           logDebug('No topic data returned for ID', topic);
           throw new Error(`Topic not found: ${topic}`);
         }
-        
+
         setTopicData(topicData);
         logDebug('Topic data loaded successfully');
-        
+
         // Add defensive check for chapters
         if (!topicData.chapters) {
           logDebug('No chapter data associated with topic', topicData);
           throw new Error(`Chapter data missing for topic: ${topic}`);
         }
-        
+
         setChapterData(topicData.chapters);
         logDebug('Chapter data loaded successfully', topicData.chapters);
 
@@ -311,13 +342,28 @@ export default function ClientTopicPage({
           setQuizzes([]);
         }
       } catch (err) {
-        captureError(err instanceof Error ? err : new Error(String(err)), 'ClientTopicPage');
-        setError(err instanceof Error ? err.message : 'An unknown error occurred');
-        
+        console.error('💥 CLIENT PAGE ERROR:', err);
+        // Log stack trace for detailed debugging
+        if (err instanceof Error) {
+          console.error('Error name:', err.name);
+          console.error('Error message:', err.message);
+          console.error('Error stack:', err.stack);
+        }
+
+        captureError(
+          err instanceof Error ? err : new Error(String(err)),
+          'ClientTopicPage'
+        );
+        setError(
+          err instanceof Error ? err.message : 'An unknown error occurred'
+        );
+
         // You might want to consider redirecting on certain types of errors
-        if (err instanceof Error && 
-            (err.message.includes('not found') || 
-             err.message.includes('does not exist'))) {
+        if (
+          err instanceof Error &&
+          (err.message.includes('not found') ||
+            err.message.includes('does not exist'))
+        ) {
           // Wait a moment before redirecting to show the error
           setTimeout(() => {
             router.push('/dashboard');
