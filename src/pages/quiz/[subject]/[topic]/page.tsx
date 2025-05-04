@@ -19,6 +19,10 @@ export default function TopicPage() {
   useEffect(() => {
     if (!router.isReady || !subject || !topic) return;
 
+    console.log('Router is ready:', router.isReady);
+    console.log('Subject:', subject);
+    console.log('Topic:', topic);
+
     const fetchTopicData = async () => {
       try {
         const { data, error } = await supabase
@@ -26,6 +30,8 @@ export default function TopicPage() {
           .select('*')
           .eq('id', topic)
           .single();
+
+        console.log('Supabase query response:', { data, error });
 
         if (error) throw error;
         setTopicData(data);

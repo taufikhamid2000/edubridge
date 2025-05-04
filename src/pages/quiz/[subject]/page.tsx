@@ -51,10 +51,21 @@ export default function TopicQuiz() {
 
   // Updated useEffect to wait for router.query to be populated
   useEffect(() => {
+    console.log('Router is ready:', router.isReady);
+    console.log('Subject:', subject);
+    console.log('Topic:', topic);
+
     if (!router.isReady || !subject || !topic) {
       console.warn('Router query not ready or missing subject/topic');
       return;
     }
+
+    console.log(
+      'You are in the TopicQuiz file for subject:',
+      subject,
+      'and topic:',
+      topic
+    );
 
     const fetchData = async () => {
       try {
