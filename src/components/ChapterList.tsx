@@ -79,7 +79,7 @@ export default function ChapterList({
                             <li key={topic.id} className="mb-2">
                               <Link
                                 href={`/quiz/${subject}/${topic.id}`}
-                                className="text-blue-500 hover:underline"
+                                className="text-green-500 hover:underline"
                               >
                                 {topic.title}
                               </Link>
