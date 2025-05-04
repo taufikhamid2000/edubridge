@@ -3,14 +3,11 @@ const nextConfig = {
   reactStrictMode: true,
   // Enable more verbose error logging in production
   output: 'standalone',
-  // This helps with hybrid Pages/App routing
+  // Enable source maps in production for better error tracing
+  productionBrowserSourceMaps: true,
+  // Remove invalid options and use only valid ones
   experimental: {
-    // This is important for hybrid setups with both /app and /pages
-    appDir: true,
-  },
-  // Optional: Enable server actions for better error handling
-  serverActions: {
-    bodySizeLimit: '2mb',
+    // Empty but keeping for future use
   },
 };
 

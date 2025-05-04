@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint --fix"
+    "lint": "next lint --fix",
+    "prebuild": "tsc --noEmit",
+    "predeploy": "npm run lint && npm run prebuild && next build"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.48.1",

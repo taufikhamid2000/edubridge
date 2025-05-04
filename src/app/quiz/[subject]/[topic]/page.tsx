@@ -8,16 +8,16 @@ interface QuizParams {
   topic: string;
 }
 
+// Update the Props interface to align with PageProps constraint
 interface Props {
-  params: Promise<QuizParams> | QuizParams;
+  params: Promise<QuizParams>; // Only Promise<QuizParams> is acceptable
 }
 
 // Generate metadata for the page
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
-    // Handle both Promise<QuizParams> and direct QuizParams format
-    const resolvedParams = 'then' in params ? await params : params;
-    const { subject, topic } = resolvedParams;
+    // Always await the params as they are always a Promise in Next.js 15.1.6
+    const { subject, topic } = await params;
 
     return {
       title: `${subject} - ${topic} | EduBridge Quiz`,
@@ -33,11 +33,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 // Dynamic route component with proper return type for React elements
-export default function Page({ params }: Props): ReactNode {
+export default async function Page({ params }: Props): Promise<ReactNode> {
   try {
-    // Extract the params safely without requiring async/await
-    const subject = 'subject' in params ? params.subject : '';
-    const topic = 'topic' in params ? params.topic : '';
+    // Always await the params since they are always a Promise in Next.js 15.1.6
+    const { subject, topic } = await params;
 
     if (!subject || !topic) {
       return notFound();
@@ -47,7 +46,6 @@ export default function Page({ params }: Props): ReactNode {
       <Suspense
         fallback={<div className="p-8 text-center">Loading quiz data...</div>}
       >
-        {/* Explicitly cast the component props to fix TypeScript error */}
         <ClientTopicPage subject={subject} topic={topic} />
       </Suspense>
     );
@@ -56,7 +54,9 @@ export default function Page({ params }: Props): ReactNode {
     return (
       <div className="p-8 text-center">
         <h2 className="text-xl font-bold mb-2">Something went wrong</h2>
-        <p>We&rsquo;re having trouble loading this quiz. Please try again later.</p>
+        <p>
+          We&rsquo;re having trouble loading this quiz. Please try again later.
+        </p>
       </div>
     );
   }

@@ -3,6 +3,10 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Providers from '@/components/Providers';
 import ErrorBoundary from '@/components/ErrorBoundary';
+import { validateEnvironment } from '@/lib/env-check';
+
+// Validate environment variables on startup
+validateEnvironment();
 
 export const metadata = {
   title: 'EduBridge',
