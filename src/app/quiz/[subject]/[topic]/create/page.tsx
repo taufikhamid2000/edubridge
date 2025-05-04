@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
@@ -21,7 +23,7 @@ export default function CreateQuizPage() {
     handleSubmit,
     formState: { errors },
   } = useForm<QuizData>();
-  
+
   const mutation = useMutation({
     mutationFn: (data: QuizData) => createQuiz(data),
     onSuccess: () => {
