@@ -1,17 +1,22 @@
 import { Suspense } from 'react';
 import ClientTopicPage from './client-page';
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
 
-// Define the correct type for the params
-interface PageParams {
+interface QuizParams {
   subject: string;
   topic: string;
 }
 
-// Generate metadata for the page
-export async function generateMetadata({ params }: { params: PageParams }) {
-  // Await the params object and destructure the properties
-  const { subject, topic } = await Promise.resolve(params);
+// Create our own Props interface instead of using PageProps
+interface Props {
+  params: Promise<QuizParams>;
+}
+
+// Generate metadata for the page using our Props interface
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  // params is typed as Promise<QuizParams>
+  const { subject, topic } = await params;
 
   return {
     title: `${subject} - ${topic}`,
@@ -19,9 +24,9 @@ export async function generateMetadata({ params }: { params: PageParams }) {
 }
 
 // Make server component async to properly handle params
-export default async function Page({ params }: { params: PageParams }) {
-  // Await the params object and destructure the properties
-  const { subject, topic } = await Promise.resolve(params);
+export default async function Page({ params }: Props) {
+  // Directly await the params which is now correctly typed as a Promise
+  const { subject, topic } = await params;
 
   if (!subject || !topic) {
     notFound();
