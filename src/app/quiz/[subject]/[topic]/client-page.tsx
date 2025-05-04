@@ -191,7 +191,6 @@ export default function ClientTopicPage({
       return;
     }
 
-    // Use an IIFE to handle async code and avoid creating a separate function
     (async () => {
       try {
         // Fetch subject data

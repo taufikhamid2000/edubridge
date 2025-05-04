@@ -1,13 +1,13 @@
 import { Suspense } from 'react';
 import ClientTopicPage from './client-page';
 
-// The root component is now a Server Component which can use the params directly
+// Use a regular function component instead of async
 export default function TopicPage({
   params,
 }: {
   params: { subject: string; topic: string };
 }) {
-  // Server components can directly access params without `use()`
+  // Access params directly as they are properly typed now
   const { subject, topic } = params;
 
   return (
