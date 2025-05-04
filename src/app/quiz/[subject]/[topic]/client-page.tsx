@@ -1,8 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import Head from 'next/head';
 import { supabase } from '@/lib/supabase';
 
 interface Topic {
@@ -176,7 +175,7 @@ export default function ClientTopicPage({
 }: {
   subject: string;
   topic: string;
-}) {
+}): ReactNode {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [subjectData, setSubjectData] = useState<Subject | null>(null);
@@ -185,6 +184,9 @@ export default function ClientTopicPage({
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
 
   useEffect(() => {
+    // For troubleshooting production issues
+    console.log('ClientTopicPage mounted with:', { subject, topic });
+
     if (!subject || !topic) {
       setError('Missing subject or topic parameters');
       setLoading(false);
@@ -193,42 +195,87 @@ export default function ClientTopicPage({
 
     (async () => {
       try {
+        // Add defensive code for production environment
+        if (typeof window !== 'undefined') {
+          console.log('Running in browser environment');
+        }
+
         // Fetch subject data
+        console.log('Fetching subject data for:', subject);
         const { data: subjectData, error: subjectError } = await supabase
           .from('subjects')
           .select('*')
           .eq('slug', subject)
           .single();
 
-        if (subjectError)
+        if (subjectError) {
+          console.error('Subject fetch error:', subjectError);
           throw new Error(`Failed to load subject: ${subjectError.message}`);
+        }
+
+        if (!subjectData) {
+          console.error('No subject data returned');
+          throw new Error('Subject not found');
+        }
+
         setSubjectData(subjectData);
+        console.log('Subject data loaded:', subjectData);
 
         // Fetch topic and chapter data
+        console.log('Fetching topic data for:', topic);
         const { data: topicData, error: topicError } = await supabase
           .from('topics')
           .select('*, chapters(*)')
           .eq('id', topic)
           .single();
 
-        if (topicError)
+        if (topicError) {
+          console.error('Topic fetch error:', topicError);
           throw new Error(`Failed to load topic: ${topicError.message}`);
+        }
+
+        if (!topicData) {
+          console.error('No topic data returned');
+          throw new Error('Topic not found');
+        }
+
         setTopicData(topicData);
+
+        // Add defensive check for chapters
+        if (!topicData.chapters) {
+          console.error('No chapter data in topic');
+          throw new Error('Chapter data missing for this topic');
+        }
+
         setChapterData(topicData.chapters);
+        console.log('Topic and chapter data loaded');
 
         // Fetch quizzes with email
-        const { data: quizzesData, error: quizzesError } = await supabase
-          .from('quizzes_with_email')
-          .select('*')
-          .eq('topic_id', topic)
-          .neq('created_by', null)
-          .neq('created_by', '')
-          .ilike('created_by', '%-%-%-%-%');
+        try {
+          const { data: quizzesData, error: quizzesError } = await supabase
+            .from('quizzes_with_email')
+            .select('*')
+            .eq('topic_id', topic)
+            .neq('created_by', null)
+            .neq('created_by', '')
+            .ilike('created_by', '%-%-%-%-%');
 
-        if (quizzesError)
-          throw new Error(`Failed to load quizzes: ${quizzesError.message}`);
-        setQuizzes(quizzesData);
+          if (quizzesError) {
+            console.error('Quizzes fetch error:', quizzesError);
+            // Don't throw here, just log the error
+            console.warn(`Quiz loading issue: ${quizzesError.message}`);
+            setQuizzes([]);
+          } else {
+            setQuizzes(quizzesData || []);
+            console.log('Quizzes loaded:', quizzesData?.length || 0);
+          }
+        } catch (quizErr) {
+          console.error('Error in quiz fetch:', quizErr);
+          // Don't throw here, continue with empty quizzes
+          setQuizzes([]);
+        }
       } catch (err) {
+        console.error('ClientTopicPage error:', err);
         setError(
           err instanceof Error ? err.message : 'An unknown error occurred'
         );
@@ -253,9 +300,6 @@ export default function ClientTopicPage({
 
   return (
     <>
-      <Head>
-        <title>{topicData.title} · Topic</title>
-      </Head>
       <main className="container py-6 md:py-8 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto">
           {/* Topic Header Information */}

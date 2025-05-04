@@ -2,6 +2,7 @@ import '../styles/globals.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Providers from '@/components/Providers';
+import ErrorBoundary from '@/components/ErrorBoundary';
 
 export const metadata = {
   title: 'EduBridge',
@@ -17,9 +18,11 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Providers>
-          <Header />
-          <main>{children}</main>
-          <Footer />
+          <ErrorBoundary>
+            <Header />
+            <main>{children}</main>
+            <Footer />
+          </ErrorBoundary>
         </Providers>
       </body>
     </html>
