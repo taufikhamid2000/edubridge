@@ -1,9 +1,9 @@
 import React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
-import { useMutation } from 'react-query';
-import { createQuiz } from '@/services/quizService'; // Corrected import path
-import { QuizForm } from '@/components/QuizForm'; // Corrected import path
+import { useMutation } from '@tanstack/react-query';
+import { createQuiz } from '@/services/quizService';
+import { QuizForm } from '@/components/QuizForm';
 
 interface QuizData {
   name: string;
@@ -21,8 +21,9 @@ export default function CreateQuizPage() {
     handleSubmit,
     formState: { errors },
   } = useForm<QuizData>();
-  const mutation = useMutation((data: QuizData) => createQuiz(data), {
-    // Fixed type mismatch
+  
+  const mutation = useMutation({
+    mutationFn: (data: QuizData) => createQuiz(data),
     onSuccess: () => {
       router.push(`/quiz/${subject}/${topic}`);
     },
@@ -33,7 +34,7 @@ export default function CreateQuizPage() {
       ...data,
       subject: subject as string,
       topic: topic as string,
-    }); // Ensured correct types
+    });
   };
 
   return (
