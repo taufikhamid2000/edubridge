@@ -4,6 +4,13 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 
+// Import dashboard components
+import WelcomeBanner from '@/components/dashboard/WelcomeBanner';
+import SubjectSearch from '@/components/dashboard/SubjectSearch';
+import SubjectGrid from '@/components/dashboard/SubjectGrid';
+import WeeklyProgress from '@/components/dashboard/WeeklyProgress';
+import Achievements from '@/components/dashboard/Achievements';
+
 interface User {
   email: string;
   streak: number;
@@ -18,14 +25,22 @@ interface Subject {
   slug: string;
   description: string;
   icon: string;
+  category?: string;
 }
 
-export default function DashboardPage() {
+function DashboardClient() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [error, setError] = useState<string | null>(null);
+
+  // State for search, pagination, and filtering
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [categories, setCategories] = useState<string[]>([]);
+  const subjectsPerPage = 12;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -54,6 +69,14 @@ export default function DashboardPage() {
         console.log('Subjects data received:', subjectsData);
         setSubjects(subjectsData || []);
 
+        // Extract unique categories
+        const uniqueCategories = Array.from(
+          new Set(
+            subjectsData?.map((subject) => subject.category || 'Uncategorized')
+          )
+        );
+        setCategories(['all', ...uniqueCategories]);
+
         // TODO: Fetch user data from Supabase
         setUser({
           email: session.user.email || '',
@@ -77,126 +100,130 @@ export default function DashboardPage() {
     router.push(`/quiz/${slug}/chapters`);
   };
 
+  // Filter subjects based on search query and selected category
+  const filteredSubjects = subjects.filter((subject) => {
+    const matchesSearch =
+      subject.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      subject.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory =
+      selectedCategory === 'all' ||
+      (subject.category || 'Uncategorized') === selectedCategory;
+
+    return matchesSearch && matchesCategory;
+  });
+
+  // Calculate pagination
+  const indexOfLastSubject = currentPage * subjectsPerPage;
+  const indexOfFirstSubject = indexOfLastSubject - subjectsPerPage;
+  const currentSubjects = filteredSubjects.slice(
+    indexOfFirstSubject,
+    indexOfLastSubject
+  );
+  const totalPages = Math.ceil(filteredSubjects.length / subjectsPerPage);
+
+  // Handle page change
+  const handlePageChange = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+    // Scroll to top of subjects section
+    document
+      .getElementById('subjects-section')
+      ?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  // Event handlers for search and category selection
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+    setCurrentPage(1); // Reset to first page on search
+  };
+
+  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedCategory(e.target.value);
+    setCurrentPage(1); // Reset to first page on filter change
+  };
+
+  // Achievement data
+  const achievements = [
+    {
+      title: 'Quiz Master',
+      description: 'Completed 10 quizzes in a week',
+      bgColor: 'bg-blue-100',
+    },
+    {
+      title: 'High Scorer',
+      description: 'Scored above 90% in 5 quizzes',
+      bgColor: 'bg-green-100',
+    },
+    {
+      title: 'Consistent Learner',
+      description: 'Maintained a 7-day streak',
+      bgColor: 'bg-yellow-100',
+    },
+  ];
+
   if (loading) {
-    return <div className="dashboard-loading">Loading...</div>;
+    return (
+      <div className="flex justify-center items-center min-h-[60vh]">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
   }
 
   return (
     <main className="container mx-auto py-6 px-4 sm:px-6 md:px-8">
       <div className="flex flex-col gap-8 sm:gap-10 md:gap-12">
         {/* Welcome Section */}
-        <section className="dashboard-section welcome bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 sm:p-6 md:p-8 rounded-lg shadow-md dark:bg-gradient-to-r dark:from-gray-800 dark:to-gray-900">
-          <div>
-            <h1 className="text-3xl sm:text-4xl font-bold mb-2">
-              Welcome back, {user?.email}
-            </h1>
-            <p className="text-base sm:text-lg">
-              Ready to continue your learning journey?
-            </p>
-            <p className="mt-4 text-sm sm:text-base">
-              Your current streak: <strong>{user?.streak} days</strong>
-            </p>
-          </div>
-        </section>
+        <WelcomeBanner user={user} />
 
-        {/* Subjects Section */}
-        <section>
-          <h2 className="text-2xl sm:text-3xl font-semibold mb-4 sm:mb-6">
-            Subjects
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
-            {error ? (
-              <div className="text-red-500 bg-red-100 p-3 sm:p-4 rounded dark:bg-red-900">
-                Error loading subjects: {error}
-              </div>
-            ) : subjects.length === 0 ? (
-              <div className="text-center p-3 sm:p-4 dark:text-gray-300">
-                <p>No subjects available yet. Please check back later.</p>
-              </div>
-            ) : (
-              subjects.map((subject) => (
-                <div
-                  key={subject.id}
-                  className="bg-white rounded-lg p-3 sm:p-4 md:p-6 shadow-md hover:shadow-lg transition-shadow cursor-pointer dark:bg-gray-800 dark:text-gray-200"
-                  onClick={() => handleSubjectClick(subject.slug)}
-                >
-                  <div className="flex items-center gap-3 sm:gap-4">
-                    <div className="text-3xl sm:text-4xl">{subject.icon}</div>
-                    <div>
-                      <h3 className="text-lg sm:text-xl font-semibold text-dashboard-blue">
-                        {subject.name}
-                      </h3>
-                      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                        {subject.description}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))
-            )}
+        {/* Subjects Section with Search and Filters */}
+        <section id="subjects-section">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 sm:mb-6">
+            <h2 className="text-2xl sm:text-3xl font-semibold mb-4 md:mb-0">
+              Subjects
+            </h2>
           </div>
+
+          <SubjectSearch
+            searchTerm={searchQuery}
+            selectedCategory={selectedCategory}
+            categories={categories}
+            handleSearchChange={handleSearchChange}
+            handleCategoryChange={handleCategoryChange}
+          />
+
+          {/* Subjects Grid with Results Count */}
+          <div className="mb-4">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Showing {currentSubjects.length} of {filteredSubjects.length}{' '}
+              subjects
+              {searchQuery && ` matching "${searchQuery}"`}
+              {selectedCategory !== 'all' && ` in ${selectedCategory}`}
+            </p>
+          </div>
+
+          <SubjectGrid
+            subjects={currentSubjects}
+            error={error}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            handleSubjectClick={handleSubjectClick}
+            handlePageChange={handlePageChange}
+          />
         </section>
 
         {/* Weekly Progress Section */}
-        <section className="dashboard-section progress bg-gray-100 p-3 sm:p-4 md:p-6 rounded-lg shadow-md dark:bg-gray-800 dark:text-gray-200">
-          <h2 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4">
-            Weekly Progress
-          </h2>
-          <div className="flex flex-col gap-3 sm:gap-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm sm:text-base">Quizzes This Week</span>
-              <div className="w-2/3 bg-gray-300 rounded-full h-3 sm:h-4 dark:bg-gray-700">
-                <div
-                  className="bg-blue-500 h-3 sm:h-4 rounded-full"
-                  style={{ width: '70%' }}
-                ></div>
-              </div>
-              <span className="text-sm sm:text-base">7/10</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm sm:text-base">Average Score</span>
-              <div className="w-2/3 bg-gray-300 rounded-full h-3 sm:h-4 dark:bg-gray-700">
-                <div
-                  className="bg-green-500 h-3 sm:h-4 rounded-full"
-                  style={{ width: '85%' }}
-                ></div>
-              </div>
-              <span className="text-sm sm:text-base">85%</span>
-            </div>
-          </div>
-        </section>
+        <WeeklyProgress
+          quizzesCompleted={7}
+          quizzesTotal={10}
+          averageScore={85}
+        />
 
         {/* Recent Achievements Section */}
-        <section className="dashboard-section achievements bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-md dark:bg-gray-800 dark:text-gray-200">
-          <h2 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4">
-            Recent Achievements
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
-            <div className="achievement-card bg-blue-100 p-3 sm:p-4 rounded-lg shadow dark:bg-blue-900">
-              <h3 className="text-base sm:text-lg font-semibold">
-                Quiz Master
-              </h3>
-              <p className="text-xs sm:text-sm">
-                Completed 10 quizzes in a week
-              </p>
-            </div>
-            <div className="achievement-card bg-green-100 p-3 sm:p-4 rounded-lg shadow dark:bg-green-900">
-              <h3 className="text-base sm:text-lg font-semibold">
-                High Scorer
-              </h3>
-              <p className="text-xs sm:text-sm">
-                Scored above 90% in 5 quizzes
-              </p>
-            </div>
-            <div className="achievement-card bg-yellow-100 p-3 sm:p-4 rounded-lg shadow dark:bg-yellow-900">
-              <h3 className="text-base sm:text-lg font-semibold">
-                Consistent Learner
-              </h3>
-              <p className="text-xs sm:text-sm">Maintained a 7-day streak</p>
-            </div>
-          </div>
-        </section>
+        <Achievements achievements={achievements} />
       </div>
     </main>
   );
+}
+
+export default function DashboardPage() {
+  return <DashboardClient />;
 }
