@@ -1,5 +1,22 @@
 import { supabase } from './supabase';
 
+export async function getSubjectBySlug(subjectSlug: string) {
+  console.log(`Fetching subject data for slug: ${subjectSlug}`);
+
+  const { data, error } = await supabase
+    .from('subjects')
+    .select('id, name, slug')
+    .eq('slug', subjectSlug)
+    .single();
+
+  if (error) {
+    console.error('Error fetching subject:', error);
+    throw new Error('Failed to fetch subject data');
+  }
+
+  return data;
+}
+
 export async function getChaptersBySubjectSlug(subjectSlug: string) {
   console.log(`Fetching chapters for subject slug: ${subjectSlug}`);
 
