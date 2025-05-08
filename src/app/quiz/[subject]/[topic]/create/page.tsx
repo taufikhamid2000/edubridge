@@ -40,16 +40,16 @@ interface ChapterData {
 export default function CreateQuizPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  
+
   const subject = searchParams?.get('subject') || '';
   const topic = searchParams?.get('topic') || '';
-  
+
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [subjectData, setSubjectData] = useState<SubjectData | null>(null);
   const [topicData, setTopicData] = useState<TopicData | null>(null);
   const [chapterData, setChapterData] = useState<ChapterData | null>(null);
-  
+
   const {
     register,
     handleSubmit,
@@ -60,7 +60,7 @@ export default function CreateQuizPage() {
       difficulty: 'beginner',
       timeLimit: 10,
       isPublic: false,
-    }
+    },
   });
 
   // Fetch metadata about the subject, topic, and chapter
@@ -68,7 +68,7 @@ export default function CreateQuizPage() {
     const fetchMetadata = async () => {
       try {
         setIsLoading(true);
-        
+
         // Fetch subject data
         if (subject) {
           const { data: subjectData, error: subjectError } = await supabase
@@ -76,11 +76,11 @@ export default function CreateQuizPage() {
             .select('id, name, slug')
             .eq('slug', subject)
             .single();
-            
+
           if (subjectError) throw subjectError;
           if (subjectData) setSubjectData(subjectData);
         }
-        
+
         // Fetch topic data
         if (topic) {
           const { data: topicData, error: topicError } = await supabase
@@ -88,11 +88,11 @@ export default function CreateQuizPage() {
             .select('id, title, chapter_id')
             .eq('id', topic)
             .single();
-            
+
           if (topicError) throw topicError;
           if (topicData) {
             setTopicData(topicData);
-            
+
             // Fetch chapter data if we have a chapter_id
             if (topicData.chapter_id) {
               const { data: chapterData, error: chapterError } = await supabase
@@ -100,7 +100,7 @@ export default function CreateQuizPage() {
                 .select('id, title, form')
                 .eq('id', topicData.chapter_id)
                 .single();
-                
+
               if (chapterError) throw chapterError;
               if (chapterData) setChapterData(chapterData);
             }
@@ -108,12 +108,14 @@ export default function CreateQuizPage() {
         }
       } catch (err) {
         console.error('Error fetching metadata:', err);
-        setError(err instanceof Error ? err.message : 'Failed to load quiz context');
+        setError(
+          err instanceof Error ? err.message : 'Failed to load quiz context'
+        );
       } finally {
         setIsLoading(false);
       }
     };
-    
+
     fetchMetadata();
   }, [subject, topic]);
 
@@ -127,8 +129,10 @@ export default function CreateQuizPage() {
     },
     onError: (error) => {
       console.error('Error creating quiz:', error);
-      setError(error instanceof Error ? error.message : 'Failed to create quiz');
-    }
+      setError(
+        error instanceof Error ? error.message : 'Failed to create quiz'
+      );
+    },
   });
 
   const onSubmit = (data: QuizData) => {
@@ -147,7 +151,9 @@ export default function CreateQuizPage() {
         <div className="max-w-3xl mx-auto flex justify-center items-center min-h-[300px]">
           <div className="text-center">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-t-blue-500 border-r-transparent border-b-blue-500 border-l-transparent mb-4"></div>
-            <p className="text-gray-600 dark:text-gray-400">Loading quiz information...</p>
+            <p className="text-gray-600 dark:text-gray-400">
+              Loading quiz information...
+            </p>
           </div>
         </div>
       </div>
@@ -158,28 +164,30 @@ export default function CreateQuizPage() {
     <div className="container mx-auto py-6 md:py-8 px-4 sm:px-6">
       <div className="max-w-3xl mx-auto">
         <div className="flex items-center justify-between mb-6">
-          <button 
-            onClick={() => router.back()} 
+          <button
+            onClick={() => router.back()}
             className="text-blue-600 dark:text-blue-400 hover:underline flex items-center"
           >
             ← Back
           </button>
         </div>
-        
+
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 md:p-8">
           <div className="mb-6">
-            <h1 className="text-2xl md:text-3xl font-bold mb-2">Create New Quiz</h1>
+            <h1 className="text-2xl md:text-3xl font-bold mb-2">
+              Create New Quiz
+            </h1>
             <p className="text-gray-600 dark:text-gray-400">
               Design a quiz for students to test their knowledge
             </p>
           </div>
-          
+
           {error && (
             <div className="mb-6 p-3 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-300 rounded">
               {error}
             </div>
           )}
-          
+
           <QuizForm
             register={register}
             handleSubmit={handleSubmit}
@@ -188,12 +196,18 @@ export default function CreateQuizPage() {
             isLoading={mutation.status === 'pending'}
             subjectName={subjectData?.name}
             topicName={topicData?.title}
-            chapterName={chapterData?.title ? `Form ${chapterData.form} · ${chapterData.title}` : undefined}
+            chapterName={
+              chapterData?.title
+                ? `Form ${chapterData.form} · ${chapterData.title}`
+                : undefined
+            }
           />
         </div>
-        
+
         <div className="mt-8 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg p-5">
-          <h2 className="text-lg font-medium mb-3">Tips for creating effective quizzes</h2>
+          <h2 className="text-lg font-medium mb-3">
+            Tips for creating effective quizzes
+          </h2>
           <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
             <li className="flex items-start">
               <span className="text-green-500 mr-2">✓</span>
@@ -201,15 +215,22 @@ export default function CreateQuizPage() {
             </li>
             <li className="flex items-start">
               <span className="text-green-500 mr-2">✓</span>
-              <span>Include a variety of question types (multiple choice, true/false, etc.)</span>
+              <span>
+                Include a variety of question types (multiple choice,
+                true/false, etc.)
+              </span>
             </li>
             <li className="flex items-start">
               <span className="text-green-500 mr-2">✓</span>
-              <span>Make sure all questions relate to the topic being assessed</span>
+              <span>
+                Make sure all questions relate to the topic being assessed
+              </span>
             </li>
             <li className="flex items-start">
               <span className="text-green-500 mr-2">✓</span>
-              <span>Set an appropriate time limit for the number of questions</span>
+              <span>
+                Set an appropriate time limit for the number of questions
+              </span>
             </li>
           </ul>
         </div>

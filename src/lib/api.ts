@@ -20,7 +20,7 @@ export async function getSubjectBySlug(subjectSlug: string) {
 export async function getChaptersBySubjectSlug(subjectSlug: string) {
   console.log(`Fetching chapters for subject slug: ${subjectSlug}`);
 
-  // Step 1: Fetch the subject ID based on the slug
+  // Step 1: Get the subject ID first - this is necessary with Supabase
   const { data: subjectData, error: subjectError } = await supabase
     .from('subjects')
     .select('id')
@@ -37,10 +37,10 @@ export async function getChaptersBySubjectSlug(subjectSlug: string) {
     throw new Error('Subject not found');
   }
 
-  // Step 2: Fetch chapters using the subject ID and sort by form and order_index
+  // Step 2: Fetch chapters using the subject ID with a more optimized select
   const { data: chaptersData, error: chaptersError } = await supabase
     .from('chapters')
-    .select('id, title, topics, form, order_index')
+    .select('id, title, form, order_index')
     .eq('subject_id', subjectId)
     .order('form', { ascending: true })
     .order('order_index', { ascending: true });

@@ -32,3 +32,34 @@ export interface Quiz {
   topic_id: string;
   email?: string;
 }
+
+export interface Question {
+  id: string;
+  quiz_id: string;
+  text: string;
+  type: 'radio' | 'checkbox';
+  order_index: number;
+  created_at: string;
+  updated_at: string;
+  answers?: Answer[];
+}
+
+export interface Answer {
+  id: string;
+  question_id: string;
+  text: string;
+  is_correct: boolean;
+  order_index: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface QuizAttempt {
+  id: string;
+  user_id: string;
+  quiz_id: string;
+  score: number;
+  completed: boolean;
+  started_at: string;
+  completed_at?: string;
+}

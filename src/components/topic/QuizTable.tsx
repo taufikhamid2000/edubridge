@@ -12,7 +12,6 @@ const ITEMS_PER_PAGE = 5;
 
 export default function QuizTable({ quizzes: initialQuizzes }: QuizTableProps) {
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
-  const [quizzes, setQuizzes] = useState<Quiz[]>(initialQuizzes);
 
   // Search and filter states
   const [searchTerm, setSearchTerm] = useState('');
@@ -22,16 +21,7 @@ export default function QuizTable({ quizzes: initialQuizzes }: QuizTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
 
   const handleSort = () => {
-    const newDirection = sortDirection === 'asc' ? 'desc' : 'asc';
-    setSortDirection(newDirection);
-
-    const sortedQuizzes = [...quizzes].sort((a, b) => {
-      const dateA = new Date(a.created_at).getTime();
-      const dateB = new Date(b.created_at).getTime();
-      return newDirection === 'asc' ? dateA - dateB : dateB - dateA;
-    });
-
-    setQuizzes(sortedQuizzes);
+    setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
   };
 
   // Reset to first page when search or filters change
@@ -39,9 +29,8 @@ export default function QuizTable({ quizzes: initialQuizzes }: QuizTableProps) {
     setCurrentPage(1);
   }, [searchTerm, statusFilter]);
 
-  // Update quizzes when initialQuizzes changes
+  // Reset filters when initialQuizzes changes
   useEffect(() => {
-    setQuizzes(initialQuizzes);
     setSortDirection(null);
     setSearchTerm('');
     setStatusFilter('all');
@@ -97,12 +86,17 @@ export default function QuizTable({ quizzes: initialQuizzes }: QuizTableProps) {
       <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         {/* Search input */}
         <div className="relative">
+          <label htmlFor="quiz-search" className="sr-only">
+            Search quizzes
+          </label>
           <input
+            id="quiz-search"
             type="text"
             placeholder="Search quiz name or creator..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10 pr-4 py-2 border rounded-md w-full max-w-xs bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            aria-label="Search quizzes"
           />
           <svg
             className="absolute left-3 top-2.5 h-5 w-5 text-gray-400 dark:text-gray-500"
@@ -110,6 +104,7 @@ export default function QuizTable({ quizzes: initialQuizzes }: QuizTableProps) {
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
+            aria-hidden="true"
           >
             <path
               strokeLinecap="round"
@@ -122,10 +117,17 @@ export default function QuizTable({ quizzes: initialQuizzes }: QuizTableProps) {
 
         {/* Status filter */}
         <div className="flex flex-wrap gap-2">
-          <span className="text-sm text-gray-600 dark:text-gray-300 self-center">
+          <span
+            id="status-filter-label"
+            className="text-sm text-gray-600 dark:text-gray-300 self-center"
+          >
             Status:
           </span>
-          <div className="flex rounded-md overflow-hidden border border-gray-300 dark:border-gray-700">
+          <div
+            className="flex rounded-md overflow-hidden border border-gray-300 dark:border-gray-700"
+            role="group"
+            aria-labelledby="status-filter-label"
+          >
             <button
               onClick={() => setStatusFilter('all')}
               className={`px-3 py-1 text-sm ${
@@ -133,6 +135,7 @@ export default function QuizTable({ quizzes: initialQuizzes }: QuizTableProps) {
                   ? 'bg-blue-600 text-white'
                   : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
               }`}
+              aria-pressed={statusFilter === 'all'}
             >
               All
             </button>
@@ -143,6 +146,7 @@ export default function QuizTable({ quizzes: initialQuizzes }: QuizTableProps) {
                   ? 'bg-blue-600 text-white'
                   : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
               }`}
+              aria-pressed={statusFilter === 'verified'}
             >
               Verified
             </button>
@@ -153,6 +157,7 @@ export default function QuizTable({ quizzes: initialQuizzes }: QuizTableProps) {
                   ? 'bg-blue-600 text-white'
                   : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
               }`}
+              aria-pressed={statusFilter === 'unverified'}
             >
               Unverified
             </button>
@@ -178,17 +183,34 @@ export default function QuizTable({ quizzes: initialQuizzes }: QuizTableProps) {
               <th
                 className="px-4 py-2 text-left cursor-pointer select-none group"
                 onClick={handleSort}
+                aria-sort={
+                  sortDirection === 'asc'
+                    ? 'ascending'
+                    : sortDirection === 'desc'
+                      ? 'descending'
+                      : 'none'
+                }
               >
                 <div className="flex items-center">
                   <span className="md:inline">Created at</span>
-                  <span className="ml-1">
+                  <span className="ml-1" aria-hidden="true">
                     {sortDirection === 'asc'
                       ? '↑'
                       : sortDirection === 'desc'
                         ? '↓'
                         : '⇅'}
                   </span>
-                  <span className="ml-1 text-xs text-gray-500 dark:text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity hidden md:inline">
+                  <span className="sr-only">
+                    {sortDirection
+                      ? sortDirection === 'asc'
+                        ? 'sorted oldest first'
+                        : 'sorted newest first'
+                      : 'not sorted, click to sort'}
+                  </span>
+                  <span
+                    className="ml-1 text-xs text-gray-500 dark:text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity hidden md:inline"
+                    aria-hidden="true"
+                  >
                     {sortDirection
                       ? sortDirection === 'asc'
                         ? 'Oldest first'
@@ -200,13 +222,14 @@ export default function QuizTable({ quizzes: initialQuizzes }: QuizTableProps) {
               <th className="px-4 py-2 text-left hidden sm:table-cell">
                 Status
               </th>
+              <th className="px-4 py-2 text-right">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
             {paginatedQuizzes.length === 0 ? (
               <tr>
                 <td
-                  colSpan={4}
+                  colSpan={5}
                   className="text-center py-4 text-gray-500 dark:text-gray-400"
                 >
                   {searchTerm || statusFilter !== 'all'
@@ -221,21 +244,33 @@ export default function QuizTable({ quizzes: initialQuizzes }: QuizTableProps) {
                   className="border-b hover:bg-gray-50 dark:hover:bg-gray-800/80 transition-colors"
                 >
                   <td className="px-4 py-3">
-                    {quiz.name}
-                    {/* Show verification badge on mobile when name is shown */}
-                    <span className="ml-2 inline sm:hidden">
-                      {quiz.verified ? (
-                        <span
-                          className="inline-block w-2 h-2 bg-green-500 rounded-full"
-                          title="Verified"
-                        ></span>
-                      ) : (
-                        <span
-                          className="inline-block w-2 h-2 bg-yellow-500 rounded-full"
-                          title="Unverified"
-                        ></span>
-                      )}
-                    </span>
+                    <div className="flex items-center">
+                      <a
+                        href={`#quiz-${quiz.id}`}
+                        className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          // Replace with actual quiz viewing logic
+                          alert(`View Quiz: ${quiz.name}`);
+                        }}
+                      >
+                        {quiz.name}
+                      </a>
+                      {/* Show verification badge on mobile when name is shown */}
+                      <span className="ml-2 inline sm:hidden">
+                        {quiz.verified ? (
+                          <span
+                            className="inline-block w-2 h-2 bg-green-500 rounded-full"
+                            title="Verified"
+                          ></span>
+                        ) : (
+                          <span
+                            className="inline-block w-2 h-2 bg-yellow-500 rounded-full"
+                            title="Unverified"
+                          ></span>
+                        )}
+                      </span>
+                    </div>
                   </td>
                   <td className="px-4 py-3 hidden sm:table-cell">
                     {quiz.email?.split('@')[0] || 'Unknown'}
@@ -245,7 +280,7 @@ export default function QuizTable({ quizzes: initialQuizzes }: QuizTableProps) {
                   </td>
                   <td className="px-4 py-3 hidden sm:table-cell">
                     <span
-                      className={`px-2 py-1 rounded text-sm ${
+                      className={`inline-block px-2 py-1 rounded text-sm ${
                         quiz.verified
                           ? 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300'
                           : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300'
@@ -253,6 +288,40 @@ export default function QuizTable({ quizzes: initialQuizzes }: QuizTableProps) {
                     >
                       {quiz.verified ? 'Verified' : 'Unverified'}
                     </span>
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    <div className="flex items-center justify-end space-x-2">
+                      <button
+                        className="p-1 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                        aria-label={`Take quiz: ${quiz.name}`}
+                        title="Take quiz"
+                        onClick={() => {
+                          // Navigate to the play quiz page with the current quiz id
+                          window.location.href = `/quiz/${window.location.pathname.split('/')[2]}/${window.location.pathname.split('/')[3]}/play/${quiz.id}`;
+                        }}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+                          />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))
@@ -264,33 +333,44 @@ export default function QuizTable({ quizzes: initialQuizzes }: QuizTableProps) {
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="mt-4 flex items-center justify-between">
-          <div className="text-sm text-gray-500 dark:text-gray-400">
+          <div
+            className="text-sm text-gray-500 dark:text-gray-400"
+            aria-live="polite"
+          >
             Page {currentPage} of {totalPages}
           </div>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              disabled={currentPage === 1}
-              className={`px-3 py-1 rounded ${
-                currentPage === 1
-                  ? 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-600 cursor-not-allowed'
-                  : 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
-              }`}
-            >
-              Previous
-            </button>
-            <button
-              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-              disabled={currentPage === totalPages}
-              className={`px-3 py-1 rounded ${
-                currentPage === totalPages
-                  ? 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-600 cursor-not-allowed'
-                  : 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
-              }`}
-            >
-              Next
-            </button>
-          </div>
+          <nav aria-label="Quiz pagination">
+            <div className="flex gap-2">
+              <button
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                aria-disabled={currentPage === 1}
+                aria-label="Go to previous page"
+                className={`px-3 py-1 rounded ${
+                  currentPage === 1
+                    ? 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-600 cursor-not-allowed'
+                    : 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+                }`}
+              >
+                Previous
+              </button>
+              <button
+                onClick={() =>
+                  setCurrentPage((p) => Math.min(totalPages, p + 1))
+                }
+                disabled={currentPage === totalPages}
+                aria-disabled={currentPage === totalPages}
+                aria-label="Go to next page"
+                className={`px-3 py-1 rounded ${
+                  currentPage === totalPages
+                    ? 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-600 cursor-not-allowed'
+                    : 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+                }`}
+              >
+                Next
+              </button>
+            </div>
+          </nav>
         </div>
       )}
     </div>
