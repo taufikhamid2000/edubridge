@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { useMutation } from '@tanstack/react-query';
 import { createQuiz } from '@/services/quizService';
@@ -39,10 +39,12 @@ interface ChapterData {
 
 export default function CreateQuizPage() {
   const router = useRouter();
+  const params = useParams();
   const searchParams = useSearchParams();
 
-  const subject = searchParams?.get('subject') || '';
-  const topic = searchParams?.get('topic') || '';
+  // Get subject and topic from path parameters, not search parameters
+  const subject = (params?.subject as string) || '';
+  const topic = (params?.topic as string) || '';
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -121,11 +123,16 @@ export default function CreateQuizPage() {
 
   const mutation = useMutation({
     mutationFn: (data: QuizData) => createQuiz(data),
-    onSuccess: () => {
-      // Show success notification
-      alert('Quiz created successfully!');
-      // Redirect back to the topic page
-      router.push(`/quiz/${subject}/${topic}`);
+    onSuccess: (result) => {
+      if (result.success && result.quizId) {
+        // Show success notification
+        alert('Quiz created successfully! Now you can add questions.');
+        // Redirect to the question management page
+        router.push(`/quiz/${subject}/${topic}/${result.quizId}/questions`);
+      } else {
+        // Handle error case where quiz was created but no ID was returned
+        setError('Quiz created but unable to proceed to question creation');
+      }
     },
     onError: (error) => {
       console.error('Error creating quiz:', error);
@@ -136,11 +143,19 @@ export default function CreateQuizPage() {
   });
 
   const onSubmit = (data: QuizData) => {
+    // Validate that we have a valid topic ID
+    if (!topicData?.id) {
+      setError(
+        'Cannot create a quiz: Invalid topic ID. Please select a valid topic.'
+      );
+      return;
+    }
+
     // Add the subject and topic IDs to the form data
     mutation.mutate({
       ...data,
-      subject: subject,
-      topic: topic,
+      subject: subjectData?.id || subject,
+      topic: topicData.id, // Use the topic ID from our fetched data
     });
   };
 
