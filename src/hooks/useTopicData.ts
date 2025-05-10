@@ -48,19 +48,32 @@ export function useTopicData(subject: string, topic: string) {
           throw new Error(`Chapter data missing for topic: ${topic}`);
 
         setTopicData(topicData);
-        setChapterData(topicData.chapters);
-
-        // Fetch quizzes with email
+        setChapterData(topicData.chapters); // Fetch quizzes with email - use distinct to avoid duplicates
         try {
-          const { data: quizzesData, error: quizzesError } = await supabase
+          // First query the actual quizzes table to get unique quiz IDs
+          const { data: uniqueQuizzes, error: quizzesError } = await supabase
+            .from('quizzes')
+            .select('*')
+            .eq('topic_id', topic);
+
+          if (quizzesError || !uniqueQuizzes) {
+            setQuizzes([]);
+            return;
+          }
+
+          // Then join with user info if needed
+          const { data: quizzesData } = await supabase
             .from('quizzes_with_email')
             .select('*')
             .eq('topic_id', topic)
-            .neq('created_by', null)
-            .neq('created_by', '')
-            .ilike('created_by', '%-%-%-%-%');
+            .in(
+              'id',
+              uniqueQuizzes.map((quiz) => quiz.id)
+            );
 
-          setQuizzes(quizzesError ? [] : quizzesData || []);
+          // If we have data from the view, use that (it has email info)
+          // Otherwise fall back to the basic quiz data
+          setQuizzes(quizzesData || uniqueQuizzes || []);
         } catch {
           setQuizzes([]);
         }

@@ -1,6 +1,15 @@
-/* eslint-disable react/no-unescaped-entities */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from 'react';
+
+// Function to generate a random alphanumeric code of specified length
+const generateQuizCode = (length = 6) => {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+};
 
 interface QuizFormProps {
   register: any;
@@ -13,41 +22,56 @@ interface QuizFormProps {
   topicName?: string;
 }
 
-export function QuizForm({ 
-  register, 
-  handleSubmit, 
-  errors, 
+export function QuizForm({
+  register,
+  handleSubmit,
+  errors,
   onSubmit,
   isLoading = false,
   subjectName,
   chapterName,
-  topicName
+  topicName,
 }: QuizFormProps) {
-  const [questionCount, setQuestionCount] = useState(3);
-  
+  const [questionCount] = useState(3);
+  const [quizCode] = useState(() => generateQuizCode());
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       {/* Quiz Context Information */}
       {(subjectName || chapterName || topicName) && (
         <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg mb-6">
-          <h3 className="font-medium text-blue-800 dark:text-blue-300 mb-2">Quiz Context</h3>
+          <h3 className="font-medium text-blue-800 dark:text-blue-300 mb-2">
+            Quiz Context
+          </h3>
           <dl className="grid grid-cols-1 gap-2 text-sm">
             {subjectName && (
               <div className="flex">
-                <dt className="font-medium text-gray-500 dark:text-gray-400 w-24">Subject:</dt>
-                <dd className="text-gray-800 dark:text-gray-200">{subjectName}</dd>
+                <dt className="font-medium text-gray-500 dark:text-gray-400 w-24">
+                  Subject:
+                </dt>
+                <dd className="text-gray-800 dark:text-gray-200">
+                  {subjectName}
+                </dd>
               </div>
             )}
             {chapterName && (
               <div className="flex">
-                <dt className="font-medium text-gray-500 dark:text-gray-400 w-24">Chapter:</dt>
-                <dd className="text-gray-800 dark:text-gray-200">{chapterName}</dd>
+                <dt className="font-medium text-gray-500 dark:text-gray-400 w-24">
+                  Chapter:
+                </dt>
+                <dd className="text-gray-800 dark:text-gray-200">
+                  {chapterName}
+                </dd>
               </div>
             )}
             {topicName && (
               <div className="flex">
-                <dt className="font-medium text-gray-500 dark:text-gray-400 w-24">Topic:</dt>
-                <dd className="text-gray-800 dark:text-gray-200">{topicName}</dd>
+                <dt className="font-medium text-gray-500 dark:text-gray-400 w-24">
+                  Topic:
+                </dt>
+                <dd className="text-gray-800 dark:text-gray-200">
+                  {topicName}
+                </dd>
               </div>
             )}
           </dl>
@@ -56,132 +80,138 @@ export function QuizForm({
 
       {/* Quiz Basic Information */}
       <div className="space-y-4">
+        {' '}
         <div className="space-y-2">
-          <label 
-            htmlFor="quizName" 
+          <label
+            htmlFor="quizName"
             className="block text-sm font-medium text-gray-700 dark:text-gray-300"
           >
-            Quiz Name*
+            Quiz Code
           </label>
-          <input 
-            id="quizName" 
-            className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 
-              ${errors.name ? 
-                'border-red-300 focus:border-red-500 focus:ring-red-500 dark:border-red-700' : 
-                'border-gray-300 dark:border-gray-700 dark:bg-gray-800'
-              }`}
-            placeholder="Enter descriptive quiz name" 
-            {...register('name', { 
-              required: 'Quiz name is required',
-              minLength: { value: 5, message: 'Quiz name should be at least 5 characters' }
-            })} 
-          />
-          {errors.name && (
-            <p className="mt-1 text-sm text-red-600 dark:text-red-400">
-              {errors.name.message}
-            </p>
-          )}
+          <div className="relative">
+            <input
+              id="quizName"
+              className="w-full px-3 py-2 border rounded-md shadow-sm bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-700 text-gray-800 dark:text-gray-200 font-mono"
+              readOnly
+              value={quizCode}
+              {...register('name', {
+                required: true,
+                value: quizCode,
+              })}
+            />
+          </div>
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            Auto-generated unique quiz identifier
+          </p>
         </div>
-        
         <div className="space-y-2">
-          <label 
-            htmlFor="description" 
+          <label
+            htmlFor="description"
             className="block text-sm font-medium text-gray-700 dark:text-gray-300"
           >
             Description
-          </label>
-          <textarea 
-            id="description" 
+          </label>{' '}
+          <textarea
+            id="description"
             rows={3}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 
+              ${errors.description ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 dark:border-gray-700 dark:bg-gray-800'}`}
             placeholder="Describe what this quiz covers"
-            {...register('description')} 
+            {...register('description')}
           />
-        </div>
-
-        <div className="space-y-2">
-          <label 
-            htmlFor="difficulty" 
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          {errors.description && (
+            <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+              {errors.description.message}
+            </p>
+          )}
+        </div>{' '}
+        <div className="space-y-2 opacity-50">
+          <label
+            htmlFor="difficulty"
+            className="flex items-center text-sm font-medium text-gray-700 dark:text-gray-300"
           >
             Difficulty Level
+            <span className="ml-2 text-xs py-0.5 px-1.5 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded">
+              Coming soon
+            </span>
           </label>
           <select
             id="difficulty"
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-not-allowed"
+            disabled
             {...register('difficulty')}
           >
             <option value="beginner">Beginner</option>
             <option value="intermediate">Intermediate</option>
             <option value="advanced">Advanced</option>
           </select>
-        </div>
-
-        <div className="space-y-2">
-          <label 
-            htmlFor="timeLimit" 
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+        </div>{' '}
+        <div className="space-y-2 opacity-50">
+          <label
+            htmlFor="timeLimit"
+            className="flex items-center text-sm font-medium text-gray-700 dark:text-gray-300"
           >
             Time Limit (minutes)
+            <span className="ml-2 text-xs py-0.5 px-1.5 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded">
+              Coming soon
+            </span>
           </label>
-          <input 
-            id="timeLimit" 
+          <input
+            id="timeLimit"
             type="number"
             min="1"
             max="120"
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 rounded-md shadow-sm cursor-not-allowed"
             placeholder="Time limit in minutes"
-            {...register('timeLimit', { 
-              min: { value: 1, message: 'Time limit must be at least 1 minute' },
-              max: { value: 120, message: 'Time limit cannot exceed 120 minutes' }
-            })} 
+            {...register('timeLimit')}
           />
-          {errors.timeLimit && (
-            <p className="mt-1 text-sm text-red-600 dark:text-red-400">
-              {errors.timeLimit.message}
-            </p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        </div>{' '}
+        <div className="space-y-2 opacity-50">
+          <label className="flex items-center text-sm font-medium text-gray-700 dark:text-gray-300">
             Number of Questions
+            <span className="ml-2 text-xs py-0.5 px-1.5 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded">
+              Coming soon
+            </span>
           </label>
           <div className="flex items-center space-x-2">
             <input
               type="range"
               min="1"
               max="20"
+              disabled
               value={questionCount}
-              onChange={(e) => setQuestionCount(parseInt(e.target.value))}
-              className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
+              className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-not-allowed"
             />
             <span className="w-8 text-center">{questionCount}</span>
           </div>
           <p className="text-xs text-gray-500 dark:text-gray-400">
-            You'll be able to add {questionCount} questions after creating the quiz
+            Default questions will be added after creating the quiz
           </p>
         </div>
-
-        <div className="flex items-center mt-2">
+        <div className="flex items-center mt-2 opacity-50">
           <input
             id="isPublic"
             type="checkbox"
-            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            disabled
+            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-not-allowed"
             {...register('isPublic')}
           />
           <label
             htmlFor="isPublic"
-            className="ml-2 block text-sm text-gray-700 dark:text-gray-300"
+            className="ml-2 flex items-center text-sm text-gray-700 dark:text-gray-300"
           >
             Make this quiz public
+            <span className="ml-2 text-xs py-0.5 px-1.5 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded">
+              Coming soon
+            </span>
           </label>
         </div>
       </div>
-      
+
       <div className="pt-4">
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           disabled={isLoading}
           className="w-full px-4 py-3 text-white font-medium rounded-md shadow-sm 
             bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 

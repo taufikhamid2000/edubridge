@@ -268,7 +268,6 @@ export default function QuestionsManagementPage() {
         .from('questions')
         .delete()
         .eq('quiz_id', quizId);
-
       if (deleteError) {
         console.error('Error deleting existing questions:', deleteError);
         throw new Error(
@@ -289,7 +288,6 @@ export default function QuestionsManagementPage() {
               text: question.text,
               type: question.type,
               order_index: i,
-              created_by: userId, // Add user ID to track question ownership
             },
           ])
           .select()

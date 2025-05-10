@@ -218,11 +218,11 @@ export default function QuizTable({ quizzes: initialQuizzes }: QuizTableProps) {
                       : 'Click to sort'}
                   </span>
                 </div>
-              </th>
+              </th>{' '}
               <th className="px-4 py-2 text-left hidden sm:table-cell">
                 Status
               </th>
-              <th className="px-4 py-2 text-right">Actions</th>
+              <th className="px-4 py-2 text-right">Options</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
@@ -243,15 +243,16 @@ export default function QuizTable({ quizzes: initialQuizzes }: QuizTableProps) {
                   key={`${quiz.id}-${index}`}
                   className="border-b hover:bg-gray-50 dark:hover:bg-gray-800/80 transition-colors"
                 >
+                  {' '}
                   <td className="px-4 py-3">
                     <div className="flex items-center">
                       <a
-                        href={`#quiz-${quiz.id}`}
+                        href={`/quiz/${window.location.pathname.split('/')[2]}/${window.location.pathname.split('/')[3]}/play/${quiz.id}`}
                         className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
                         onClick={(e) => {
                           e.preventDefault();
-                          // Replace with actual quiz viewing logic
-                          alert(`View Quiz: ${quiz.name}`);
+                          // Navigate to quiz play page
+                          window.location.href = `/quiz/${window.location.pathname.split('/')[2]}/${window.location.pathname.split('/')[3]}/play/${quiz.id}`;
                         }}
                       >
                         {quiz.name}
@@ -288,39 +289,13 @@ export default function QuizTable({ quizzes: initialQuizzes }: QuizTableProps) {
                     >
                       {quiz.verified ? 'Verified' : 'Unverified'}
                     </span>
-                  </td>
+                  </td>{' '}
                   <td className="px-4 py-3 text-right">
                     <div className="flex items-center justify-end space-x-2">
-                      <button
-                        className="p-1 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-                        aria-label={`Take quiz: ${quiz.name}`}
-                        title="Take quiz"
-                        onClick={() => {
-                          // Navigate to the play quiz page with the current quiz id
-                          window.location.href = `/quiz/${window.location.pathname.split('/')[2]}/${window.location.pathname.split('/')[3]}/play/${quiz.id}`;
-                        }}
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
-                          />
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                          />
-                        </svg>
-                      </button>
+                      {/* Actions column kept for future functionality */}
+                      <span className="text-gray-400 dark:text-gray-600 text-sm italic">
+                        -
+                      </span>
                     </div>
                   </td>
                 </tr>
