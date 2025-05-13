@@ -26,6 +26,8 @@ interface Subject {
   description: string;
   icon: string;
   category?: string;
+  category_priority?: number;
+  order_index?: number;
 }
 
 function DashboardClient() {
@@ -51,7 +53,6 @@ function DashboardClient() {
         router.replace('/auth');
         return;
       }
-
       try {
         console.log('Fetching subjects from Supabase...');
         // Fetch subjects from Supabase
@@ -64,17 +65,32 @@ function DashboardClient() {
           console.error('Error fetching subjects:', subjectsError);
           setError(subjectsError.message);
           throw subjectsError;
-        }
+        }        // Create a sorted copy of the subjects data
+        const sortedSubjects = [...(subjectsData || [])];
 
-        console.log('Subjects data received:', subjectsData);
-        setSubjects(subjectsData || []);
+        // Sort the subjects array using the category_priority field from the database
+        sortedSubjects.sort((a, b) => {
+          // First, try to sort by category_priority if present
+          const priorityA = a.category_priority ?? 999;
+          const priorityB = b.category_priority ?? 999;
+
+          // First sort by category priority
+          if (priorityA !== priorityB) {
+            return priorityA - priorityB;
+          }
+
+          // Then sort by the existing order_index within the same category
+          return (a.order_index || 0) - (b.order_index || 0);
+        });
+        console.log('Subjects data sorted:', sortedSubjects);
+        setSubjects(sortedSubjects);
 
         // Extract unique categories
         const uniqueCategories = Array.from(
           new Set(
-            subjectsData?.map((subject) => subject.category || 'Uncategorized')
+            sortedSubjects.map((subject) => subject.category || 'Uncategorized')
           )
-        );
+        ) as string[];
         setCategories(['all', ...uniqueCategories]);
 
         // TODO: Fetch user data from Supabase

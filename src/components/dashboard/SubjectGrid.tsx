@@ -7,6 +7,8 @@ interface Subject {
   description: string;
   icon: string;
   category?: string;
+  category_priority?: number;
+  order_index?: number;
 }
 
 interface SubjectGridProps {

@@ -217,8 +217,8 @@ export default function QuizTable({ quizzes: initialQuizzes }: QuizTableProps) {
                         : 'Newest first'
                       : 'Click to sort'}
                   </span>
-                </div>
-              </th>{' '}
+                </div>{' '}
+              </th>
               <th className="px-4 py-2 text-left hidden sm:table-cell">
                 Status
               </th>
@@ -243,7 +243,6 @@ export default function QuizTable({ quizzes: initialQuizzes }: QuizTableProps) {
                   key={`${quiz.id}-${index}`}
                   className="border-b hover:bg-gray-50 dark:hover:bg-gray-800/80 transition-colors"
                 >
-                  {' '}
                   <td className="px-4 py-3">
                     <div className="flex items-center">
                       <a
@@ -287,9 +286,9 @@ export default function QuizTable({ quizzes: initialQuizzes }: QuizTableProps) {
                           : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300'
                       }`}
                     >
-                      {quiz.verified ? 'Verified' : 'Unverified'}
+                      {quiz.verified ? 'Verified' : 'Unverified'}{' '}
                     </span>
-                  </td>{' '}
+                  </td>
                   <td className="px-4 py-3 text-right">
                     <div className="flex items-center justify-end space-x-2">
                       {/* Actions column kept for future functionality */}

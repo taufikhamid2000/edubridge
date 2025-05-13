@@ -21,6 +21,9 @@ export interface Subject {
   slug: string;
   description: string;
   icon: string;
+  category?: string;
+  category_priority?: number;
+  order_index?: number;
 }
 
 export interface Quiz {

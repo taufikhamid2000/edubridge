@@ -196,13 +196,11 @@ export default function CreateQuizPage() {
               Design a quiz for students to test their knowledge
             </p>
           </div>
-
           {error && (
             <div className="mb-6 p-3 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-300 rounded">
               {error}
             </div>
-          )}
-
+          )}{' '}
           <QuizForm
             register={register}
             handleSubmit={handleSubmit}
