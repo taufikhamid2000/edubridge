@@ -48,7 +48,12 @@ export function useTopicData(subject: string, topic: string) {
           throw new Error(`Chapter data missing for topic: ${topic}`);
 
         setTopicData(topicData);
-        setChapterData(topicData.chapters); // Fetch quizzes with email - use distinct to avoid duplicates
+        // Get the first chapter from the array, assuming each topic is associated with one chapter
+        const chapter =
+          Array.isArray(topicData.chapters) && topicData.chapters.length > 0
+            ? topicData.chapters[0]
+            : null;
+        setChapterData(chapter); // Set the first chapter data
         try {
           // First query the actual quizzes table to get unique quiz IDs
           const { data: uniqueQuizzes, error: quizzesError } = await supabase

@@ -34,11 +34,9 @@ export default function ClientTopicPage({
           subject={subjectData}
           chapter={chapterData}
           topic={topicData}
-        />
+        />{' '}
         <QuizTable quizzes={quizzes} />
         <ActionButtons
-          subjectData={subjectData}
-          topicData={topicData}
           chapterData={chapterData}
           subject={subject}
           topic={topic}

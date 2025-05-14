@@ -5,7 +5,7 @@ export interface Topic {
   difficulty_level: number | null;
   time_estimate_minutes: number | null;
   order_index: number;
-  chapters: Chapter;
+  chapters: Chapter[];
 }
 
 export interface Chapter {
