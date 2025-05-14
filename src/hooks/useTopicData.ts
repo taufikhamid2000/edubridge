@@ -40,20 +40,39 @@ export function useTopicData(subject: string, topic: string) {
           .select('*, chapters(*)')
           .eq('id', topic)
           .single();
-
         if (topicError)
           throw new Error(`Failed to load topic: ${topicError.message}`);
         if (!topicData) throw new Error(`Topic not found: ${topic}`);
-        if (!topicData.chapters)
-          throw new Error(`Chapter data missing for topic: ${topic}`);
-
+        if (!topicData.chapters) {
+          console.warn(`Chapter data missing for topic: ${topic}`);
+          // Continue without throwing, let the chapterData=null flow handle this
+        }
         setTopicData(topicData);
-        // Get the first chapter from the array, assuming each topic is associated with one chapter
-        const chapter =
-          Array.isArray(topicData.chapters) && topicData.chapters.length > 0
-            ? topicData.chapters[0]
-            : null;
-        setChapterData(chapter); // Set the first chapter data
+        // Log the chapters structure to understand what's coming from the API
+        console.log('Chapters from API:', JSON.stringify(topicData.chapters));
+
+        // Handle different possible formats of the chapters data
+        let chapter = null;
+        if (topicData.chapters) {
+          if (
+            Array.isArray(topicData.chapters) &&
+            topicData.chapters.length > 0
+          ) {
+            chapter = topicData.chapters[0];
+          } else if (
+            typeof topicData.chapters === 'object' &&
+            'id' in topicData.chapters
+          ) {
+            // Handle case where chapters might be a single object and not an array
+            chapter = topicData.chapters;
+          }
+        }
+
+        if (!chapter) {
+          console.warn(`No valid chapter found for topic: ${topic}`);
+        }
+
+        setChapterData(chapter); // Set the chapter data
         try {
           // First query the actual quizzes table to get unique quiz IDs
           const { data: uniqueQuizzes, error: quizzesError } = await supabase

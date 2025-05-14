@@ -19,12 +19,25 @@ export default function ClientTopicPage({
 }): ReactNode {
   const { loading, error, subjectData, topicData, chapterData, quizzes } =
     useTopicData(subject, topic);
-
   // Handle different states
   if (loading) return <LoadingDisplay />;
   if (error) return <ErrorDisplay message={error} />;
-  if (!subjectData || !topicData || !chapterData) {
+
+  // More detailed error handling with specific messages
+  if (!subjectData) {
+    return <ErrorDisplay message="Subject information not found" />;
+  }
+
+  if (!topicData) {
     return <ErrorDisplay message="Topic information not found" />;
+  }
+
+  if (!chapterData) {
+    console.warn(`No chapter data available for topic: ${topic}`);
+    // We could continue without chapter data, or show an error
+    return (
+      <ErrorDisplay message="Chapter information not found for this topic" />
+    );
   }
 
   return (
