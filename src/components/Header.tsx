@@ -83,6 +83,9 @@ export default function Header(): JSX.Element {
                 <Link href="/leaderboard" className="header-menu-link">
                   Leaderboard
                 </Link>
+                <Link href="/profile" className="header-menu-link">
+                  Profile
+                </Link>
                 <button
                   type="button"
                   className="header-menu-link"
