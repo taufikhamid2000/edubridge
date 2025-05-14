@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import { logger } from '@/lib/logger';
 
 // Import dashboard components
 import WelcomeBanner from '@/components/dashboard/WelcomeBanner';
@@ -54,7 +55,7 @@ function DashboardClient() {
         return;
       }
       try {
-        console.log('Fetching subjects from Supabase...');
+        logger.log('Fetching subjects from Supabase...');
         // Fetch subjects from Supabase
         const { data: subjectsData, error: subjectsError } = await supabase
           .from('subjects')
@@ -62,10 +63,10 @@ function DashboardClient() {
           .order('order_index', { ascending: true });
 
         if (subjectsError) {
-          console.error('Error fetching subjects:', subjectsError);
+          logger.error('Error fetching subjects:', subjectsError);
           setError(subjectsError.message);
           throw subjectsError;
-        }        // Create a sorted copy of the subjects data
+        } // Create a sorted copy of the subjects data
         const sortedSubjects = [...(subjectsData || [])];
 
         // Sort the subjects array using the category_priority field from the database
@@ -82,7 +83,7 @@ function DashboardClient() {
           // Then sort by the existing order_index within the same category
           return (a.order_index || 0) - (b.order_index || 0);
         });
-        console.log('Subjects data sorted:', sortedSubjects);
+        logger.log('Subjects data sorted:', sortedSubjects);
         setSubjects(sortedSubjects);
 
         // Extract unique categories
@@ -102,7 +103,7 @@ function DashboardClient() {
           lastQuizDate: new Date().toISOString().split('T')[0],
         });
       } catch (error) {
-        console.error('Error fetching data:', error);
+        logger.error('Error fetching data:', error);
         setError(error instanceof Error ? error.message : 'An error occurred');
       } finally {
         setLoading(false);

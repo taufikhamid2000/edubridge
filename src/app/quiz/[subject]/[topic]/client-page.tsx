@@ -31,10 +31,8 @@ export default function ClientTopicPage({
   if (!topicData) {
     return <ErrorDisplay message="Topic information not found" />;
   }
-
   if (!chapterData) {
-    console.warn(`No chapter data available for topic: ${topic}`);
-    // We could continue without chapter data, or show an error
+    // No chapter data available
     return (
       <ErrorDisplay message="Chapter information not found for this topic" />
     );

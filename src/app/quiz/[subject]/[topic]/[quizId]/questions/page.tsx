@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { Quiz } from '@/types/topics';
@@ -106,7 +107,7 @@ export default function QuestionsManagementPage() {
           addNewQuestion();
         }
       } catch (err) {
-        console.error('Error:', err);
+        logger.error('Error:', err);
         setError(err instanceof Error ? err.message : 'An error occurred');
       } finally {
         setLoading(false);
@@ -269,7 +270,7 @@ export default function QuestionsManagementPage() {
         .delete()
         .eq('quiz_id', quizId);
       if (deleteError) {
-        console.error('Error deleting existing questions:', deleteError);
+        logger.error('Error deleting existing questions:', deleteError);
         throw new Error(
           `Failed to delete existing questions: ${deleteError.message}`
         );
@@ -317,7 +318,7 @@ export default function QuestionsManagementPage() {
       alert('Questions saved successfully!');
       router.push(`/quiz/${subject}/${topic}`);
     } catch (err) {
-      console.error('Error saving questions:', err);
+      logger.error('Error saving questions:', err);
       setError(err instanceof Error ? err.message : 'Failed to save questions');
     } finally {
       setSaving(false);

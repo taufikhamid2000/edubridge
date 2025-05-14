@@ -1,0 +1,10 @@
+{
+  "name": "replace-console-logs",
+  "version": "1.0.0",
+  "description": "Script to replace console.log calls with logger utility",
+  "type": "module",
+  "main": "replace-console-logs.js",
+  "author": "EduBridge Team",
+  "license": "UNLICENSED",
+  "private": true
+}

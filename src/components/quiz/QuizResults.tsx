@@ -1,5 +1,6 @@
 import React from 'react';
 import { Question } from '@/types/topics';
+import { logger } from '@/lib/logger';
 
 interface QuizResultsProps {
   score: number;
@@ -44,13 +45,13 @@ export default function QuizResults({
           text: getShareText(),
           url: window.location.href,
         })
-        .catch((error) => console.log('Error sharing', error));
+        .catch((error) => logger.log('Error sharing', error));
     } else {
       // Fallback for browsers that don't support Web Share API
       navigator.clipboard
         .writeText(getShareText() + ' ' + window.location.href)
         .then(() => alert('Result copied to clipboard!'))
-        .catch((err) => console.error('Failed to copy: ', err));
+        .catch((err) => logger.error('Failed to copy: ', err));
     }
   };
 

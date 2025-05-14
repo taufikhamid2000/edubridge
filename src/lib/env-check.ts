@@ -1,6 +1,7 @@
 /**
  * Environment variable validation to prevent deployment with missing required variables
  */
+import { logger } from './logger';
 
 // Add your required environment variables here
 const requiredEnvVars = [
@@ -17,9 +18,8 @@ export function validateEnvironment(): void {
   const missingVars = requiredEnvVars.filter(
     (varName) => !process.env[varName]
   );
-
   if (missingVars.length > 0) {
-    console.error(
+    logger.error(
       `Error: Missing required environment variables: ${missingVars.join(', ')}`
     );
     // In build scripts, you might want to exit the process

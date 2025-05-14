@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import { getQuizWithQuestions } from '@/lib/quiz';
 import QuizPlayer from '@/components/quiz/QuizPlayer';
 import { Question, Quiz } from '@/types/topics';
+import { logger } from '@/lib/logger';
 
 export default function PlayQuizPage() {
   const params = useParams();
@@ -35,7 +36,7 @@ export default function PlayQuizPage() {
         setQuiz(quizData.quiz);
         setQuestions(quizData.questions);
       } catch (err) {
-        console.error('Error fetching quiz:', err);
+        logger.error('Error fetching quiz:', err);
         setError(
           err instanceof Error
             ? err.message
@@ -95,6 +96,7 @@ export default function PlayQuizPage() {
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="max-w-3xl mx-auto">
+        {' '}
         <QuizPlayer
           quizId={quizId}
           quizName={quiz.name}
@@ -103,7 +105,7 @@ export default function PlayQuizPage() {
           userId={userId}
           onComplete={() => {
             // Handle quiz completion
-            console.log('Quiz completed');
+            logger.log('Quiz completed');
           }}
         />
       </div>

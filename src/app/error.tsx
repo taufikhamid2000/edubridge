@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { logger } from '@/lib/logger';
 
 export default function Error({
   error,
@@ -11,7 +12,7 @@ export default function Error({
 }) {
   useEffect(() => {
     // Log the error to an error reporting service
-    console.error('Unhandled error:', error);
+    logger.error('Unhandled error:', error);
   }, [error]);
 
   return (

@@ -44,12 +44,10 @@ export function useTopicData(subject: string, topic: string) {
           throw new Error(`Failed to load topic: ${topicError.message}`);
         if (!topicData) throw new Error(`Topic not found: ${topic}`);
         if (!topicData.chapters) {
-          console.warn(`Chapter data missing for topic: ${topic}`);
+          // Chapter data missing, but we'll handle it gracefully
           // Continue without throwing, let the chapterData=null flow handle this
         }
         setTopicData(topicData);
-        // Log the chapters structure to understand what's coming from the API
-        console.log('Chapters from API:', JSON.stringify(topicData.chapters));
 
         // Handle different possible formats of the chapters data
         let chapter = null;
@@ -66,13 +64,8 @@ export function useTopicData(subject: string, topic: string) {
             // Handle case where chapters might be a single object and not an array
             chapter = topicData.chapters;
           }
-        }
-
-        if (!chapter) {
-          console.warn(`No valid chapter found for topic: ${topic}`);
-        }
-
-        setChapterData(chapter); // Set the chapter data
+        } // Set the chapter data, which might be null if no valid chapter was found
+        setChapterData(chapter);
         try {
           // First query the actual quizzes table to get unique quiz IDs
           const { data: uniqueQuizzes, error: quizzesError } = await supabase

@@ -8,6 +8,7 @@ import { useMutation } from '@tanstack/react-query';
 import { createQuiz } from '@/services/quizService';
 import { QuizForm } from '@/components/QuizForm';
 import { supabase } from '@/lib/supabase';
+import { logger } from '@/lib/logger';
 
 interface QuizData {
   name: string;
@@ -109,7 +110,7 @@ export default function CreateQuizPage() {
           }
         }
       } catch (err) {
-        console.error('Error fetching metadata:', err);
+        logger.error('Error fetching metadata:', err);
         setError(
           err instanceof Error ? err.message : 'Failed to load quiz context'
         );
@@ -135,7 +136,7 @@ export default function CreateQuizPage() {
       }
     },
     onError: (error) => {
-      console.error('Error creating quiz:', error);
+      logger.error('Error creating quiz:', error);
       setError(
         error instanceof Error ? error.message : 'Failed to create quiz'
       );

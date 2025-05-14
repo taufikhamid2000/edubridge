@@ -6,6 +6,7 @@ import QuizProgress from './QuizProgress';
 import QuizResults from './QuizResults';
 import { useRouter } from 'next/navigation';
 import { submitQuizAttempt } from '@/lib/quiz';
+import { logger } from '@/lib/logger';
 
 interface QuizPlayerProps {
   quizId: string;
@@ -152,7 +153,7 @@ export default function QuizPlayer({
         onComplete();
       }
     } catch (error) {
-      console.error('Error submitting quiz:', error);
+      logger.error('Error submitting quiz:', error);
       // You could add error handling UI here
     }
   };

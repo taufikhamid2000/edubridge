@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { logger } from '@/lib/logger';
 
 export default function ErrorBoundary({
   children,
@@ -13,7 +14,7 @@ export default function ErrorBoundary({
   useEffect(() => {
     // Add global error handler
     const handleError = (error: ErrorEvent) => {
-      console.error('Global error caught:', error);
+      logger.error('Global error caught:', error);
       setError(error.error);
       setHasError(true);
     };

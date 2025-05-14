@@ -1,9 +1,10 @@
 import { supabase } from './supabase';
 import { Question, Quiz } from '@/types/topics';
+import { logger } from './logger';
 
 export async function getQuizQuestions(subject: string, topic: string) {
   // Placeholder function to simulate fetching quiz questions
-  console.log(`Fetching questions for subject: ${subject}, topic: ${topic}`);
+  logger.log(`Fetching questions for subject: ${subject}, topic: ${topic}`);
   return [
     {
       id: 1,
@@ -26,9 +27,8 @@ export async function getQuizById(quizId: string): Promise<Quiz | null> {
     .select('*')
     .eq('id', quizId)
     .single();
-
   if (error) {
-    console.error('Error fetching quiz:', error);
+    logger.error('Error fetching quiz:', error);
     return null;
   }
 
@@ -92,7 +92,7 @@ export async function getQuizWithQuestions(
       questions: questionsData || [],
     };
   } catch (error) {
-    console.error('Error in getQuizWithQuestions:', error);
+    logger.error('Error in getQuizWithQuestions:', error);
     return null;
   }
 }
@@ -101,7 +101,6 @@ export async function submitQuizAttempt({
   quizId,
   userId,
   score,
-
 }: {
   quizId: string;
   userId: string;
@@ -110,7 +109,7 @@ export async function submitQuizAttempt({
 }) {
   try {
     // Log attempt data for debugging
-    console.log('Submitting quiz attempt:', { quizId, userId, score });
+    logger.log('Submitting quiz attempt:', { quizId, userId, score });
 
     // For now, we'll create a more resilient approach that doesn't depend on a specific table
     // First, check if the quiz_attempts table exists
@@ -119,13 +118,11 @@ export async function submitQuizAttempt({
       .select('count')
       .limit(1)
       .match((err: unknown) => {
-        console.log('Table check error:', err);
+        logger.log('Table check error:', err);
         return { data: null, error: err };
-      });
-
-    // If we can't verify the table exists, store results in localStorage as a fallback
+      }); // If we can't verify the table exists, store results in localStorage as a fallback
     if (checkError) {
-      console.log('Using localStorage fallback for quiz results');
+      logger.log('Using localStorage fallback for quiz results');
       // Store in localStorage as fallback
       const attemptData = {
         id: `local-${Date.now()}`,
@@ -162,9 +159,8 @@ export async function submitQuizAttempt({
       ])
       .select()
       .single();
-
     if (attemptError) {
-      console.error('Insert error details:', attemptError);
+      logger.error('Insert error details:', attemptError);
 
       // Fallback to localStorage if insert fails
       const fallbackData = {
@@ -190,7 +186,7 @@ export async function submitQuizAttempt({
     // If we successfully saved to the database, return that data
     return attemptData;
   } catch (error) {
-    console.error('Error in submitQuizAttempt:', error);
+    logger.error('Error in submitQuizAttempt:', error);
 
     // Even in case of unexpected errors, provide a fallback result
     const fallbackData = {

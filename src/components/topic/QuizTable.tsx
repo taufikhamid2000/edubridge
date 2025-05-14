@@ -176,7 +176,7 @@ export default function QuizTable({ quizzes: initialQuizzes }: QuizTableProps) {
         <table className="table-auto w-full">
           <thead>
             <tr className="bg-gray-100 dark:bg-gray-800">
-              <th className="px-4 py-2 text-left">Name</th>
+              <th className="px-4 py-2 text-left">Quiz Code</th>
               <th className="px-4 py-2 text-left hidden sm:table-cell">
                 Created by
               </th>

@@ -1,16 +1,16 @@
 import { supabase } from './supabase';
+import { logger } from './logger';
 
 export async function getSubjectBySlug(subjectSlug: string) {
-  console.log(`Fetching subject data for slug: ${subjectSlug}`);
+  logger.log(`Fetching subject data for slug: ${subjectSlug}`);
 
   const { data, error } = await supabase
     .from('subjects')
     .select('id, name, slug')
     .eq('slug', subjectSlug)
     .single();
-
   if (error) {
-    console.error('Error fetching subject:', error);
+    logger.error('Error fetching subject:', error);
     throw new Error('Failed to fetch subject data');
   }
 
@@ -18,7 +18,7 @@ export async function getSubjectBySlug(subjectSlug: string) {
 }
 
 export async function getChaptersBySubjectSlug(subjectSlug: string) {
-  console.log(`Fetching chapters for subject slug: ${subjectSlug}`);
+  logger.log(`Fetching chapters for subject slug: ${subjectSlug}`);
 
   // Step 1: Get the subject ID first - this is necessary with Supabase
   const { data: subjectData, error: subjectError } = await supabase
@@ -26,9 +26,8 @@ export async function getChaptersBySubjectSlug(subjectSlug: string) {
     .select('id')
     .eq('slug', subjectSlug)
     .single();
-
   if (subjectError) {
-    console.error('Error fetching subject ID:', subjectError);
+    logger.error('Error fetching subject ID:', subjectError);
     throw new Error('Failed to fetch subject ID');
   }
 
@@ -44,9 +43,8 @@ export async function getChaptersBySubjectSlug(subjectSlug: string) {
     .eq('subject_id', subjectId)
     .order('form', { ascending: true })
     .order('order_index', { ascending: true });
-
   if (chaptersError) {
-    console.error('Error fetching chapters:', chaptersError);
+    logger.error('Error fetching chapters:', chaptersError);
     throw new Error('Failed to fetch chapters');
   }
 

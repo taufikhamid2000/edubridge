@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from 'react';
+import { logger } from '@/lib/logger';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
 
@@ -32,7 +33,7 @@ export default function ChapterList({
         .order('order_index', { ascending: true });
 
       if (error) {
-        console.error('Error fetching topics:', error);
+        logger.error('Error fetching topics:', error);
         return;
       }
 
