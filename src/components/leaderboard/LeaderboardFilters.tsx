@@ -43,9 +43,12 @@ export default function LeaderboardFilters({
 
   return (
     <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+      {' '}
       <div className="flex items-center space-x-2 md:space-x-4">
-        <span className="text-sm text-gray-600 font-medium">Time:</span>
-        <div className="inline-flex bg-gray-100 rounded-lg p-1">
+        <span className="text-sm text-gray-600 dark:text-gray-300 font-medium">
+          Time:
+        </span>
+        <div className="inline-flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
           <button
             onClick={() => onTimeFrameChange('daily')}
             className={`px-3 py-1 text-sm rounded-md transition-colors ${
@@ -77,14 +80,15 @@ export default function LeaderboardFilters({
             All Time
           </button>
         </div>
-      </div>
-
+      </div>{' '}
       <div className="flex items-center space-x-2 md:space-x-4">
-        <span className="text-sm text-gray-600 font-medium">Subject:</span>
+        <span className="text-sm text-gray-600 dark:text-gray-300 font-medium">
+          Subject:
+        </span>
         <select
           value={subjectFilter || ''}
           onChange={(e) => onSubjectFilterChange(e.target.value || null)}
-          className="border rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="border dark:border-gray-600 rounded-md px-3 py-1.5 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="">All Subjects</option>
           {subjects.map((subject) => (

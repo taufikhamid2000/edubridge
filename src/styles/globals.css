@@ -4,8 +4,51 @@
 
 :root {
   --color-bg: #ffffff;
+  --scroll: 0;
   --color-text: #1a1a1a;
   --color-accent: #0071e3;
+}
+
+/* Enhanced scrolling behavior for parallax effects */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom clip path shapes for parallax effects */
+.clip-path-star {
+  clip-path: polygon(
+    50% 0%,
+    61% 35%,
+    98% 35%,
+    68% 57%,
+    79% 91%,
+    50% 70%,
+    21% 91%,
+    32% 57%,
+    2% 35%,
+    39% 35%
+  );
+}
+
+/* Timeline animation */
+.timeline-line {
+  background: linear-gradient(
+    to bottom,
+    rgba(96, 165, 250, 0.4),
+    rgba(96, 165, 250, 0.8),
+    rgba(96, 165, 250, 0.4)
+  );
+  background-size: 100% 200%;
+  animation: timelineShimmer 4s infinite linear;
+}
+
+@keyframes timelineShimmer {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 0% 200%;
+  }
 }
 
 .dark {
