@@ -142,7 +142,14 @@ export async function submitQuizAttempt({
       localStorage.setItem('quiz_attempts', JSON.stringify(existingAttempts));
 
       return attemptData;
-    }
+    } // Import the leaderboardService to update user stats
+    const { updateUserStats } = await import('@/services/leaderboardService');
+
+    // Calculate XP based on score (simple formula - adjust as needed)
+    const earnedXp = Math.round(score * 10); // 10 XP per correct answer
+
+    // Update user stats for leaderboard
+    await updateUserStats(userId, earnedXp, true);
 
     // If table exists, proceed with normal insert
     const { data: attemptData, error: attemptError } = await supabase

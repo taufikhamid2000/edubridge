@@ -75,10 +75,13 @@ export default function Header(): JSX.Element {
             <div className={`header-menu ${menuOpen ? 'open' : ''}`}>
               <button className="header-menu-button" onClick={toggleMenu}>
                 Menu
-              </button>
+              </button>{' '}
               <div className="header-menu-dropdown">
                 <Link href="/dashboard" className="header-menu-link">
                   Dashboard
+                </Link>
+                <Link href="/leaderboard" className="header-menu-link">
+                  Leaderboard
                 </Link>
                 <button
                   type="button"

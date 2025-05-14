@@ -9,7 +9,8 @@
     "lint": "next lint --fix",
     "prebuild": "tsc --noEmit",
     "predeploy": "npm run lint && npm run prebuild && next build",
-    "fix-console-logs": "node scripts/replace-console-logs.mjs"
+    "fix-console-logs": "node scripts/replace-console-logs.mjs",
+    "db:migrate": "node scripts/apply-migration.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.48.1",

@@ -42,7 +42,15 @@ const WeeklyProgress = ({
             ></div>
           </div>
           <span className="text-sm sm:text-base">{averageScore}%</span>
-        </div>
+        </div>{' '}
+      </div>
+      <div className="mt-4 text-right">
+        <a
+          href="/leaderboard"
+          className="text-sm text-blue-600 hover:underline dark:text-blue-400 inline-flex items-center"
+        >
+          See how you rank <span className="ml-1">→</span>
+        </a>
       </div>
     </section>
   );

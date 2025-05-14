@@ -5,6 +5,19 @@ const nextConfig = {
   output: 'standalone',
   // Enable source maps in production for better error tracing
   productionBrowserSourceMaps: true,
+  // Configure image domains for remote images (avatars)
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+      {
+        protocol: 'http',
+        hostname: '**',
+      },
+    ],
+  },
   // Make App Router the priority for route resolution
   experimental: {
     // Empty but keeping for future use

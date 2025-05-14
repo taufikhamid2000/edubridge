@@ -23,10 +23,19 @@ const WelcomeBanner = ({ user }: WelcomeBannerProps) => {
         </h1>
         <p className="text-base sm:text-lg">
           Ready to continue your learning journey?
-        </p>
+        </p>{' '}
         <p className="mt-4 text-sm sm:text-base">
           Your current streak: <strong>{user.streak} days</strong>
         </p>
+        <div className="mt-6 flex items-center">
+          <a
+            href="/leaderboard"
+            className="inline-flex items-center px-4 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 transition-all rounded-lg text-sm font-medium"
+          >
+            <span className="mr-2">🏆</span>
+            View Leaderboard
+          </a>
+        </div>
       </div>
     </section>
   );

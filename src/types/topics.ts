@@ -19,8 +19,8 @@ export interface Subject {
   id: string;
   name: string;
   slug: string;
-  description: string;
-  icon: string;
+  description?: string;
+  icon?: string;
   category?: string;
   category_priority?: number;
   order_index?: number;
