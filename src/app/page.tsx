@@ -17,12 +17,35 @@ export default function HomePage() {
       );
     };
 
-    // Add scroll event listener
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll(); // Initialize on load
+    // Check if the device is mobile (based on screen width)
+    const isMobile = window.innerWidth < 768;
+
+    // Only add scroll event listener on non-mobile devices
+    if (!isMobile) {
+      window.addEventListener('scroll', handleScroll, { passive: true });
+      handleScroll(); // Initialize on load
+    } else {
+      // Reset any parallax effects on mobile
+      document.documentElement.style.setProperty('--scroll', '0');
+    }
+
+    // Add resize listener to handle orientation changes
+    const handleResize = () => {
+      const newIsMobile = window.innerWidth < 768;
+      if (newIsMobile) {
+        document.documentElement.style.setProperty('--scroll', '0');
+        window.removeEventListener('scroll', handleScroll);
+      } else {
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        handleScroll();
+      }
+    };
+
+    window.addEventListener('resize', handleResize, { passive: true });
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleResize);
     };
   }, []);
 
@@ -110,7 +133,6 @@ export default function HomePage() {
             Welcome to{' '}
             <span className="text-blue-600 dark:text-blue-400 relative inline-block">
               EduBridge
-              <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-yellow-400 transform translate-y-[calc(var(--scroll)*-0.05px)] origin-left scale-x-[calc(0.5+var(--scroll)*0.0005)]"></span>
             </span>
           </h2>
           <div className="h-1 w-20 bg-yellow-400 mx-auto"></div>
@@ -547,7 +569,7 @@ export default function HomePage() {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
                   />
                 </svg>
               </span>
@@ -1073,7 +1095,6 @@ export default function HomePage() {
             <div className="absolute top-1/3 right-1/4 w-24 h-1 bg-green-500/10 transform translate-y-[calc(var(--scroll)*-0.09px)]"></div>
             <div className="absolute top-1/2 right-1/4 w-20 h-1 bg-green-500/10 transform translate-y-[calc(var(--scroll)*-0.12px)]"></div>
           </div>
-
           <span className="inline-block px-4 py-1 rounded-full bg-blue-100 text-blue-800 text-sm font-semibold mb-4 dark:bg-blue-900/30 dark:text-blue-300 relative">
             <span className="absolute -top-1 -left-1 w-2 h-2 bg-blue-400 rounded-full transform translate-y-[calc(var(--scroll)*-0.2px)]"></span>
             PERFORMANCE
@@ -1081,13 +1102,14 @@ export default function HomePage() {
           <h3 className="text-3xl font-bold mb-6">📈 Success Metrics</h3>
           <div className="h-1 w-20 bg-yellow-400 mx-auto mb-8 relative">
             <div className="absolute -right-4 -top-1 w-3 h-3 rounded-full bg-yellow-300 transform translate-y-[calc(var(--scroll)*0.22px)]"></div>
-          </div>
+          </div>{' '}
         </div>{' '}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-16 relative">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16 relative">
           {/* Parallax effect for first card */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 text-center translate-y-[calc(var(--scroll)*0.02px)]">
-            <div className="bg-indigo-100 dark:bg-indigo-900/30 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 relative overflow-hidden">
-              <div className="absolute w-12 h-3 bg-indigo-200/50 dark:bg-indigo-700/30 rounded-full -rotate-45 transform translate-y-[calc(var(--scroll)*-0.05px)]"></div>
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 sm:p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 text-center sm:translate-y-[calc(var(--scroll)*0.02px)]">
+            {' '}
+            <div className="bg-indigo-100 dark:bg-indigo-900/30 w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-4 relative overflow-hidden">
+              <div className="absolute w-10 sm:w-12 h-3 bg-indigo-200/50 dark:bg-indigo-700/30 rounded-full -rotate-45 transform sm:translate-y-[calc(var(--scroll)*-0.05px)]"></div>
               <svg
                 className="h-8 w-8 text-indigo-600 dark:text-indigo-400"
                 fill="none"
@@ -1108,9 +1130,9 @@ export default function HomePage() {
             <p className="text-gray-600 dark:text-gray-300">
               Day-2 retention among pilot users
             </p>
-          </div>
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 text-center">
-            <div className="bg-green-100 dark:bg-green-900/30 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+          </div>{' '}
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 sm:p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 text-center">
+            <div className="bg-green-100 dark:bg-green-900/30 w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg
                 className="h-8 w-8 text-green-600 dark:text-green-400"
                 fill="none"
@@ -1130,11 +1152,11 @@ export default function HomePage() {
             </h4>
             <p className="text-gray-600 dark:text-gray-300">
               Quizzes per user weekly
-            </p>
+            </p>{' '}
           </div>{' '}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 text-center translate-y-[calc(var(--scroll)*-0.015px)]">
-            <div className="bg-purple-100 dark:bg-purple-900/30 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 relative overflow-hidden">
-              <div className="absolute w-10 h-10 bg-purple-200/40 dark:bg-purple-700/30 rounded-full transform translate-y-[calc(var(--scroll)*0.04px)] rotate-45"></div>
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 sm:p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 text-center sm:translate-y-[calc(var(--scroll)*-0.015px)]">
+            <div className="bg-purple-100 dark:bg-purple-900/30 w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-4 relative overflow-hidden">
+              <div className="absolute w-10 h-10 bg-purple-200/40 dark:bg-purple-700/30 rounded-full transform sm:translate-y-[calc(var(--scroll)*0.04px)] rotate-45"></div>
               <svg
                 className="h-8 w-8 text-purple-600 dark:text-purple-400"
                 fill="none"
@@ -1154,11 +1176,11 @@ export default function HomePage() {
             </h4>
             <p className="text-gray-600 dark:text-gray-300">
               Monthly active users by Month 4
-            </p>
+            </p>{' '}
           </div>{' '}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 text-center translate-y-[calc(var(--scroll)*0.025px)]">
-            <div className="bg-amber-100 dark:bg-amber-900/30 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 relative overflow-hidden">
-              <div className="absolute inset-0 bg-amber-200/30 dark:bg-amber-700/20 rounded-full clip-path-star transform translate-y-[calc(var(--scroll)*-0.06px)] rotate-[25deg]"></div>
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 sm:p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 text-center sm:translate-y-[calc(var(--scroll)*0.025px)]">
+            <div className="bg-amber-100 dark:bg-amber-900/30 w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-4 relative overflow-hidden">
+              <div className="absolute inset-0 bg-amber-200/30 dark:bg-amber-700/20 rounded-full clip-path-star transform sm:translate-y-[calc(var(--scroll)*-0.06px)] rotate-[25deg]"></div>
               <svg
                 className="h-8 w-8 text-amber-600 dark:text-amber-400"
                 fill="none"
