@@ -1,10 +1,19 @@
 {
-  "name": "replace-console-logs",
+  "name": "edubridge-scripts",
   "version": "1.0.0",
-  "description": "Script to replace console.log calls with logger utility",
+  "description": "Admin and utility scripts for EduBridge",
   "type": "module",
-  "main": "replace-console-logs.js",
+  "scripts": {
+    "set-admin": "node set-admin.mjs",
+    "fix-roles": "node fix-roles.mjs",
+    "verify-admin": "node verify-admin-roles.mjs",
+    "replace-logs": "node replace-console-logs.mjs"
+  },
   "author": "EduBridge Team",
   "license": "UNLICENSED",
-  "private": true
+  "private": true,
+  "dependencies": {
+    "@supabase/supabase-js": "^2.0.0",
+    "dotenv": "^16.0.0"
+  }
 }

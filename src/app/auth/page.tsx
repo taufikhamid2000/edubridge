@@ -13,21 +13,68 @@ export default function Auth() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const router = useRouter();
-
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) router.replace('/dashboard');
-    });
-  }, [router]);
+    // Try to get the session with recovery in case of token issues
+    const checkSession = async () => {
+      try {
+        const { data, error } = await supabase.auth.getSession();
 
+        if (error) {
+          // If there's an authentication error, attempt to recover
+          const { recoverSession } = await import('@/lib/supabase');
+          await recoverSession();
+          // Error already handled, stay on login page
+          return;
+        }
+
+        if (data.session) {
+          router.replace('/dashboard');
+        }
+      } catch (err) {
+        console.error('Session check error:', err);
+      }
+    };
+
+    checkSession();
+  }, [router]);
   const handleGoogleLogin = async () => {
     setLoadingGoogle(true);
     setError(null);
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-    });
-    if (error) {
-      setError(error.message);
+
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin + '/dashboard',
+          // Specify scopes to ensure token refresh works correctly
+          scopes: 'email profile',
+        },
+      });
+
+      if (error) {
+        // If there's a token-related error, try recovery
+        if (
+          error.message.includes('token') ||
+          error.message.includes('Token')
+        ) {
+          const { recoverSession } = await import('@/lib/supabase');
+          await recoverSession();
+          // Try again after recovery
+          await supabase.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+              redirectTo: window.location.origin + '/dashboard',
+              scopes: 'email profile',
+            },
+          });
+        } else {
+          setError(error.message);
+          setLoadingGoogle(false);
+        }
+      }
+    } catch (err) {
+      setError('An unexpected error occurred. Please try again.');
+      console.error('Google login error:', err);
       setLoadingGoogle(false);
     }
   };
@@ -41,17 +88,43 @@ export default function Auth() {
       setLoadingManual(false);
       return;
     }
+    try {
+      let res;
+      if (isSignUp) {
+        res = await supabase.auth.signUp({ email, password });
+      } else {
+        res = await supabase.auth.signInWithPassword({ email, password });
+        if (!res.error) router.replace('/dashboard');
+      }
 
-    let res;
-    if (isSignUp) {
-      res = await supabase.auth.signUp({ email, password });
-    } else {
-      res = await supabase.auth.signInWithPassword({ email, password });
-      if (!res.error) router.replace('/dashboard');
+      if (res.error) {
+        // If there's an auth error related to tokens, try recovery
+        if (
+          res.error.message.includes('token') ||
+          res.error.message.includes('Token')
+        ) {
+          const { recoverSession } = await import('@/lib/supabase');
+          await recoverSession();
+          // Try auth again after recovery
+          if (isSignUp) {
+            res = await supabase.auth.signUp({ email, password });
+          } else {
+            res = await supabase.auth.signInWithPassword({ email, password });
+            if (!res.error) router.replace('/dashboard');
+          }
+
+          // If still error after recovery
+          if (res.error) setError(res.error.message);
+        } else {
+          setError(res.error.message);
+        }
+      }
+    } catch (err) {
+      setError('An unexpected error occurred. Please try again.');
+      console.error('Auth error:', err);
+    } finally {
+      setLoadingManual(false);
     }
-
-    if (res.error) setError(res.error.message);
-    setLoadingManual(false);
   };
 
   const onSubmit = (e: React.FormEvent) => {
@@ -84,7 +157,9 @@ export default function Auth() {
 
         <form onSubmit={onSubmit} className="flex flex-col gap-8">
           <div className="flex flex-col gap-2">
-            <label htmlFor="email" className="text-gray-700 dark:text-gray-300">Email</label>
+            <label htmlFor="email" className="text-gray-700 dark:text-gray-300">
+              Email
+            </label>
             <input
               id="email"
               type="email"
@@ -96,7 +171,12 @@ export default function Auth() {
           </div>
 
           <div className="flex flex-col gap-2">
-            <label htmlFor="password" className="text-gray-700 dark:text-gray-300">Password</label>
+            <label
+              htmlFor="password"
+              className="text-gray-700 dark:text-gray-300"
+            >
+              Password
+            </label>
             <input
               id="password"
               type="password"
@@ -109,7 +189,12 @@ export default function Auth() {
 
           {isSignUp && (
             <div className="flex flex-col gap-2">
-              <label htmlFor="confirmPassword" className="text-gray-700 dark:text-gray-300">Confirm Password</label>
+              <label
+                htmlFor="confirmPassword"
+                className="text-gray-700 dark:text-gray-300"
+              >
+                Confirm Password
+              </label>
               <input
                 id="confirmPassword"
                 type="password"

@@ -62,30 +62,28 @@ export default function AdminLogsPage() {
   useEffect(() => {
     fetchLogs();
   }, [fetchLogs]);
-
   // Function to get the appropriate color based on log level
   function getLevelColor(level: string): string {
     switch (level) {
       case 'error':
-        return 'bg-red-100 text-red-800';
+        return 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200';
       case 'warn':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200';
       case 'info':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200';
       case 'debug':
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200';
     }
   }
-
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="flex">
         <AdminNavigation />
         <div className="flex-1 p-8">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-4 md:space-y-0">
-            <h1 className="text-3xl font-bold">System Logs</h1>
+            <h1 className="text-3xl font-bold dark:text-white">System Logs</h1>
             <div className="flex flex-wrap gap-2">
               {' '}
               <select
@@ -100,7 +98,7 @@ export default function AdminLogsPage() {
                       | 'debug'
                   )
                 }
-                className="bg-white border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-100 sm:text-sm"
               >
                 <option value="all">All Levels</option>
                 <option value="error">Errors</option>
@@ -111,7 +109,7 @@ export default function AdminLogsPage() {
               <select
                 value={days}
                 onChange={(e) => setDays(Number(e.target.value))}
-                className="bg-white border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-100 sm:text-sm"
               >
                 <option value={1}>Last 24 hours</option>
                 <option value={7}>Last 7 days</option>
@@ -121,7 +119,7 @@ export default function AdminLogsPage() {
               <select
                 value={source}
                 onChange={(e) => setSource(e.target.value)}
-                className="bg-white border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-100 sm:text-sm"
               >
                 <option value="all">All Sources</option>
                 <option value="server">Server</option>
@@ -132,19 +130,18 @@ export default function AdminLogsPage() {
               <button
                 onClick={fetchLogs}
                 disabled={loading}
-                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-blue-300"
+                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 dark:hover:bg-blue-800 disabled:bg-blue-300 dark:disabled:bg-blue-700"
               >
                 {loading ? 'Loading...' : 'Refresh'}
               </button>
             </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-lg font-medium text-gray-900">
+          </div>{' '}
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+              <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
                 System Log Entries
               </h2>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                 Showing {logs.length} logs from the past {days} days
                 {logLevel !== 'all' && ` with level "${logLevel}"`}
                 {source !== 'all' && ` from "${source}"`}
@@ -153,15 +150,15 @@ export default function AdminLogsPage() {
 
             {loading ? (
               <div className="p-8 flex justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 dark:border-blue-400"></div>
               </div>
             ) : logs.length === 0 ? (
-              <div className="p-8 text-center text-gray-500">
+              <div className="p-8 text-center text-gray-500 dark:text-gray-400">
                 No log entries found matching your criteria.
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
+                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                   <thead className="bg-gray-50">
                     <tr>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -226,7 +223,6 @@ export default function AdminLogsPage() {
               </div>
             )}
           </div>
-
           <div className="mt-6 text-right">
             <button
               onClick={() => {

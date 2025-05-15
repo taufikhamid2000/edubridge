@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -9,10 +9,32 @@ import {
   Settings,
   BarChart3,
   LogOut,
+  Sun,
+  Moon,
 } from 'lucide-react';
 
 export default function AdminNavigation() {
   const pathname = usePathname();
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    if (typeof window !== 'undefined') {
+      return (localStorage.getItem('theme') as 'light' | 'dark') || 'dark';
+    }
+    return 'dark';
+  });
+
+  // Apply theme changes
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+  }, [theme]);
+
+  // Toggle theme function
+  const toggleTheme = () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+    document.documentElement.classList.toggle('dark', newTheme === 'dark');
+  };
+
   const navItems = [
     {
       name: 'Dashboard',
@@ -98,11 +120,23 @@ export default function AdminNavigation() {
     }
     return pathname.startsWith(path);
   };
-
   return (
-    <div className="w-64 min-h-screen bg-gray-900 text-white p-4">
-      <div className="mb-8 flex items-center">
+    <div className="w-64 min-h-screen bg-gray-900 dark:bg-gray-800 text-white p-4">
+      <div className="mb-8 flex items-center justify-between">
         <h2 className="text-xl font-bold">EduBridge Admin</h2>
+
+        {/* Theme toggle button */}
+        <button
+          onClick={toggleTheme}
+          className="p-2 rounded-full hover:bg-gray-800 dark:hover:bg-gray-700 transition-colors"
+          aria-label="Toggle theme"
+        >
+          {theme === 'dark' ? (
+            <Sun size={18} className="text-yellow-400" />
+          ) : (
+            <Moon size={18} className="text-gray-300" />
+          )}
+        </button>
       </div>
 
       <nav>
@@ -113,8 +147,8 @@ export default function AdminNavigation() {
                 href={item.path}
                 className={`flex items-center py-2 px-4 rounded transition-colors ${
                   isActive(item.path)
-                    ? 'bg-blue-700 text-white'
-                    : 'hover:bg-gray-800'
+                    ? 'bg-blue-700 text-white dark:bg-blue-600'
+                    : 'hover:bg-gray-800 dark:hover:bg-gray-700'
                 }`}
               >
                 {item.icon}
@@ -128,7 +162,7 @@ export default function AdminNavigation() {
       <div className="mt-auto pt-8">
         <Link
           href="/dashboard"
-          className="flex items-center py-2 px-4 rounded hover:bg-gray-800 transition-colors text-gray-400 hover:text-white"
+          className="flex items-center py-2 px-4 rounded hover:bg-gray-800 dark:hover:bg-gray-700 transition-colors text-gray-400 hover:text-white"
         >
           <LogOut className="mr-3" size={18} />
           Exit Admin

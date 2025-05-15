@@ -51,7 +51,6 @@ export default function AdminDashboard() {
 
     fetchAdminStats();
   }, []);
-
   return (
     <div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -60,10 +59,10 @@ export default function AdminDashboard() {
           value={loading ? '...' : usersCount}
           change={5.25}
           icon={
-            <div className="rounded-full bg-blue-100 p-3">
+            <div className="rounded-full bg-blue-100 dark:bg-blue-900/30 p-3">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6 text-blue-500"
+                className="h-6 w-6 text-blue-500 dark:text-blue-400"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -77,16 +76,16 @@ export default function AdminDashboard() {
               </svg>
             </div>
           }
-        />
+        />{' '}
         <StatCard
           title="Total Quizzes"
           value={loading ? '...' : quizzesCount}
           change={2.5}
           icon={
-            <div className="rounded-full bg-green-100 p-3">
+            <div className="rounded-full bg-green-100 dark:bg-green-900/30 p-3">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6 text-green-500"
+                className="h-6 w-6 text-green-500 dark:text-green-400"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -100,16 +99,16 @@ export default function AdminDashboard() {
               </svg>
             </div>
           }
-        />
+        />{' '}
         <StatCard
           title="Subjects"
           value={loading ? '...' : subjectsCount}
           change={0}
           icon={
-            <div className="rounded-full bg-purple-100 p-3">
+            <div className="rounded-full bg-purple-100 dark:bg-purple-900/30 p-3">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6 text-purple-500"
+                className="h-6 w-6 text-purple-500 dark:text-purple-400"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -124,56 +123,61 @@ export default function AdminDashboard() {
             </div>
           }
         />
-      </div>
-
-      <div className="bg-white rounded-lg shadow p-6 mb-8">
-        <h2 className="text-xl font-semibold mb-4">Recent Activities</h2>
+      </div>{' '}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-8">
+        <h2 className="text-xl font-semibold mb-4 dark:text-gray-100">
+          Recent Activities
+        </h2>
         {loading ? (
           <div className="animate-pulse">
-            <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
-            <div className="h-4 bg-gray-200 rounded w-5/6 mb-4"></div>
-            <div className="h-4 bg-gray-200 rounded w-2/3 mb-4"></div>
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-4"></div>
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-4"></div>
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6 mb-4"></div>
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-2/3 mb-4"></div>
           </div>
         ) : (
           <div className="space-y-4">
-            <p>
+            <p className="dark:text-gray-300">
               No recent activities to display. This feature will be implemented
               soon.
             </p>
           </div>
         )}
-      </div>
-
+      </div>{' '}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <h2 className="text-xl font-semibold mb-4 dark:text-gray-100">
             Top Performing Students
           </h2>
           {loading ? (
             <div className="animate-pulse space-y-3">
-              <div className="h-4 bg-gray-200 rounded w-full"></div>
-              <div className="h-4 bg-gray-200 rounded w-full"></div>
-              <div className="h-4 bg-gray-200 rounded w-full"></div>
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
             </div>
           ) : (
             <div className="space-y-2">
-              <p>Leaderboard data will be displayed here.</p>
+              <p className="dark:text-gray-300">
+                Leaderboard data will be displayed here.
+              </p>
             </div>
           )}
-        </div>
-
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Popular Quizzes</h2>
+        </div>{' '}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <h2 className="text-xl font-semibold mb-4 dark:text-gray-100">
+            Popular Quizzes
+          </h2>
           {loading ? (
             <div className="animate-pulse space-y-3">
-              <div className="h-4 bg-gray-200 rounded w-full"></div>
-              <div className="h-4 bg-gray-200 rounded w-full"></div>
-              <div className="h-4 bg-gray-200 rounded w-full"></div>
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
             </div>
           ) : (
             <div className="space-y-2">
-              <p>Quiz analytics will be displayed here.</p>
+              <p className="dark:text-gray-300">
+                Quiz analytics will be displayed here.
+              </p>
             </div>
           )}
         </div>
@@ -184,19 +188,23 @@ export default function AdminDashboard() {
 
 function StatCard({ title, value, change, icon }: StatsCard) {
   return (
-    <div className="bg-white rounded-lg shadow p-6">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
       <div className="flex justify-between items-start">
         <div>
-          <p className="text-sm text-gray-500 mb-1">{title}</p>
-          <p className="text-2xl font-bold">{value}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
+            {title}
+          </p>
+          <p className="text-2xl font-bold dark:text-white">{value}</p>
           <div className="flex items-center mt-2">
             <span
-              className={`text-xs font-medium ${change >= 0 ? 'text-green-500' : 'text-red-500'}`}
+              className={`text-xs font-medium ${change >= 0 ? 'text-green-500 dark:text-green-400' : 'text-red-500 dark:text-red-400'}`}
             >
               {change >= 0 ? '+' : ''}
               {change}%
             </span>
-            <span className="text-xs text-gray-500 ml-1">from last month</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">
+              from last month
+            </span>
           </div>
         </div>
         {icon}

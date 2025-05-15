@@ -123,60 +123,62 @@ export default function AdminUsersPage() {
       user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.display_name.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="flex">
         <AdminNavigation />
         <div className="flex-1 p-8">
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-3xl font-bold">Users Management</h1>
+            <h1 className="text-3xl font-bold dark:text-white">
+              Users Management
+            </h1>
             <div className="relative">
               <input
                 type="text"
                 placeholder="Search users..."
-                className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
-            </div>
+            </div>{' '}
           </div>
 
-          <div className="bg-white rounded-lg shadow overflow-hidden">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
             {loading ? (
               <div className="p-4 flex justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 dark:border-blue-400"></div>
               </div>
             ) : (
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead className="bg-gray-50 dark:bg-gray-700">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       User
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       Email
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       Level/XP
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       Joined
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       Role
                     </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                   {filteredUsers.length === 0 ? (
                     <tr>
+                      {' '}
                       <td
                         colSpan={6}
-                        className="px-6 py-4 text-center text-gray-500"
+                        className="px-6 py-4 text-center text-gray-500 dark:text-gray-400"
                       >
                         {searchTerm
                           ? 'No users found matching your search.'
@@ -210,48 +212,50 @@ export default function AdminUsersPage() {
                               )}
                             </div>
                             <div className="ml-4">
-                              <div className="text-sm font-medium text-gray-900">
+                              {' '}
+                              <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
                                 {user.display_name}
                               </div>
-                              <div className="text-sm text-gray-500">
+                              <div className="text-sm text-gray-500 dark:text-gray-400">
                                 ID: {user.id.slice(0, 8)}...
                               </div>
                             </div>
                           </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        </td>{' '}
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                           {user.email}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">
+                          <div className="text-sm text-gray-900 dark:text-gray-100">
                             Level {user.level}
                           </div>
-                          <div className="text-sm text-gray-500">
+                          <div className="text-sm text-gray-500 dark:text-gray-400">
                             {user.xp} XP
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                           {new Date(user.created_at).toLocaleDateString()}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
+                          {' '}
                           <select
                             value={user.role}
                             onChange={(e) =>
                               handleRoleChange(user.id, e.target.value)
                             }
-                            className="text-sm border rounded py-1 px-2"
+                            className="text-sm border rounded py-1 px-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                           >
                             <option value="user">User</option>
                             <option value="admin">Admin</option>
                             <option value="moderator">Moderator</option>
                           </select>
-                        </td>
+                        </td>{' '}
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <button className="text-blue-600 hover:text-blue-900">
+                          <button className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
                             View
                           </button>
-                          <span className="mx-2">|</span>
-                          <button className="text-red-600 hover:text-red-900">
+                          <span className="mx-2 dark:text-gray-400">|</span>
+                          <button className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
                             Disable
                           </button>
                         </td>

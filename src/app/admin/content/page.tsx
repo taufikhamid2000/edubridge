@@ -56,21 +56,23 @@ export default function AdminContentPage() {
       setLoading(false);
     }
   }
-
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="flex">
         <AdminNavigation />
         <div className="flex-1 p-8">
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-3xl font-bold">Content Management</h1>
+            <h1 className="text-3xl font-bold dark:text-white">
+              Content Management
+            </h1>
             <div className="flex space-x-2">
+              {' '}
               <button
                 onClick={() => setActiveTab('subjects')}
                 className={`px-4 py-2 rounded ${
                   activeTab === 'subjects'
                     ? 'bg-blue-600 text-white'
-                    : 'bg-white text-gray-700 border'
+                    : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 border dark:border-gray-600'
                 }`}
               >
                 Subjects
@@ -80,7 +82,7 @@ export default function AdminContentPage() {
                 className={`px-4 py-2 rounded ${
                   activeTab === 'topics'
                     ? 'bg-blue-600 text-white'
-                    : 'bg-white text-gray-700 border'
+                    : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 border dark:border-gray-600'
                 }`}
               >
                 Topics
@@ -90,81 +92,82 @@ export default function AdminContentPage() {
                 className={`px-4 py-2 rounded ${
                   activeTab === 'quizzes'
                     ? 'bg-blue-600 text-white'
-                    : 'bg-white text-gray-700 border'
+                    : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 border dark:border-gray-600'
                 }`}
               >
                 Quizzes
               </button>
             </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow p-6">
+          </div>{' '}
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
             {activeTab === 'subjects' && (
               <div>
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl font-semibold">Subject Management</h2>
-                  <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                  <h2 className="text-xl font-semibold dark:text-white">
+                    Subject Management
+                  </h2>
+                  <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600">
                     Add New Subject
                   </button>
-                </div>
-
+                </div>{' '}
                 {loading ? (
                   <div className="flex justify-center py-8">
-                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 dark:border-blue-400"></div>
                   </div>
                 ) : subjects.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">
+                  <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                     No subjects found. Create your first subject to get started.
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead>
+                    <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                      <thead className="bg-gray-50 dark:bg-gray-700">
                         <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          {' '}
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             Name
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             Description
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             Topics
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             Quizzes
                           </th>
-                          <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             Actions
                           </th>
                         </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
+                      </thead>{' '}
+                      <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                         {subjects.map((subject) => (
                           <tr key={subject.id}>
                             <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm font-medium text-gray-900">
+                              <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
                                 {subject.name}
                               </div>
                             </td>
                             <td className="px-6 py-4">
-                              <div className="text-sm text-gray-500 truncate max-w-xs">
+                              <div className="text-sm text-gray-500 dark:text-gray-400 truncate max-w-xs">
                                 {subject.description}
                               </div>
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                               {subject.topic_count}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                               {subject.quiz_count}
-                            </td>
+                            </td>{' '}
                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                               <Link
                                 href={`/admin/content/subjects/${subject.id}`}
-                                className="text-blue-600 hover:text-blue-900 mr-4"
+                                className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-4"
                               >
                                 Edit
                               </Link>
-                              <button className="text-red-600 hover:text-red-900">
+                              <button className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
                                 Delete
                               </button>
                             </td>
@@ -175,21 +178,23 @@ export default function AdminContentPage() {
                   </div>
                 )}
               </div>
-            )}
-
+            )}{' '}
             {activeTab === 'topics' && (
               <div className="text-center py-8">
-                <h2 className="text-xl font-semibold mb-4">Topic Management</h2>
-                <p className="text-gray-500">
+                <h2 className="text-xl font-semibold mb-4 dark:text-white">
+                  Topic Management
+                </h2>
+                <p className="text-gray-500 dark:text-gray-400">
                   Topic management functionality will be implemented soon.
                 </p>
               </div>
             )}
-
             {activeTab === 'quizzes' && (
               <div className="text-center py-8">
-                <h2 className="text-xl font-semibold mb-4">Quiz Management</h2>
-                <p className="text-gray-500">
+                <h2 className="text-xl font-semibold mb-4 dark:text-white">
+                  Quiz Management
+                </h2>
+                <p className="text-gray-500 dark:text-gray-400">
                   Quiz management functionality will be implemented soon.
                 </p>
               </div>
