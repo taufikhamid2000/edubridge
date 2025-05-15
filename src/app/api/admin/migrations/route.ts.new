@@ -16,14 +16,15 @@ const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build';
 // We use a dynamic import to avoid loading during build time
 if (!isBuildPhase && typeof window === 'undefined') {
   // Server-side only imports
-  Promise.all([import('@/lib/supabase'), import('@/services/adminService')])
-    .then(([supabaseModule, adminServiceModule]) => {
-      supabaseClient = supabaseModule.supabase;
-      adminChecker = adminServiceModule.isUserAdmin;
-    })
-    .catch((err) => {
-      logger.error('Failed to import modules:', err);
-    });
+  Promise.all([
+    import('@/lib/supabase'),
+    import('@/services/adminService')
+  ]).then(([supabaseModule, adminServiceModule]) => {
+    supabaseClient = supabaseModule.supabase;
+    adminChecker = adminServiceModule.isUserAdmin;
+  }).catch(err => {
+    logger.error('Failed to import modules:', err);
+  });
 }
 
 // Helper function to read migration file
@@ -83,7 +84,7 @@ export async function POST(request: NextRequest) {
         { status: 503 }
       );
     }
-
+    
     // Check authorization
     const {
       data: { session },
@@ -125,7 +126,7 @@ export async function POST(request: NextRequest) {
         { status: 404 }
       );
     }
-
+    
     // Apply the migration
     const { error } = await supabaseClient.rpc('exec_sql', { sql });
 
