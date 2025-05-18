@@ -48,6 +48,25 @@ This project includes an admin panel with role-based access control:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
+## Testing
+
+This project uses Jest and React Testing Library for testing components, hooks, utilities, and services. To run the tests:
+
+```bash
+npm test          # Run tests once
+npm run test:watch    # Run tests in watch mode
+npm run test:coverage # Run tests with coverage report
+```
+
+Tests are organized in the following structure:
+
+- `src/__tests__/components/` - Component tests
+- `src/__tests__/hooks/` - Hook tests
+- `src/__tests__/lib/` - Utility function tests
+- `src/__tests__/services/` - Service function tests
+
+When adding new features, please add corresponding tests.
+
 ## Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
