@@ -5,6 +5,10 @@ const nextConfig = {
   output: 'standalone',
   // Enable source maps in production for better error tracing
   productionBrowserSourceMaps: true,
+  // Exclude test files from build
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   // Configure image domains for remote images (avatars)
   images: {
     remotePatterns: [

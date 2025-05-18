@@ -86,3 +86,49 @@ export async function createQuiz(
     };
   }
 }
+
+/**
+ * Fetches all available quizzes
+ */
+export async function fetchQuizzes() {
+  try {
+    const response = await fetch('/api/quizzes');
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch quizzes: ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    logger.error('Error fetching quizzes:', error);
+    throw error;
+  }
+}
+
+/**
+ * Submits a quiz with the user's answers
+ * @param data Object containing quizId and answers
+ */
+export async function submitQuiz(data: {
+  quizId: number;
+  answers: Array<{ questionId: number; answer: string }>;
+}) {
+  try {
+    const response = await fetch('/api/quiz/submit', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to submit quiz: ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    logger.error('Error submitting quiz:', error);
+    throw error;
+  }
+}
