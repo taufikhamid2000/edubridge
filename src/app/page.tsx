@@ -86,15 +86,14 @@ export default function HomePage() {
               onClick={() => router.push('/auth')}
             >
               Get Started 🚀
-            </button>
+            </button>{' '}
             <button
               className="inline-block uppercase tracking-wide rounded-full shadow-lg transition-all duration-300 ease-in-out px-8 py-4 bg-transparent border-2 border-white text-white font-medium hover:bg-white/10 hover:scale-105 transform"
               onClick={() => {
-                const featuresSection = document.getElementById('features');
-                featuresSection?.scrollIntoView({ behavior: 'smooth' });
+                window.open('/docs/EduBridge%20Research.pdf', '_blank');
               }}
             >
-              Learn More ⬇️
+              Learn More 📄
             </button>
           </div>
 

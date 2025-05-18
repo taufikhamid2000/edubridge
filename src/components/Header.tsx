@@ -56,6 +56,10 @@ export default function Header(): JSX.Element {
     setMenuOpen((prev) => !prev);
   };
 
+  const openResearchPDF = () => {
+    window.open('/docs/EduBridge%20Research.pdf', '_blank');
+  };
+
   return (
     <header className="sticky top-0 bg-[var(--color-bg)] bg-opacity-70 backdrop-blur-sm z-50">
       <div className="header-container">
@@ -68,9 +72,8 @@ export default function Header(): JSX.Element {
             className="w-8 h-8 mr-2"
           />
           EduBridge
-        </Link>
-
-        <nav className="header-nav">
+        </Link>{' '}
+        <nav className="header-nav space-x-2 md:space-x-4">
           {user ? (
             <div className={`header-menu ${menuOpen ? 'open' : ''}`}>
               <button className="header-menu-button" onClick={toggleMenu}>
@@ -82,10 +85,17 @@ export default function Header(): JSX.Element {
                 </Link>
                 <Link href="/leaderboard" className="header-menu-link">
                   Leaderboard
-                </Link>
+                </Link>{' '}
                 <Link href="/profile" className="header-menu-link">
                   Profile
                 </Link>
+                <button
+                  type="button"
+                  className="header-menu-link"
+                  onClick={openResearchPDF}
+                >
+                  Research
+                </button>
                 <button
                   type="button"
                   className="header-menu-link"
@@ -95,19 +105,22 @@ export default function Header(): JSX.Element {
                     setMenuOpen(false);
                   }}
                 >
+                  {' '}
                   Sign Out
                 </button>
               </div>
             </div>
           ) : (
-            <Link href="/auth" className="btn">
+            <Link
+              href="/auth"
+              className="btn text-sm md:text-base px-4 py-2 md:px-6 md:py-3"
+            >
               Get Started
             </Link>
-          )}
-
+          )}{' '}
           <button
             type="button"
-            className="header-theme-button"
+            className="header-theme-button text-sm md:text-base p-1 md:p-2"
             onClick={toggleTheme}
             aria-label="Toggle theme"
           >

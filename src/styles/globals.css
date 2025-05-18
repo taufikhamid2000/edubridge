@@ -80,7 +80,7 @@ body {
 }
 
 .header-nav {
-  @apply flex items-center space-x-4;
+  @apply flex items-center space-x-2 md:space-x-4;
 }
 
 .header-menu {
