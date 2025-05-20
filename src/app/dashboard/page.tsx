@@ -44,7 +44,7 @@ function DashboardClient() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [categories, setCategories] = useState<string[]>([]);
-  const subjectsPerPage = 12;
+  const subjectsPerPage = 6;
 
   useEffect(() => {
     const fetchData = async () => {

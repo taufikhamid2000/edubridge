@@ -16,7 +16,7 @@ import {
 export default function AdminNavigation() {
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [theme] = useState<'light' | 'dark'>(() => {
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     if (typeof window !== 'undefined') {
       return (localStorage.getItem('theme') as 'light' | 'dark') || 'dark';
     }
@@ -110,8 +110,8 @@ export default function AdminNavigation() {
         </svg>
       ),
     },
-  ];
-
+  ]; 
+  
   // Function to check if a nav item is active
   const isActive = (path: string): boolean => {
     if (!pathname) return false;
@@ -120,14 +120,12 @@ export default function AdminNavigation() {
     }
     return pathname.startsWith(path);
   };
-
+  
   return (
-    <div
-      className={`${isCollapsed ? 'w-16' : 'w-64'} transition-all duration-300 min-h-screen bg-gray-900 dark:bg-gray-800 text-white p-4`}
-    >
+    <div className={`${isCollapsed ? 'w-16' : 'w-64'} transition-all duration-300 min-h-screen bg-gray-900 dark:bg-gray-800 text-white p-4`}>
       <div className="mb-8 flex items-center justify-between">
         {!isCollapsed && <h2 className="text-xl font-bold">EduBridge Admin</h2>}
-
+        
         {/* Sidebar toggle button */}
         <button
           onClick={toggleSidebar}
@@ -168,7 +166,7 @@ export default function AdminNavigation() {
           className="flex items-center py-2 px-4 rounded hover:bg-gray-800 dark:hover:bg-gray-700 transition-colors text-gray-400 hover:text-white"
         >
           <LogOut className="mr-3" size={18} />
-          {!isCollapsed && 'Exit Admin'}
+          {!isCollapsed && "Exit Admin"}
         </Link>
       </div>
     </div>
