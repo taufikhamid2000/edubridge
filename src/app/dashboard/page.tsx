@@ -14,6 +14,7 @@ import Achievements from '@/components/dashboard/Achievements';
 
 interface User {
   email: string;
+  display_name?: string;
   streak: number;
   xp: number;
   level: number;
@@ -92,15 +93,27 @@ function DashboardClient() {
             sortedSubjects.map((subject) => subject.category || 'Uncategorized')
           )
         ) as string[];
-        setCategories(['all', ...uniqueCategories]);
+        setCategories(['all', ...uniqueCategories]); // Fetch user profile data from Supabase
+        const { data: userData, error: userError } = await supabase
+          .from('user_profiles')
+          .select('display_name, streak, xp, level, last_quiz_date')
+          .eq('id', session.user.id)
+          .single();
 
-        // TODO: Fetch user data from Supabase
+        if (userError && userError.code !== 'PGRST116') {
+          // PGRST116 means no profile found, which we'll handle by creating default data
+          logger.error('Error fetching user profile:', userError);
+        }
+
+        // Use profile data if available, or create default data
         setUser({
           email: session.user.email || '',
-          streak: 5,
-          xp: 1250,
-          level: 3,
-          lastQuizDate: new Date().toISOString().split('T')[0],
+          display_name: userData?.display_name,
+          streak: userData?.streak || 0,
+          xp: userData?.xp || 0,
+          level: userData?.level || 1,
+          lastQuizDate:
+            userData?.last_quiz_date || new Date().toISOString().split('T')[0],
         });
       } catch (error) {
         logger.error('Error fetching data:', error);

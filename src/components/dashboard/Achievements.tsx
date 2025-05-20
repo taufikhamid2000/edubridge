@@ -23,10 +23,10 @@ const Achievements = ({ achievements }: AchievementsProps) => {
             key={index}
             className={`achievement-card ${achievement.bgColor} p-3 sm:p-4 rounded-lg shadow dark:bg-opacity-70`}
           >
-            <h3 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-white">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-900">
               {achievement.title}
             </h3>
-            <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-200">
+            <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-700">
               {achievement.description}
             </p>
           </div>

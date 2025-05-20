@@ -1,8 +1,29 @@
 'use client';
 
+import { useEffect } from 'react';
 import Head from 'next/head';
+import { supabase } from '@/lib/supabase';
 
 export default function AboutPage() {
+  // Check session on page load to prevent unintended logout
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const { error } = await supabase.auth.getSession();
+
+        // If there's an authentication error, attempt to recover the session
+        if (error) {
+          const { recoverSession } = await import('@/lib/supabase');
+          await recoverSession();
+        }
+      } catch (err) {
+        console.error('Session check error:', err);
+      }
+    };
+
+    checkSession();
+  }, []);
+
   const openResearchPDF = () => {
     window.open('/docs/EduBridge%20Research.pdf', '_blank');
   };

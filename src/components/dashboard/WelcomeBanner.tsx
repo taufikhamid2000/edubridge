@@ -1,7 +1,9 @@
 import React from 'react';
+import Link from 'next/link';
 
 interface User {
   email: string;
+  display_name?: string;
   streak: number;
   xp: number;
   level: number;
@@ -19,7 +21,14 @@ const WelcomeBanner = ({ user }: WelcomeBannerProps) => {
     <section className="dashboard-section welcome bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 sm:p-6 md:p-8 rounded-lg shadow-md dark:bg-gradient-to-r dark:from-gray-800 dark:to-gray-900">
       <div>
         <h1 className="text-3xl sm:text-4xl font-bold mb-2">
-          Welcome back, {user.email}
+          Welcome back, {user.display_name || user.email.split('@')[0]}
+          {!user.display_name && (
+            <Link href="/profile" className="inline-block ml-4">
+              <button className="text-sm bg-white bg-opacity-20 hover:bg-opacity-30 px-3 py-1 rounded transition-colors">
+                Set username
+              </button>
+            </Link>
+          )}
         </h1>
         <p className="text-base sm:text-lg">
           Ready to continue your learning journey?
