@@ -23,19 +23,34 @@ export const signIn = async (email: string, password: string) => {
 };
 
 export const signOut = async () => {
+  console.log('SignOut function started');
   try {
     // Sign out from both local session and server session
-    await supabase.auth.signOut({ scope: 'global' });
+    console.log('Calling supabase.auth.signOut()...');
+    const { error } = await supabase.auth.signOut({ scope: 'global' });
+
+    if (error) {
+      console.error('Supabase signOut error:', error);
+    } else {
+      console.log('Supabase signOut successful');
+    }
 
     // Clear any locally stored auth data
     if (typeof window !== 'undefined') {
+      console.log('Removing auth token from localStorage');
       localStorage.removeItem('supabase.auth.token');
     }
 
-    window.location.href = '/';
+    // Delay to ensure signout operations complete
+    console.log('Redirecting to homepage...');
+
+    // Use a hard redirect that won't be caught by Next.js router
+    document.location.href = '/';
+    return true; // Signal that signout completed successfully
   } catch (error) {
     console.error('Error signing out:', error);
     // Force redirect to auth page even if there was an error
-    window.location.href = '/auth';
+    document.location.href = '/auth';
+    return false;
   }
 };

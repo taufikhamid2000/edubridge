@@ -95,14 +95,31 @@ export default function Header(): JSX.Element {
                   onClick={openResearchPDF}
                 >
                   Research
-                </button>
+                </button>{' '}
                 <button
                   type="button"
                   className="header-menu-link"
-                  onClick={() => {
-                    signOut();
-                    setUser(null);
-                    setMenuOpen(false);
+                  onClick={async () => {
+                    console.log('Sign out button clicked');
+                    try {
+                      setUser(null); // Immediately update UI
+                      setMenuOpen(false);
+
+                      // Initialize signout process
+                      signOut().catch((err) =>
+                        console.error('SignOut error:', err)
+                      );
+
+                      // Add a small delay to allow UI to update before redirect
+                      setTimeout(() => {
+                        console.log('Redirecting after UI update...');
+                        // Force a hard refresh/redirect to the home page
+                        document.location.href = '/';
+                      }, 150); // 150ms delay to allow React to render the UI change
+                    } catch (error) {
+                      console.error('Error during sign out:', error);
+                      document.location.href = '/auth';
+                    }
                   }}
                 >
                   {' '}
