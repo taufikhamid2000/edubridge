@@ -9,8 +9,10 @@ import { validateEnvironment } from '@/lib/env-check';
 validateEnvironment();
 
 export const metadata = {
-  title: 'EduBridge',
-  description: 'An educational platform',
+  title: 'EduBridge - Learn, Earn, Grow',
+  description:
+    'Empowering students and educators with tools to learn, earn and grow.',
+  viewport: 'width=device-width, initial-scale=1',
 };
 
 export default function RootLayout({

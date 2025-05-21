@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { captureError } from '@/lib/debug';
+import { logger } from '@/lib/logger';
 import { Subject, Topic, Chapter, Quiz } from '@/types/topics';
 
 export function useTopicData(subject: string, topic: string) {
@@ -95,10 +95,13 @@ export function useTopicData(subject: string, topic: string) {
           setQuizzes([]);
         }
       } catch (err) {
-        captureError(
-          err instanceof Error ? err : new Error(String(err)),
-          'useTopicData'
-        );
+        // Log the error
+        const error = err instanceof Error ? err : new Error(String(err));
+        logger.error(`[ERROR] useTopicData: ${error.message}`);
+        if (process.env.NODE_ENV !== 'production') {
+          logger.error(error);
+        }
+
         setError(
           err instanceof Error ? err.message : 'An unknown error occurred'
         );

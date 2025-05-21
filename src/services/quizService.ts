@@ -1,6 +1,39 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { supabase } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
+import { checkAdminAccess } from './adminAuthService';
+
+/**
+ * Interface for Quiz structure
+ */
+export interface Quiz {
+  id: string;
+  topic_id: string;
+  name: string;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+  question_count?: number;
+  is_published?: boolean;
+  difficulty_level?: 'easy' | 'medium' | 'hard';
+  time_limit_seconds?: number;
+  passing_score?: number;
+}
+
+/**
+ * Interface for QuizQuestion structure
+ */
+export interface QuizQuestion {
+  id: string;
+  quiz_id: string;
+  question_text: string;
+  options: string[];
+  correct_option: number;
+  explanation?: string;
+  order_index: number;
+  created_at: string;
+  updated_at: string;
+}
 
 export async function createQuiz(
   quizData: any
@@ -130,5 +163,210 @@ export async function submitQuiz(data: {
   } catch (error) {
     logger.error('Error submitting quiz:', error);
     throw error;
+  }
+}
+
+/**
+ * Fetches all quizzes for admin use
+ */
+export async function fetchAdminQuizzes(): Promise<{
+  data: Quiz[] | null;
+  error: { message: string } | null;
+}> {
+  try {
+    console.log('Fetching admin quizzes...');
+
+    // Check session
+    const { success, error: accessError } = await checkAdminAccess();
+
+    if (!success) {
+      console.log('No admin access for quiz fetch');
+      return {
+        data: null,
+        error: {
+          message:
+            accessError?.message || 'Authentication required. Please log in.',
+        },
+      };
+    }
+
+    // Fetch quizzes with topic details
+    const { data, error } = await supabase
+      .from('quizzes')
+      .select(
+        `
+        *,
+        topics (
+          title,
+          id
+        )
+      `
+      )
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching quizzes:', error);
+      return {
+        data: null,
+        error: {
+          message: error.message || 'Unknown error in fetchAdminQuizzes',
+        },
+      };
+    }
+
+    // Format quiz data
+    const formattedQuizzes: Quiz[] = data.map((quiz) => ({
+      ...quiz,
+      topic_title: quiz.topics?.title || 'Unknown Topic',
+      topic_id: quiz.topics?.id || quiz.topic_id,
+    }));
+
+    return { data: formattedQuizzes, error: null };
+  } catch (err) {
+    logger.error('Error in fetchAdminQuizzes:', err);
+    return {
+      data: null,
+      error: {
+        message: err instanceof Error ? err.message : 'Unknown error occurred',
+      },
+    };
+  }
+}
+
+/**
+ * Creates a new quiz for admin use
+ */
+export async function createAdminQuiz(quizData: {
+  name: string;
+  topic_id: string;
+  difficulty_level?: 'easy' | 'medium' | 'hard';
+  time_limit_seconds?: number;
+  passing_score?: number;
+}): Promise<{
+  id?: string;
+  error: { message: string } | null;
+}> {
+  try {
+    // Validate required fields
+    if (!quizData.name || quizData.name.trim() === '') {
+      return {
+        error: { message: 'Quiz name is required' },
+      };
+    }
+
+    if (!quizData.topic_id) {
+      return {
+        error: { message: 'Topic is required' },
+      };
+    }
+
+    // Check admin access
+    const { success, error: accessError } = await checkAdminAccess();
+
+    if (!success) {
+      return {
+        error: {
+          message:
+            accessError?.message || 'Authentication required. Please log in.',
+        },
+      };
+    }
+
+    // Prepare quiz data
+    const quizRecord = {
+      name: quizData.name.trim(),
+      topic_id: quizData.topic_id,
+      created_by: '', // Set to empty string or fetch userId from session if needed
+      difficulty_level: quizData.difficulty_level || 'medium',
+      time_limit_seconds: quizData.time_limit_seconds || 300, // 5 minutes default
+      passing_score: quizData.passing_score || 70, // 70% default
+      is_published: false,
+    };
+
+    // Insert quiz into database
+    const { data, error } = await supabase
+      .from('quizzes')
+      .insert([quizRecord])
+      .select();
+
+    if (error) {
+      console.error('Error creating quiz:', error);
+      return {
+        error: { message: error.message || 'Failed to create quiz' },
+      };
+    }
+
+    if (!data || data.length === 0) {
+      return {
+        error: { message: 'Quiz created but no ID returned' },
+      };
+    }
+
+    return {
+      id: data[0].id,
+      error: null,
+    };
+  } catch (err) {
+    logger.error('Error in createAdminQuiz:', err);
+    return {
+      error: {
+        message: err instanceof Error ? err.message : 'Unknown error occurred',
+      },
+    };
+  }
+}
+
+/**
+ * Deletes a quiz (admin function)
+ */
+export async function deleteQuiz(id: string): Promise<{
+  error: { message: string } | null;
+}> {
+  try {
+    // Check admin access
+    const { success, error: accessError } = await checkAdminAccess();
+
+    if (!success) {
+      return {
+        error: {
+          message:
+            accessError?.message || 'Authentication required. Please log in.',
+        },
+      };
+    }
+
+    // Delete quiz questions first (cascade might handle this, but being explicit)
+    const { error: questionsError } = await supabase
+      .from('quiz_questions')
+      .delete()
+      .eq('quiz_id', id);
+
+    if (questionsError) {
+      console.error('Error deleting quiz questions:', questionsError);
+      return {
+        error: {
+          message: questionsError.message || 'Failed to delete quiz questions',
+        },
+      };
+    }
+
+    // Delete the quiz
+    const { error } = await supabase.from('quizzes').delete().eq('id', id);
+
+    if (error) {
+      console.error('Error deleting quiz:', error);
+      return {
+        error: { message: error.message || 'Failed to delete quiz' },
+      };
+    }
+
+    return { error: null };
+  } catch (err) {
+    logger.error('Error in deleteQuiz:', err);
+    return {
+      error: {
+        message: err instanceof Error ? err.message : 'Unknown error occurred',
+      },
+    };
   }
 }

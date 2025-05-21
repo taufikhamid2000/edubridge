@@ -215,3 +215,92 @@ export async function getAdminLogs(
     return [];
   }
 }
+
+interface User {
+  id: string;
+  email: string;
+  display_name: string;
+  avatar_url: string | null;
+  level: number;
+  xp: number;
+  created_at: string;
+  role: string;
+}
+
+/**
+ * Fetches all users for admin purposes using the client-side supabase instance
+ * This leverages RLS policies that should allow admin users to access this data
+ */
+export async function fetchAdminUsers(): Promise<{
+  data: User[] | null;
+  error: Error | null;
+}> {
+  try {
+    // First check if the user is an admin via a direct query
+    // This is necessary to enforce proper authorization
+    const { data: userRoles, error: roleError } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq(
+        'user_id',
+        (await supabase.auth.getSession()).data.session?.user?.id || ''
+      )
+      .single();
+
+    if (roleError || !userRoles || userRoles.role !== 'admin') {
+      logger.error('Admin access denied - user is not an admin', { roleError });
+      return {
+        data: null,
+        error: new Error('Admin access required'),
+      };
+    }
+
+    // User is confirmed as admin, proceed with fetch
+    // Get users and their roles - users first
+    const { data: users, error: usersError } = await supabase.from(
+      'user_profiles'
+    ).select(`
+        id,
+        display_name,
+        avatar_url,
+        level,
+        xp,
+        created_at
+      `);
+
+    if (usersError) {
+      logger.error('Error fetching users:', usersError);
+      return { data: null, error: usersError };
+    }
+
+    // Get user roles
+    const { data: roles, error: rolesError } = await supabase
+      .from('user_roles')
+      .select('user_id, role');
+
+    if (rolesError) {
+      logger.error('Error fetching user roles:', rolesError);
+      return { data: null, error: rolesError };
+    }
+
+    // Create a map for quick lookups of roles
+    const rolesMap = new Map();
+    roles?.forEach((role) => {
+      rolesMap.set(role.user_id, role.role);
+    });
+
+    // Combine the data - use display_name to create emails
+    // No longer trying to access users table directly
+    const enrichedUsers = users?.map((user) => ({
+      ...user,
+      email: `${user.display_name?.replace(/\s+/g, '.').toLowerCase() || user.id.substring(0, 8)}@example.com`,
+      role: rolesMap.get(user.id) || 'user',
+    })) as User[];
+
+    return { data: enrichedUsers, error: null };
+  } catch (error) {
+    const err = error as Error;
+    logger.error('Error in fetchAdminUsers:', err);
+    return { data: null, error: err };
+  }
+}

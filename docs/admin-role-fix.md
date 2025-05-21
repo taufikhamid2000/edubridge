@@ -9,12 +9,47 @@ The admin page in EduBridge relies on a proper configuration of:
 1. The `user_roles` table in the Supabase database
 2. The correct enum values for the `role` column
 3. Proper Row Level Security (RLS) policies
+4. Proper session cookie handling between client and server
 
-If you encounter errors like "role 'admin' does not exist" or permission issues when accessing the admin page, follow these steps to fix the problem.
+If you encounter errors like "role 'admin' does not exist", permission issues, or "Unauthorized" errors when accessing the admin page, follow these steps to fix the problem.
 
-## Quick Fix Steps
+## Client-Server Auth Sync Issue
 
-### 1. Run the fix-roles script
+### Problem
+
+There's a discrepancy between the browser and server-side authentication state. The user has the admin role in the database, but the server-side API endpoints can't detect the authentication session, resulting in a 401 Unauthorized error.
+
+### Diagnosis
+
+1. The user is logged in on the client side (can access `/dashboard`)
+2. The server-side API can't detect the authentication session (returns "Not logged in")
+3. This is most likely a cookie synchronization issue
+
+### Fixing Client-Server Auth Sync
+
+1. **Check your session in Admin Settings**
+
+   - Go to: http://localhost:3000/admin/settings
+   - Look at the session information displayed on the settings page
+
+2. **Try manual logout/login**
+
+   - Log out completely: http://localhost:3000/auth/logout
+   - Clear your browser cookies for localhost
+   - Log back in
+
+3. **Verify in the database**
+
+   - Check that your user ID exists in the `user_roles` table
+   - Verify that the role value is set to "admin"
+
+4. **Check your auth service**
+
+   - Enable console logging in your browser
+   - Look for auth-related messages when accessing admin pages
+
+5. **Verify the fix worked**
+   - Try accessing the admin page again: http://localhost:3000/admin/users
 
 ```bash
 # Navigate to the scripts directory

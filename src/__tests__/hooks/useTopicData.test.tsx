@@ -12,9 +12,10 @@ jest.mock('next/navigation', () => ({
   }),
 }));
 
-// Mock debug function
-jest.mock('@/lib/debug', () => ({
-  captureError: jest.fn(),
+// Mock logger
+jest.mock('@/lib/logger', () => ({
+  error: jest.fn(),
+  debug: jest.fn(),
 }));
 
 // Define our response types to avoid using 'any'
@@ -36,7 +37,7 @@ function createTypedMock<T>(returnValue?: MockResponse<T>) {
   const mock = {
     select: jest.fn().mockReturnThis(),
     eq: jest.fn().mockReturnThis(),
-    order: jest.fn().mockReturnThis(), 
+    order: jest.fn().mockReturnThis(),
     limit: jest.fn().mockReturnThis(),
     in: jest.fn().mockReturnThis(),
     url: new URL('https://example.com'),
@@ -48,13 +49,13 @@ function createTypedMock<T>(returnValue?: MockResponse<T>) {
     delete: jest.fn().mockReturnThis(),
     filter: jest.fn().mockReturnThis(),
   };
-  
+
   // Add response methods
   if (returnValue) {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     mock.single = jest.fn().mockResolvedValue(returnValue);
-    
+
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     mock.then = jest.fn().mockImplementation((callback: ThenCallback<T>) => {
@@ -62,7 +63,7 @@ function createTypedMock<T>(returnValue?: MockResponse<T>) {
       return Promise.resolve(returnValue);
     });
   }
-  
+
   return mock;
 }
 
@@ -85,7 +86,11 @@ describe('useTopicData hook', () => {
 
   it('should fetch topic data successfully', async () => {
     // Mock the Supabase responses
-    const mockSubject: Subject = { id: 'sub1', name: 'Mathematics', slug: 'math' };
+    const mockSubject: Subject = {
+      id: 'sub1',
+      name: 'Mathematics',
+      slug: 'math',
+    };
     const mockTopic: Topic = {
       id: 'top1',
       title: 'Algebra',
@@ -93,16 +98,25 @@ describe('useTopicData hook', () => {
       difficulty_level: 1,
       time_estimate_minutes: 60,
       order_index: 1,
-      chapters: [{ id: 'ch1', title: 'Introduction to Algebra', order_index: 1, form: 1 }],
+      chapters: [
+        {
+          id: 'ch1',
+          title: 'Introduction to Algebra',
+          order_index: 1,
+          form: 1,
+        },
+      ],
     };
-    const mockQuizzes: Quiz[] = [{ 
-      id: 'q1', 
-      name: 'Algebra Basics',
-      created_by: 'user1',
-      created_at: '2023-01-01T00:00:00Z',
-      verified: true,
-      topic_id: 'top1'
-    }];
+    const mockQuizzes: Quiz[] = [
+      {
+        id: 'q1',
+        name: 'Algebra Basics',
+        created_by: 'user1',
+        created_at: '2023-01-01T00:00:00Z',
+        verified: true,
+        topic_id: 'top1',
+      },
+    ];
 
     // Setup the mock implementations
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment

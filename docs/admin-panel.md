@@ -75,3 +75,11 @@ VALUES ('YOUR_USER_UUID', 'admin');
 2. **Use Audit Logs** - Regularly review admin actions through logs
 3. **Test Changes** - Always test configuration changes before deploying to production
 4. **Regular Backups** - Ensure database backups before making significant changes
+5. **Security First** - Follow principle of least privilege and remove debug/development tools in production
+
+## Security Considerations
+
+1. **Production Deployments** - All debugging tools and endpoints have been removed for security
+2. **Environment Variables** - Store sensitive keys in environment variables, never expose them
+3. **Role Validation** - Implement server-side validation for all admin actions
+4. **Authentication** - Always validate session tokens on both client and server sides

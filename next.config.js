@@ -22,10 +22,6 @@ const nextConfig = {
       },
     ],
   },
-  // Make App Router the priority for route resolution
-  experimental: {
-    // Empty but keeping for future use
-  },
   // Add redirects from old Pages Router routes to new App Router routes
   async redirects() {
     return [

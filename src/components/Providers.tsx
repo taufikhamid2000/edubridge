@@ -7,7 +7,15 @@ import { supabase } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
 
 // Create a client
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60 * 1000, // 1 minute
+      retry: 2,
+      refetchOnWindowFocus: process.env.NODE_ENV === 'production',
+    },
+  },
+});
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   useEffect(() => {
