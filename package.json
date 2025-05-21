@@ -12,6 +12,7 @@
     "fix-console-logs": "node scripts/replace-console-logs.mjs",
     "db:migrate": "node scripts/apply-migration.mjs",
     "db:migrate:admin": "node scripts/apply-migration.mjs admin-migration.sql",
+    "migrate:app-router": "node scripts/migrate-to-app-router.mjs",
     "test": "npx jest --config jest.config.mjs",
     "test:watch": "npx jest --config jest.config.mjs --watch",
     "test:coverage": "npx jest --config jest.config.mjs --coverage"
