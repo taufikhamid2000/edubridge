@@ -75,8 +75,8 @@ export async function POST(request: Request) {
           );
         }
 
-        // Check if user has admin privileges
-        const { data: userRoles } = await supabase
+        // Check if user has admin privileges - USING ADMIN CLIENT TO BYPASS RLS
+        const { data: userRoles } = await supabaseAdmin
           .from('user_roles')
           .select('role')
           .eq('user_id', session.user.id)

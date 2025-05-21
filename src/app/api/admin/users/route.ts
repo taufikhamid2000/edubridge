@@ -27,17 +27,24 @@ export async function GET() {
       data: { session },
     } = await supabase.auth.getSession();
     if (!session) {
+      logger.warn(
+        'Unauthorized attempt to access admin/users - no session found'
+      );
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Check if user has admin privileges
-    const { data: userRoles } = await supabase
+    // Check if user has admin privileges - using admin client to bypass RLS
+    // This is secure because we're still checking if the user is logged in
+    const { data: userRoles } = await supabaseAdmin
       .from('user_roles')
       .select('role')
       .eq('user_id', session.user.id)
       .single();
 
     if (!userRoles || userRoles.role !== 'admin') {
+      logger.warn(
+        `User ${session.user.id} attempted to access admin but lacks admin role`
+      );
       return NextResponse.json(
         { error: 'Forbidden: Admin access required' },
         { status: 403 }

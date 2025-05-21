@@ -100,11 +100,19 @@ logger.info(
  */
 export async function recoverSession() {
   try {
+    // Log that we're attempting session recovery
+    logger.info('Attempting to recover auth session...');
+
     // Get current session - may trigger a token refresh if needed
     const { data, error } = await supabase.auth.getSession();
 
     if (error || !data.session) {
-      logger.warn('Session recovery needed, clearing auth state'); // Clear browser storage to remove any corrupted tokens
+      logger.warn('Session recovery needed, clearing auth state', {
+        error: error ? error.message : 'No session found',
+        hasSession: !!data?.session,
+      });
+
+      // Clear browser storage to remove any corrupted tokens
       if (typeof window !== 'undefined') {
         // Clear local storage auth data using our custom storage key
         localStorage.removeItem('edubridge-auth-storage-key');
@@ -116,11 +124,23 @@ export async function recoverSession() {
 
         // Force sign out to clear any remaining session data
         await supabase.auth.signOut({ scope: 'global' });
+
+        logger.info('Auth storage cleared and user signed out');
+
+        // Optional: Redirect to login page after 2 seconds
+        setTimeout(() => {
+          window.location.href = '/auth';
+        }, 2000);
       }
 
       return false;
     }
 
+    // Session exists and is valid
+    logger.info('Session recovery successful', {
+      userId: data.session.user.id,
+      expiresAt: new Date(data.session.expires_at! * 1000).toISOString(),
+    });
     return true;
   } catch (error) {
     logger.error('Error during session recovery:', error);
