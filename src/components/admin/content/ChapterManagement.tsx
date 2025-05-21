@@ -4,8 +4,11 @@ import { useState } from 'react';
 import { logger } from '@/lib/logger';
 import Link from 'next/link';
 import { Chapter, Subject, createChapter, deleteChapter } from '@/services';
-import ContentLoadingState from './ContentLoadingState';
-import ContentEmptyState from './ContentEmptyState';
+import {
+  DataTableCardView,
+  type Column,
+  type CardField,
+} from '@/components/admin/ui';
 
 interface ChapterManagementProps {
   chapters: Chapter[];
@@ -80,7 +83,6 @@ export default function ChapterManagement({
       setLoading(false);
     }
   };
-
   // Function to handle chapter deletion
   const handleDeleteChapter = async (id: string, title: string) => {
     if (!confirm(`Are you sure you want to delete the chapter "${title}"?`)) {
@@ -113,6 +115,87 @@ export default function ChapterManagement({
       setLoading(false);
     }
   };
+
+  // Define columns for DataTableCardView
+  const columns: Column<Chapter>[] = [
+    {
+      key: 'title',
+      header: 'Title',
+      render: (chapter) => (
+        <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+          {chapter.title}
+        </div>
+      ),
+    },
+    {
+      key: 'subject',
+      header: 'Subject',
+      render: (chapter) => (
+        <div className="text-sm text-gray-500 dark:text-gray-400">
+          {subjects.find((s) => s.id === chapter.subject_id)?.name || 'N/A'}
+        </div>
+      ),
+    },
+    {
+      key: 'form',
+      header: 'Form',
+      render: (chapter) => (
+        <div className="text-sm text-gray-500 dark:text-gray-400">
+          {chapter.form}
+        </div>
+      ),
+    },
+  ];
+
+  // Define card fields for mobile view
+  const cardFields: CardField<Chapter>[] = [
+    {
+      key: 'title',
+      label: 'Title',
+      isHeader: true,
+      render: (chapter) => (
+        <div className="text-base font-medium text-gray-900 dark:text-gray-100">
+          {chapter.title}
+        </div>
+      ),
+    },
+    {
+      key: 'subject',
+      label: 'Subject',
+      render: (chapter) => (
+        <div className="text-sm text-gray-900 dark:text-gray-100">
+          {subjects.find((s) => s.id === chapter.subject_id)?.name || 'N/A'}
+        </div>
+      ),
+    },
+    {
+      key: 'form',
+      label: 'Form',
+      render: (chapter) => (
+        <div className="text-sm text-gray-900 dark:text-gray-100">
+          {chapter.form}
+        </div>
+      ),
+    },
+  ];
+
+  // Actions render function
+  const renderActions = (chapter: Chapter) => (
+    <>
+      <Link
+        href={`/admin/content/chapters/${chapter.id}`}
+        className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-4"
+      >
+        Edit
+      </Link>
+      <button
+        onClick={() => handleDeleteChapter(chapter.id, chapter.title)}
+        className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+      >
+        Delete
+      </button>
+    </>
+  );
 
   return (
     <div>
@@ -215,66 +298,15 @@ export default function ChapterManagement({
           </form>
         </div>
       )}
-      {loading ? (
-        <ContentLoadingState />
-      ) : chapters.length === 0 ? (
-        <ContentEmptyState message="No chapters found. Create your first chapter to get started." />
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-50 dark:bg-gray-700">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Title
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Subject
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Form
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-              {chapters.map((chapter) => (
-                <tr key={chapter.id}>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                      {chapter.title}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                    {subjects.find((s) => s.id === chapter.subject_id)?.name ||
-                      'N/A'}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                    {chapter.form}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <Link
-                      href={`/admin/content/chapters/${chapter.id}`}
-                      className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-4"
-                    >
-                      Edit
-                    </Link>
-                    <button
-                      onClick={() =>
-                        handleDeleteChapter(chapter.id, chapter.title)
-                      }
-                      className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <DataTableCardView<Chapter>
+        data={chapters}
+        isLoading={loading}
+        columns={columns}
+        cardFields={cardFields}
+        keyExtractor={(chapter) => chapter.id}
+        emptyMessage="No chapters found. Create your first chapter to get started."
+        actions={renderActions}
+      />
     </div>
   );
 }

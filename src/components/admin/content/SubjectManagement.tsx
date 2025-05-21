@@ -4,8 +4,11 @@ import { useState } from 'react';
 import { logger } from '@/lib/logger';
 import Link from 'next/link';
 import { Subject, createSubject, deleteSubject } from '@/services';
-import ContentLoadingState from './ContentLoadingState';
-import ContentEmptyState from './ContentEmptyState';
+import {
+  DataTableCardView,
+  type Column,
+  type CardField,
+} from '@/components/admin/ui';
 
 interface SubjectManagementProps {
   subjects: Subject[];
@@ -68,7 +71,6 @@ export default function SubjectManagement({
       setLoading(false);
     }
   };
-
   // Function to handle subject deletion
   const handleDeleteSubject = async (id: string, name: string) => {
     if (!confirm(`Are you sure you want to delete the subject "${name}"?`)) {
@@ -102,6 +104,104 @@ export default function SubjectManagement({
     }
   };
 
+  // Define columns for DataTableCardView
+  const columns: Column<Subject>[] = [
+    {
+      key: 'name',
+      header: 'Name',
+      render: (subject) => (
+        <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+          {subject.name}
+        </div>
+      ),
+    },
+    {
+      key: 'description',
+      header: 'Description',
+      render: (subject) => (
+        <div className="text-sm text-gray-500 dark:text-gray-400 truncate max-w-xs">
+          {subject.description}
+        </div>
+      ),
+    },
+    {
+      key: 'topics',
+      header: 'Topics',
+      render: (subject) => (
+        <div className="text-sm text-gray-500 dark:text-gray-400">
+          {subject.topic_count}
+        </div>
+      ),
+    },
+    {
+      key: 'quizzes',
+      header: 'Quizzes',
+      render: (subject) => (
+        <div className="text-sm text-gray-500 dark:text-gray-400">
+          {subject.quiz_count}
+        </div>
+      ),
+    },
+  ];
+
+  // Define card fields for mobile view
+  const cardFields: CardField<Subject>[] = [
+    {
+      key: 'name',
+      label: 'Name',
+      isHeader: true,
+      render: (subject) => (
+        <div className="text-base font-medium text-gray-900 dark:text-gray-100">
+          {subject.name}
+        </div>
+      ),
+    },
+    {
+      key: 'description',
+      label: 'Description',
+      render: (subject) => (
+        <div className="text-sm text-gray-500 dark:text-gray-400">
+          {subject.description}
+        </div>
+      ),
+    },
+    {
+      key: 'topics',
+      label: 'Topics',
+      render: (subject) => (
+        <div className="text-sm text-gray-900 dark:text-gray-100">
+          {subject.topic_count}
+        </div>
+      ),
+    },
+    {
+      key: 'quizzes',
+      label: 'Quizzes',
+      render: (subject) => (
+        <div className="text-sm text-gray-900 dark:text-gray-100">
+          {subject.quiz_count}
+        </div>
+      ),
+    },
+  ];
+
+  // Actions render function
+  const renderActions = (subject: Subject) => (
+    <>
+      <Link
+        href={`/admin/content/subjects/${subject.id}`}
+        className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-4"
+      >
+        Edit
+      </Link>
+      <button
+        onClick={() => handleDeleteSubject(subject.id, subject.name)}
+        className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+      >
+        Delete
+      </button>
+    </>
+  );
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
@@ -115,6 +215,7 @@ export default function SubjectManagement({
           {showNewSubjectForm ? 'Cancel' : 'Add New Subject'}
         </button>
       </div>
+
       {showNewSubjectForm && (
         <div className="mb-6 p-4 border rounded-lg dark:border-gray-700">
           <h3 className="text-lg font-medium mb-3 dark:text-white">
@@ -174,74 +275,17 @@ export default function SubjectManagement({
             </div>
           </form>
         </div>
-      )}{' '}
-      {loading ? (
-        <ContentLoadingState />
-      ) : subjects.length === 0 ? (
-        <ContentEmptyState message="No subjects found. Create your first subject to get started." />
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-50 dark:bg-gray-700">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Name
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Description
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Topics
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Quizzes
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-              {subjects.map((subject) => (
-                <tr key={subject.id}>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                      {subject.name}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="text-sm text-gray-500 dark:text-gray-400 truncate max-w-xs">
-                      {subject.description}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                    {subject.topic_count}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                    {subject.quiz_count}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <Link
-                      href={`/admin/content/subjects/${subject.id}`}
-                      className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-4"
-                    >
-                      Edit
-                    </Link>
-                    <button
-                      onClick={() =>
-                        handleDeleteSubject(subject.id, subject.name)
-                      }
-                      className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
       )}
+
+      <DataTableCardView<Subject>
+        data={subjects}
+        isLoading={loading}
+        columns={columns}
+        cardFields={cardFields}
+        keyExtractor={(subject) => subject.id}
+        emptyMessage="No subjects found. Create your first subject to get started."
+        actions={renderActions}
+      />
     </div>
   );
 }

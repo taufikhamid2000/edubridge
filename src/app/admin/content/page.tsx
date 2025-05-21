@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { logger } from '@/lib/logger';
 import { supabase } from '@/lib/supabase';
-import AdminNavigation from '@/components/admin/AdminNavigation';
+import { AdminLayout, Message } from '@/components/admin/ui';
 import {
   Subject,
   Chapter,
@@ -220,16 +220,20 @@ export default function AdminContentPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, []); // Function to handle current content refresh based on active tab
+  const refreshCurrentContent = async () => {
+    if (activeTab === 'subjects') {
+      await fetchSubjects();
+    } else if (activeTab === 'chapters') {
+      await fetchChapters();
+    } else if (activeTab === 'topics') {
+      await fetchTopics();
+    }
+  };
+
   // Function to handle the retry button
   const handleRetry = () => {
-    if (activeTab === 'subjects') {
-      fetchSubjects();
-    } else if (activeTab === 'chapters') {
-      fetchChapters();
-    } else if (activeTab === 'topics') {
-      fetchTopics();
-    }
+    refreshCurrentContent();
   };
 
   // Clear success message after 5 seconds
@@ -261,137 +265,114 @@ export default function AdminContentPage() {
       fetchTopics();
     }
   }, [activeTab, fetchTopics]);
-
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="flex">
-        <AdminNavigation />
-        <div className="flex-1 p-8">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-3xl font-bold dark:text-white">
-              Content Management
-            </h1>
-            <div className="flex space-x-2">
-              {' '}
-              <button
-                onClick={() => setActiveTab('subjects')}
-                className={`px-4 py-2 rounded ${
-                  activeTab === 'subjects'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 border dark:border-gray-600'
-                }`}
-              >
-                Subjects
-              </button>
-              <button
-                onClick={() => setActiveTab('chapters')}
-                className={`px-4 py-2 rounded ${
-                  activeTab === 'chapters'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 border dark:border-gray-600'
-                }`}
-              >
-                Chapters
-              </button>
-              <button
-                onClick={() => setActiveTab('topics')}
-                className={`px-4 py-2 rounded ${
-                  activeTab === 'topics'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 border dark:border-gray-600'
-                }`}
-              >
-                Topics
-              </button>
-              <button
-                onClick={() => setActiveTab('quizzes')}
-                className={`px-4 py-2 rounded ${
-                  activeTab === 'quizzes'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 border dark:border-gray-600'
-                }`}
-              >
-                Quizzes
-              </button>
-            </div>
-          </div>{' '}
-          {error && (
-            <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded dark:bg-red-900 dark:border-red-700 dark:text-red-300">
-              <div className="flex justify-between">
-                <div>
-                  <p className="font-bold">Error:</p>
-                  <p>{error}</p>
-                </div>{' '}
-                <button
-                  onClick={handleRetry}
-                  className="bg-red-200 hover:bg-red-300 text-red-800 font-bold py-2 px-4 rounded dark:bg-red-800 dark:hover:bg-red-700 dark:text-red-200"
-                >
-                  Retry
-                </button>
-              </div>
-            </div>
-          )}
-          {successMessage && (
-            <div className="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded dark:bg-green-900 dark:border-green-700 dark:text-green-300">
-              <div className="flex justify-between">
-                <div>
-                  <p className="font-bold">Success:</p>
-                  <p>{successMessage}</p>
-                </div>
-                <button
-                  onClick={() => setSuccessMessage(null)}
-                  className="bg-green-200 hover:bg-green-300 text-green-800 font-bold py-2 px-4 rounded dark:bg-green-800 dark:hover:bg-green-700 dark:text-green-200"
-                >
-                  Dismiss
-                </button>
-              </div>
-            </div>
-          )}{' '}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            {activeTab === 'subjects' && (
-              <SubjectManagement
-                subjects={subjects}
-                loading={loading}
-                setLoading={setLoading}
-                setError={setError}
-                setSuccessMessage={setSuccessMessage}
-                refreshSubjects={fetchSubjects}
-              />
-            )}
-            {activeTab === 'chapters' && (
-              <ChapterManagement
-                chapters={chapters}
-                subjects={subjects}
-                loading={loading}
-                setLoading={setLoading}
-                setError={setError}
-                setSuccessMessage={setSuccessMessage}
-                refreshChapters={fetchChapters}
-              />
-            )}{' '}
-            {activeTab === 'topics' && (
-              <TopicManagement
-                topics={topics}
-                chapters={chapters}
-                loading={loading}
-                setLoading={setLoading}
-                setError={setError}
-                setSuccessMessage={setSuccessMessage}
-                refreshTopics={fetchTopics}
-              />
-            )}
-            {activeTab === 'quizzes' && (
-              <QuizManagement
-                topics={topics}
-                loading={loading}
-                setLoading={setLoading}
-                setError={setError}
-                setSuccessMessage={setSuccessMessage}
-              />
-            )}
-          </div>
+    <AdminLayout
+      title="Content Management"
+      refreshAction={refreshCurrentContent}
+      isLoading={loading}
+    >
+      <div className="mb-6">
+        <div className="flex space-x-2">
+          <button
+            onClick={() => setActiveTab('subjects')}
+            className={`px-4 py-2 rounded ${
+              activeTab === 'subjects'
+                ? 'bg-blue-600 text-white'
+                : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 border dark:border-gray-600'
+            }`}
+          >
+            Subjects
+          </button>
+          <button
+            onClick={() => setActiveTab('chapters')}
+            className={`px-4 py-2 rounded ${
+              activeTab === 'chapters'
+                ? 'bg-blue-600 text-white'
+                : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 border dark:border-gray-600'
+            }`}
+          >
+            Chapters
+          </button>
+          <button
+            onClick={() => setActiveTab('topics')}
+            className={`px-4 py-2 rounded ${
+              activeTab === 'topics'
+                ? 'bg-blue-600 text-white'
+                : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 border dark:border-gray-600'
+            }`}
+          >
+            Topics
+          </button>
+          <button
+            onClick={() => setActiveTab('quizzes')}
+            className={`px-4 py-2 rounded ${
+              activeTab === 'quizzes'
+                ? 'bg-blue-600 text-white'
+                : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 border dark:border-gray-600'
+            }`}
+          >
+            Quizzes
+          </button>
         </div>
       </div>
-    </div>
+
+      {/* Error and Success Messages */}
+      <Message
+        type="error"
+        message={error}
+        onDismiss={() => setError(null)}
+        onRetry={handleRetry}
+      />
+
+      <Message
+        type="success"
+        message={successMessage}
+        onDismiss={() => setSuccessMessage(null)}
+      />
+
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        {activeTab === 'subjects' && (
+          <SubjectManagement
+            subjects={subjects}
+            loading={loading}
+            setLoading={setLoading}
+            setError={setError}
+            setSuccessMessage={setSuccessMessage}
+            refreshSubjects={fetchSubjects}
+          />
+        )}
+        {activeTab === 'chapters' && (
+          <ChapterManagement
+            chapters={chapters}
+            subjects={subjects}
+            loading={loading}
+            setLoading={setLoading}
+            setError={setError}
+            setSuccessMessage={setSuccessMessage}
+            refreshChapters={fetchChapters}
+          />
+        )}
+        {activeTab === 'topics' && (
+          <TopicManagement
+            topics={topics}
+            chapters={chapters}
+            loading={loading}
+            setLoading={setLoading}
+            setError={setError}
+            setSuccessMessage={setSuccessMessage}
+            refreshTopics={fetchTopics}
+          />
+        )}
+        {activeTab === 'quizzes' && (
+          <QuizManagement
+            topics={topics}
+            loading={loading}
+            setLoading={setLoading}
+            setError={setError}
+            setSuccessMessage={setSuccessMessage}
+          />
+        )}
+      </div>
+    </AdminLayout>
   );
 }

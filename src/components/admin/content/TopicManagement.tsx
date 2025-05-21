@@ -3,8 +3,11 @@
 import { useState } from 'react';
 import { logger } from '@/lib/logger';
 import { Topic, Chapter, createTopic, deleteTopic } from '@/services';
-import ContentLoadingState from './ContentLoadingState';
-import ContentEmptyState from './ContentEmptyState';
+import {
+  DataTableCardView,
+  type Column,
+  type CardField,
+} from '@/components/admin/ui';
 
 interface TopicManagementProps {
   topics: Topic[];
@@ -106,13 +109,84 @@ export default function TopicManagement({
       setLoading(false);
     }
   };
-
   // Function to get chapter title by ID
   const getChapterTitle = (chapterId: string) => {
     const chapter = chapters.find((c) => c.id === chapterId);
     return chapter ? chapter.title : 'Unknown Chapter';
   };
 
+  // Define columns for DataTableCardView
+  const columns: Column<Topic>[] = [
+    {
+      key: 'title',
+      header: 'Title',
+      render: (topic) => (
+        <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+          {topic.title}
+        </div>
+      ),
+    },
+    {
+      key: 'chapter',
+      header: 'Chapter',
+      render: (topic) => (
+        <div className="text-sm text-gray-500 dark:text-gray-400">
+          {getChapterTitle(topic.chapter_id)}
+        </div>
+      ),
+    },
+    {
+      key: 'created',
+      header: 'Created',
+      render: (topic) => (
+        <div className="text-sm text-gray-500 dark:text-gray-400">
+          {new Date(topic.created_at).toLocaleDateString()}
+        </div>
+      ),
+    },
+  ];
+
+  // Define card fields for mobile view
+  const cardFields: CardField<Topic>[] = [
+    {
+      key: 'title',
+      label: 'Title',
+      isHeader: true,
+      render: (topic) => (
+        <div className="text-base font-medium text-gray-900 dark:text-gray-100">
+          {topic.title}
+        </div>
+      ),
+    },
+    {
+      key: 'chapter',
+      label: 'Chapter',
+      render: (topic) => (
+        <div className="text-sm text-gray-900 dark:text-gray-100">
+          {getChapterTitle(topic.chapter_id)}
+        </div>
+      ),
+    },
+    {
+      key: 'created',
+      label: 'Created',
+      render: (topic) => (
+        <div className="text-sm text-gray-900 dark:text-gray-100">
+          {new Date(topic.created_at).toLocaleDateString()}
+        </div>
+      ),
+    },
+  ];
+
+  // Actions render function
+  const renderActions = (topic: Topic) => (
+    <button
+      onClick={() => handleDeleteTopic(topic.id)}
+      className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+    >
+      Delete
+    </button>
+  );
   return (
     <div>
       <div className="flex justify-between mb-4">
@@ -206,57 +280,15 @@ export default function TopicManagement({
         </form>
       )}
 
-      {loading ? (
-        <ContentLoadingState />
-      ) : topics.length === 0 ? (
-        <ContentEmptyState message="No topics found. Create your first topic to get started." />
-      ) : (
-        <div className="mt-4">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead>
-              <tr>
-                <th className="px-6 py-3 bg-gray-50 dark:bg-gray-800 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Title
-                </th>
-                <th className="px-6 py-3 bg-gray-50 dark:bg-gray-800 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Chapter
-                </th>
-                <th className="px-6 py-3 bg-gray-50 dark:bg-gray-800 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Created
-                </th>
-                <th className="px-6 py-3 bg-gray-50 dark:bg-gray-800 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white dark:bg-gray-700 divide-y divide-gray-200 dark:divide-gray-600">
-              {topics.map((topic) => (
-                <tr key={topic.id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                    {topic.title}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                    {getChapterTitle(topic.chapter_id)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                    {new Date(topic.created_at).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => handleDeleteTopic(topic.id)}
-                        className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <DataTableCardView<Topic>
+        data={topics}
+        isLoading={loading}
+        columns={columns}
+        cardFields={cardFields}
+        keyExtractor={(topic) => topic.id}
+        emptyMessage="No topics found. Create your first topic to get started."
+        actions={renderActions}
+      />
     </div>
   );
 }

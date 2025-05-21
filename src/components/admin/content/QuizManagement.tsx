@@ -11,8 +11,12 @@ import {
   createAdminQuiz as createQuiz,
   deleteQuiz,
 } from '@/services';
-import ContentLoadingState from './ContentLoadingState';
-import ContentEmptyState from './ContentEmptyState';
+import {
+  DataTableCardView,
+  type Column,
+  type CardField,
+  Message,
+} from '@/components/admin/ui';
 
 interface QuizManagementProps {
   topics?: Topic[];
@@ -181,12 +185,126 @@ export default function QuizManagement({
       setParentLoading(false);
     }
   };
-
   // Function to get topic title by ID
   const getTopicTitle = (topicId: string) => {
     const topic = topics.find((t) => t.id === topicId);
     return topic ? topic.title : 'Unknown Topic';
   };
+
+  // Define columns for DataTableCardView
+  const columns: Column<Quiz>[] = [
+    {
+      key: 'name',
+      header: 'Name',
+      render: (quiz) => (
+        <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+          {quiz.name}
+        </div>
+      ),
+    },
+    {
+      key: 'topic',
+      header: 'Topic',
+      render: (quiz) => (
+        <div className="text-sm text-gray-500 dark:text-gray-400">
+          {getTopicTitle(quiz.topic_id)}
+        </div>
+      ),
+    },
+    {
+      key: 'difficulty',
+      header: 'Difficulty',
+      render: (quiz) => (
+        <span
+          className={`px-2 py-1 text-xs rounded-full ${
+            quiz.difficulty_level === 'easy'
+              ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+              : quiz.difficulty_level === 'medium'
+                ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+          }`}
+        >
+          {quiz.difficulty_level || 'Medium'}
+        </span>
+      ),
+    },
+    {
+      key: 'questions',
+      header: 'Questions',
+      render: (quiz) => (
+        <div className="text-sm text-gray-500 dark:text-gray-400">
+          {quiz.question_count || 0}
+        </div>
+      ),
+    },
+  ];
+
+  // Define card fields for mobile view
+  const cardFields: CardField<Quiz>[] = [
+    {
+      key: 'name',
+      label: 'Name',
+      isHeader: true,
+      render: (quiz) => (
+        <div className="text-base font-medium text-gray-900 dark:text-gray-100">
+          {quiz.name}
+        </div>
+      ),
+    },
+    {
+      key: 'topic',
+      label: 'Topic',
+      render: (quiz) => (
+        <div className="text-sm text-gray-900 dark:text-gray-100">
+          {getTopicTitle(quiz.topic_id)}
+        </div>
+      ),
+    },
+    {
+      key: 'difficulty',
+      label: 'Difficulty',
+      render: (quiz) => (
+        <span
+          className={`px-2 py-1 text-xs rounded-full ${
+            quiz.difficulty_level === 'easy'
+              ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+              : quiz.difficulty_level === 'medium'
+                ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+          }`}
+        >
+          {quiz.difficulty_level || 'Medium'}
+        </span>
+      ),
+    },
+    {
+      key: 'questions',
+      label: 'Questions',
+      render: (quiz) => (
+        <div className="text-sm text-gray-900 dark:text-gray-100">
+          {quiz.question_count || 0}
+        </div>
+      ),
+    },
+  ];
+
+  // Actions render function
+  const renderActions = (quiz: Quiz) => (
+    <>
+      <Link
+        href={`/admin/quizzes/${quiz.id}/questions`}
+        className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-4"
+      >
+        Edit Questions
+      </Link>
+      <button
+        onClick={() => handleDeleteQuiz(quiz.id)}
+        className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+      >
+        Delete
+      </button>
+    </>
+  );
 
   // Fetch quizzes on component mount
   useEffect(() => {
@@ -204,7 +322,6 @@ export default function QuizManagement({
   }, [successMessage]);
 
   const isLoading = loading || parentLoading;
-
   return (
     <div>
       <div className="flex justify-between mb-4">
@@ -220,27 +337,20 @@ export default function QuizManagement({
       </div>
 
       {error && !parentLoading && (
-        <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-          <p className="font-bold">Error:</p>
-          <p>{error}</p>
-        </div>
+        <Message
+          type="error"
+          message={error}
+          onDismiss={() => setError(null)}
+          onRetry={fetchQuizzes}
+        />
       )}
 
       {successMessage && !parentLoading && (
-        <div className="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
-          <div className="flex justify-between">
-            <div>
-              <p className="font-bold">Success:</p>
-              <p>{successMessage}</p>
-            </div>
-            <button
-              onClick={() => setSuccessMessage(null)}
-              className="bg-green-200 hover:bg-green-300 text-green-800 font-bold py-1 px-2 rounded"
-            >
-              Dismiss
-            </button>
-          </div>
-        </div>
+        <Message
+          type="success"
+          message={successMessage}
+          onDismiss={() => setSuccessMessage(null)}
+        />
       )}
 
       {showNewQuizForm && (
@@ -369,79 +479,15 @@ export default function QuizManagement({
         </form>
       )}
 
-      {isLoading ? (
-        <ContentLoadingState />
-      ) : quizzes.length === 0 ? (
-        <ContentEmptyState message="No quizzes found. Create your first quiz to get started." />
-      ) : (
-        <div className="mt-4">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead>
-              <tr>
-                <th className="px-6 py-3 bg-gray-50 dark:bg-gray-800 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Name
-                </th>
-                <th className="px-6 py-3 bg-gray-50 dark:bg-gray-800 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Topic
-                </th>
-                <th className="px-6 py-3 bg-gray-50 dark:bg-gray-800 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Difficulty
-                </th>
-                <th className="px-6 py-3 bg-gray-50 dark:bg-gray-800 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Questions
-                </th>
-                <th className="px-6 py-3 bg-gray-50 dark:bg-gray-800 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white dark:bg-gray-700 divide-y divide-gray-200 dark:divide-gray-600">
-              {quizzes.map((quiz) => (
-                <tr key={quiz.id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                    {quiz.name}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                    {getTopicTitle(quiz.topic_id)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                    <span
-                      className={`px-2 py-1 text-xs rounded-full ${
-                        quiz.difficulty_level === 'easy'
-                          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                          : quiz.difficulty_level === 'medium'
-                            ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
-                            : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-                      }`}
-                    >
-                      {quiz.difficulty_level || 'Medium'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                    {quiz.question_count || 0}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <div className="flex space-x-2">
-                      <Link
-                        href={`/admin/quizzes/${quiz.id}/questions`}
-                        className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
-                      >
-                        Edit Questions
-                      </Link>
-                      <button
-                        onClick={() => handleDeleteQuiz(quiz.id)}
-                        className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <DataTableCardView<Quiz>
+        data={quizzes}
+        isLoading={isLoading}
+        columns={columns}
+        cardFields={cardFields}
+        keyExtractor={(quiz) => quiz.id}
+        emptyMessage="No quizzes found. Create your first quiz to get started."
+        actions={renderActions}
+      />
     </div>
   );
 }

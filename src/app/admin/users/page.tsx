@@ -1,9 +1,20 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { logger } from '@/lib/logger';
-import AdminNavigation from '@/components/admin/AdminNavigation';
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import Image from 'next/image';
+import { logger } from '@/lib/logger';
+import {
+  AdminLayout,
+  SearchBar,
+  FilterSortControls,
+  DataTableCardView,
+  Pagination,
+  Message,
+  type Column,
+  type CardField,
+  type SortDirection,
+} from '@/components/admin/ui';
 
 // Define the structure of the user data after processing
 interface User {
@@ -17,12 +28,26 @@ interface User {
   role: string;
 }
 
+// Filtering options
+type FilterOption = 'all' | 'admin' | 'moderator' | 'user';
+type SortOption = 'name' | 'email' | 'level' | 'joined' | 'role';
+
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [usersPerPage, setUsersPerPage] = useState(10);
+
+  // Filtering and sorting state
+  const [roleFilter, setRoleFilter] = useState<FilterOption>('all');
+  const [sortBy, setSortBy] = useState<SortOption>('name');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false);
 
   // Clear success message after 5 seconds
   useEffect(() => {
@@ -125,219 +150,483 @@ export default function AdminUsersPage() {
     }
   }
 
-  const filteredUsers = users.filter(
-    (user) =>
+  const filteredUsers = users.filter((user) => {
+    // Apply search filter
+    const matchesSearch =
       (user.email &&
         user.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (user.display_name &&
-        user.display_name.toLowerCase().includes(searchTerm.toLowerCase()))
+        user.display_name.toLowerCase().includes(searchTerm.toLowerCase()));
+
+    // Apply role filter
+    const matchesRole = roleFilter === 'all' || user.role === roleFilter;
+
+    return matchesSearch && matchesRole;
+  });
+
+  // Sort the filtered users
+  const sortedUsers = [...filteredUsers].sort((a, b) => {
+    let compareA: string | number = '';
+    let compareB: string | number = '';
+
+    switch (sortBy) {
+      case 'name':
+        compareA = a.display_name || a.email || '';
+        compareB = b.display_name || b.email || '';
+        break;
+      case 'email':
+        compareA = a.email || '';
+        compareB = b.email || '';
+        break;
+      case 'level':
+        compareA = a.level;
+        compareB = b.level;
+        break;
+      case 'joined':
+        compareA = new Date(a.created_at).getTime();
+        compareB = new Date(b.created_at).getTime();
+        break;
+      case 'role':
+        compareA = a.role;
+        compareB = b.role;
+        break;
+    }
+
+    // Compare based on direction
+    if (typeof compareA === 'string' && typeof compareB === 'string') {
+      return sortDirection === 'asc'
+        ? compareA.localeCompare(compareB)
+        : compareB.localeCompare(compareA);
+    } else {
+      return sortDirection === 'asc'
+        ? Number(compareA) - Number(compareB)
+        : Number(compareB) - Number(compareA);
+    }
+  });
+
+  // Pagination logic
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = sortedUsers.slice(indexOfFirstUser, indexOfLastUser);
+  const totalPages = Math.ceil(sortedUsers.length / usersPerPage);
+
+  // Change page
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
+  // Toggle sort direction
+  const toggleSortDirection = () => {
+    setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+  };
+
+  // Handle sort change
+  const handleSortChange = (option: SortOption) => {
+    if (sortBy === option) {
+      toggleSortDirection();
+    } else {
+      setSortBy(option);
+      setSortDirection('asc');
+    }
+  };
+
+  // Define filter options for the FilterSortControls component
+  const filterOptions = [
+    { id: 'all', label: 'All' },
+    { id: 'admin', label: 'Admin' },
+    { id: 'moderator', label: 'Moderator' },
+    { id: 'user', label: 'User' },
+  ];
+
+  // Define sort options for the FilterSortControls component
+  const sortOptions = [
+    { id: 'name', label: 'Name' },
+    { id: 'email', label: 'Email' },
+    { id: 'level', label: 'Level' },
+    { id: 'joined', label: 'Join Date' },
+    { id: 'role', label: 'Role' },
+  ];
+
+  // Define columns for the DataTableCardView component
+  const columns: Column<User>[] = [
+    {
+      key: 'user',
+      header: 'User',
+      render: (user) => (
+        <div className="flex items-center">
+          <div className="flex-shrink-0 h-10 w-10">
+            {user.avatar_url ? (
+              <Image
+                className="h-10 w-10 rounded-full object-cover"
+                src={user.avatar_url}
+                alt={user.display_name || 'User avatar'}
+                width={40}
+                height={40}
+                unoptimized={user.avatar_url.startsWith('data:')}
+              />
+            ) : (
+              <div className="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400">
+                {(user.display_name || user.email || '?')
+                  .charAt(0)
+                  .toUpperCase()}
+              </div>
+            )}
+          </div>
+          <div className="ml-4">
+            <div className="text-sm font-medium text-gray-900 dark:text-white">
+              {user.display_name || 'Unnamed User'}
+            </div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: 'email',
+      header: 'Email',
+      render: (user) => (
+        <div className="text-sm text-gray-500 dark:text-gray-400">
+          {user.email}
+        </div>
+      ),
+    },
+    {
+      key: 'level',
+      header: 'Level/XP',
+      render: (user) => (
+        <>
+          <div className="text-sm font-medium text-gray-900 dark:text-white">
+            Level {user.level}
+          </div>
+          <div className="text-sm text-gray-500 dark:text-gray-400">
+            {user.xp} XP
+          </div>
+        </>
+      ),
+    },
+    {
+      key: 'joined',
+      header: 'Joined',
+      render: (user) => (
+        <div className="text-sm text-gray-500 dark:text-gray-400">
+          {new Date(user.created_at).toLocaleDateString()}
+        </div>
+      ),
+    },
+    {
+      key: 'role',
+      header: 'Role',
+      render: (user) => (
+        <select
+          value={user.role}
+          onChange={(e) => handleRoleChange(user.id, e.target.value)}
+          className="text-sm border rounded py-1 px-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+        >
+          <option value="user">User</option>
+          <option value="admin">Admin</option>
+          <option value="moderator">Moderator</option>
+        </select>
+      ),
+    },
+  ];
+
+  // Define card fields for mobile view
+  const cardFields: CardField<User>[] = [
+    {
+      key: 'user-header',
+      label: 'User',
+      isHeader: true,
+      render: (user) => (
+        <div className="flex items-center mb-3">
+          <div className="flex-shrink-0 h-12 w-12 mr-3">
+            {user.avatar_url ? (
+              <Image
+                className="h-12 w-12 rounded-full object-cover"
+                src={user.avatar_url}
+                alt={user.display_name || 'User avatar'}
+                width={48}
+                height={48}
+                unoptimized={user.avatar_url.startsWith('data:')}
+              />
+            ) : (
+              <div className="h-12 w-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400">
+                {(user.display_name || user.email || '?')
+                  .charAt(0)
+                  .toUpperCase()}
+              </div>
+            )}
+          </div>
+          <div>
+            <div className="text-base font-medium text-gray-900 dark:text-gray-100">
+              {user.display_name || 'Unnamed User'}
+            </div>
+            <div className="text-sm text-gray-500 dark:text-gray-400 break-all">
+              {user.email}
+            </div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: 'level',
+      label: 'Level/XP',
+      render: (user) => (
+        <div className="text-sm text-gray-900 dark:text-gray-100">
+          Level {user.level} ({user.xp} XP)
+        </div>
+      ),
+    },
+    {
+      key: 'joined',
+      label: 'Joined',
+      render: (user) => (
+        <div className="text-sm text-gray-900 dark:text-gray-100">
+          {new Date(user.created_at).toLocaleDateString()}
+        </div>
+      ),
+    },
+    {
+      key: 'role',
+      label: 'Role',
+      isFooter: true,
+      render: (user) => (
+        <select
+          value={user.role}
+          onChange={(e) => handleRoleChange(user.id, e.target.value)}
+          className="w-full text-sm border rounded py-2 px-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="user">User</option>
+          <option value="admin">Admin</option>
+          <option value="moderator">Moderator</option>
+        </select>
+      ),
+    },
+  ];
+
+  const renderActions = (user: User) => (
+    <>
+      <Link
+        href={`/admin/users/${user.id}`}
+        className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
+      >
+        View
+      </Link>
+      <span className="mx-2 dark:text-gray-400">|</span>
+      <button className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
+        Disable
+      </button>
+    </>
+  );
+
+  const renderMobileActions = (user: User) => (
+    <div className="flex justify-between text-sm font-medium gap-2 mt-3">
+      <Link
+        href={`/admin/users/${user.id}`}
+        className="flex-1 text-center text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 py-2 px-3 border border-blue-500 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
+        View Details
+      </Link>
+      <button className="flex-1 text-center text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 py-2 px-3 border border-red-500 rounded focus:outline-none focus:ring-2 focus:ring-red-500">
+        Disable Account
+      </button>
+    </div>
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="flex">
-        <AdminNavigation />
-        <div className="flex-1 p-8">
-          <div className="flex justify-between items-center mb-6">
-            <div className="flex items-center">
-              <h1 className="text-3xl font-bold dark:text-white mr-4">
-                Users Management
-              </h1>
-              <button
-                onClick={() => fetchUsers()}
-                className="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center space-x-1 dark:bg-blue-600 dark:hover:bg-blue-700"
-                disabled={loading}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                  />
-                </svg>
-                <span>Refresh</span>
-              </button>
-            </div>
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search users..."
-                className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-          </div>
-
-          {error && (
-            <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded dark:bg-red-900 dark:border-red-700 dark:text-red-300">
-              <div className="flex justify-between">
-                <div>
-                  <p className="font-bold">Error:</p>
-                  <p>{error}</p>
-                </div>
-                <button
-                  onClick={() => fetchUsers()}
-                  className="bg-red-200 hover:bg-red-300 text-red-800 font-bold py-2 px-4 rounded dark:bg-red-800 dark:hover:bg-red-700 dark:text-red-200"
-                >
-                  Retry
-                </button>
-              </div>
-            </div>
-          )}
-
-          {successMessage && (
-            <div className="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded dark:bg-green-900 dark:border-green-700 dark:text-green-300">
-              <div className="flex justify-between">
-                <div>
-                  <p className="font-bold">Success:</p>
-                  <p>{successMessage}</p>
-                </div>
-                <button
-                  onClick={() => setSuccessMessage(null)}
-                  className="bg-green-200 hover:bg-green-300 text-green-800 font-bold py-2 px-4 rounded dark:bg-green-800 dark:hover:bg-green-700 dark:text-green-200"
-                >
-                  Dismiss
-                </button>
-              </div>
-            </div>
-          )}
-
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
-            {loading ? (
-              <div className="p-4 flex justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 dark:border-blue-400"></div>
-              </div>
-            ) : (
-              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead className="bg-gray-50 dark:bg-gray-700">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                      User
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                      Email
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                      Level/XP
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                      Joined
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                      Role
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                  {filteredUsers.length === 0 ? (
-                    <tr>
-                      <td
-                        colSpan={6}
-                        className="px-6 py-4 text-center text-gray-500 dark:text-gray-400"
-                      >
-                        {searchTerm
-                          ? 'No users found matching your search.'
-                          : 'No users found in the system.'}
-                      </td>
-                    </tr>
-                  ) : (
-                    filteredUsers.map((user) => (
-                      <tr key={user.id}>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <div className="flex-shrink-0 h-10 w-10">
-                              {user.avatar_url ? (
-                                <Image
-                                  className="h-10 w-10 rounded-full object-cover"
-                                  src={user.avatar_url}
-                                  alt={user.display_name || 'User avatar'}
-                                  width={40}
-                                  height={40}
-                                  unoptimized={user.avatar_url.startsWith(
-                                    'data:'
-                                  )}
-                                />
-                              ) : (
-                                <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
-                                  <span className="text-gray-600 font-medium">
-                                    {user.display_name &&
-                                    user.display_name.length > 0
-                                      ? user.display_name
-                                          .charAt(0)
-                                          .toUpperCase()
-                                      : user.email && user.email.length > 0
-                                        ? user.email.charAt(0).toUpperCase()
-                                        : '?'}
-                                  </span>
-                                </div>
-                              )}
-                            </div>
-                            <div className="ml-4">
-                              <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                {user.display_name || 'Unnamed User'}
-                              </div>
-                              <div className="text-sm text-gray-500 dark:text-gray-400">
-                                ID: {user.id.slice(0, 8)}...
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                          {user.email || 'No email'}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900 dark:text-gray-100">
-                            Level {user.level}
-                          </div>
-                          <div className="text-sm text-gray-500 dark:text-gray-400">
-                            {user.xp} XP
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                          {new Date(user.created_at).toLocaleDateString()}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <select
-                            value={user.role}
-                            onChange={(e) =>
-                              handleRoleChange(user.id, e.target.value)
-                            }
-                            className="text-sm border rounded py-1 px-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                          >
-                            <option value="user">User</option>
-                            <option value="admin">Admin</option>
-                            <option value="moderator">Moderator</option>
-                          </select>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <button className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
-                            View
-                          </button>
-                          <span className="mx-2 dark:text-gray-400">|</span>
-                          <button className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
-                            Disable
-                          </button>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            )}
-          </div>
-        </div>
+    <AdminLayout
+      title="User Management"
+      refreshAction={fetchUsers}
+      isLoading={loading}
+    >
+      {/* Desktop Search */}
+      <div className="hidden md:block mb-4">
+        <SearchBar
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          placeholder="Search users..."
+        />
       </div>
-    </div>
+
+      {/* Mobile search and filter */}
+      <div className="md:hidden flex flex-col gap-3 mb-4">
+        <SearchBar
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          placeholder="Search users..."
+        />
+
+        <button
+          onClick={() => setIsFilterMenuOpen(!isFilterMenuOpen)}
+          className="px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-center"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-4 w-4 mr-2"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
+            />
+          </svg>
+          Filter & Sort
+        </button>
+
+        {isFilterMenuOpen && (
+          <div className="mt-2 p-4 bg-white border border-gray-200 rounded-lg shadow-lg dark:bg-gray-800 dark:border-gray-700">
+            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Filter by Role
+            </h3>
+            <div className="grid grid-cols-2 gap-2 mb-4">
+              {filterOptions.map((option) => (
+                <button
+                  key={option.id}
+                  onClick={() => setRoleFilter(option.id as FilterOption)}
+                  className={`px-3 py-2 text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    roleFilter === option.id
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+
+            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Sort By
+            </h3>
+            <div className="flex flex-col gap-2">
+              <select
+                value={sortBy}
+                onChange={(e) => handleSortChange(e.target.value as SortOption)}
+                className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                {sortOptions.map((option) => (
+                  <option key={option.id} value={option.id}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+
+              <div className="flex gap-2">
+                <button
+                  onClick={toggleSortDirection}
+                  className="flex-1 px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-center"
+                >
+                  Sort: {sortDirection === 'asc' ? 'Ascending' : 'Descending'}
+                  {sortDirection === 'asc' ? (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 ml-2"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"
+                      />
+                    </svg>
+                  ) : (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 ml-2"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4"
+                      />
+                    </svg>
+                  )}
+                </button>
+
+                <select
+                  value={usersPerPage}
+                  onChange={(e) => setUsersPerPage(Number(e.target.value))}
+                  className="flex-1 px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value={5}>5 per page</option>
+                  <option value={10}>10 per page</option>
+                  <option value={25}>25 per page</option>
+                  <option value={50}>50 per page</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Desktop Filter/Sort controls */}
+      <div className="hidden md:block">
+        <FilterSortControls
+          selectedFilter={roleFilter}
+          onFilterChange={(filter) => setRoleFilter(filter as FilterOption)}
+          filterOptions={filterOptions}
+          selectedSort={sortBy}
+          onSortChange={(sort) => handleSortChange(sort as SortOption)}
+          sortOptions={sortOptions}
+          sortDirection={sortDirection}
+          onSortDirectionChange={toggleSortDirection}
+          perPageOptions={[5, 10, 25, 50]}
+          itemsPerPage={usersPerPage}
+          onItemsPerPageChange={setUsersPerPage}
+        />
+      </div>
+
+      {/* Error and Success Messages */}
+      <Message
+        type="error"
+        message={error}
+        onDismiss={() => setError(null)}
+        onRetry={fetchUsers}
+      />
+
+      <Message
+        type="success"
+        message={successMessage}
+        onDismiss={() => setSuccessMessage(null)}
+      />
+
+      {/* Users Table/Card View */}
+      <DataTableCardView<User>
+        data={currentUsers}
+        isLoading={loading}
+        columns={columns}
+        cardFields={cardFields}
+        keyExtractor={(user) => user.id}
+        emptyMessage="No users found in the system."
+        emptyFilteredMessage="No users found matching your filters."
+        isFiltered={searchTerm !== '' || roleFilter !== 'all'}
+        actions={renderActions}
+      />
+
+      {/* Mobile card action buttons - rendered after each card */}
+      {!loading &&
+        currentUsers.map((user) => (
+          <div key={`mobile-actions-${user.id}`} className="md:hidden mb-2">
+            {renderMobileActions(user)}
+          </div>
+        ))}
+
+      {/* Pagination Controls */}
+      {sortedUsers.length > 0 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          itemsPerPage={usersPerPage}
+          totalItems={sortedUsers.length}
+          onPageChange={paginate}
+        />
+      )}
+    </AdminLayout>
   );
 }
