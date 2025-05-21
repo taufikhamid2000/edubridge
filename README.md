@@ -1,54 +1,60 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# EduBridge
 
-## Getting Started
+EduBridge is an educational platform built with Next.js and Supabase, designed to provide structured learning experiences with gamification elements to increase engagement.
 
-First, set up your environment variables:
+[![Next.js](https://img.shields.io/badge/Next.js-15.1.6-blue)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19.0.0-blue)](https://reactjs.org/)
+[![Supabase](https://img.shields.io/badge/Supabase-2.x-green)](https://supabase.com/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4.17-blue)](https://tailwindcss.com/)
 
-1. Copy `.env.example` to a new file named `.env`
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 18+ (LTS recommended)
+- Supabase account
+
+### Environment Setup
+
+1. Copy `.env.example` to a new file named `.env.local`
 2. Fill in your Supabase credentials:
    - `NEXT_PUBLIC_SUPABASE_URL`: Your Supabase project URL
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Your Supabase anon/public key
-   - `SUPABASE_SERVICE_ROLE_KEY`: (Optional) Your Supabase service role key for admin operations
+   - `SUPABASE_SERVICE_ROLE_KEY`: Your Supabase service role key for admin operations (required for admin features)
 
-Then run the development server:
+For detailed environment setup instructions, see [Environment Setup Guide](./docs/environment-setup.md).
+
+### Development Server
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+## 📚 Documentation
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+### Core Documentation
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+- [Project Overview](./docs/project-overview.md) - Architecture, data flow, and design decisions
+- [Development Guide](./docs/development-guide.md) - Workflow, best practices, and troubleshooting
+- [API Documentation](./docs/api-documentation.md) - API endpoints and usage
+- [Environment Setup](./docs/environment-setup.md) - Setting up the environment
+- [Component Design System](./docs/component-design-system.md) - UI component architecture
+- [Authentication System](./docs/authentication-system.md) - Auth implementation details
+- [Testing Strategy](./docs/testing-strategy.md) - Testing approach and practices
+- [Performance Optimization](./docs/performance-optimization.md) - Performance best practices
+- [Database Schema Reference](./database-schema-reference.md) - Database structure
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Feature Documentation
 
-## Learn More
+- [Admin Panel Documentation](./docs/admin-panel.md) - Admin features and functionality
+- [Admin Role Fix Guide](./docs/admin-role-fix.md) - Fixing admin role issues
+- [Leaderboard Feature](./docs/leaderboard-feature.md) - Leaderboard implementation details
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-
-## Admin Features
-
-This project includes an admin panel with role-based access control:
-
-- [Admin Panel Documentation](./docs/admin-panel.md) - learn about admin features.
-- [Admin Role Fix Guide](./docs/admin-role-fix.md) - fix issues with admin roles and permissions.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Testing
+## 🧪 Testing
 
 This project uses Jest and React Testing Library for testing components, hooks, utilities, and services. To run the tests:
 
@@ -66,6 +72,17 @@ Tests are organized in the following structure:
 - `src/__tests__/services/` - Service function tests
 
 When adding new features, please add corresponding tests.
+
+## Production Security
+
+For production deployments, we've implemented several security measures:
+
+- Removed all debugging endpoints and tools
+- Implemented proper error logging through the logger service
+- Added secure authentication validation for admin functions
+- Applied the principle of least privilege for all database operations
+
+See [Security Considerations](./docs/admin-panel.md#security-considerations) in the admin documentation for more details.
 
 ## Deploy on Vercel
 

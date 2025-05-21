@@ -27,28 +27,26 @@ There's a discrepancy between the browser and server-side authentication state. 
 
 ### Fixing Client-Server Auth Sync
 
-1. **Visit the Auth Diagnostic Tool**
+1. **Check your session in Admin Settings**
 
-   - Go to: http://localhost:3000/debug/auth
-   - This will show the client vs. server auth state and offer a fix
+   - Go to: http://localhost:3000/admin/settings
+   - Look at the session information displayed on the settings page
 
-2. **Try the automated fix**
-
-   - Click the "Fix Session Cookies" button on the diagnostic page
-   - This will refresh your session and properly set the cookies
-
-3. **If that doesn't work, try manual logout/login**
+2. **Try manual logout/login**
 
    - Log out completely: http://localhost:3000/auth/logout
    - Clear your browser cookies for localhost
    - Log back in
 
-4. **Check your admin role**
+3. **Verify in the database**
 
-   - After logging back in, visit: http://localhost:3000/api/debug/check-session
-   - Verify that:
-     - `status` is "Logged in"
-     - `user.role` is "admin"
+   - Check that your user ID exists in the `user_roles` table
+   - Verify that the role value is set to "admin"
+
+4. **Check your auth service**
+
+   - Enable console logging in your browser
+   - Look for auth-related messages when accessing admin pages
 
 5. **Verify the fix worked**
    - Try accessing the admin page again: http://localhost:3000/admin/users
