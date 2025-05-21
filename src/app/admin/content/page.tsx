@@ -321,30 +321,6 @@ export default function AdminContentPage() {
                 <div>
                   <p className="font-bold">Error:</p>
                   <p>{error}</p>
-                  <div className="mt-2">
-                    <button
-                      onClick={async () => {
-                        try {
-                          const response = await fetch(
-                            '/api/debug/database-structure'
-                          );
-                          const data = await response.json();
-                          console.log('Database structure report:', data);
-                          alert(
-                            'Database structure report generated in console - check developer tools'
-                          );
-                        } catch (err) {
-                          console.error(
-                            'Error checking database structure:',
-                            err
-                          );
-                        }
-                      }}
-                      className="text-sm underline text-red-700 dark:text-red-300 hover:text-red-800 dark:hover:text-red-200"
-                    >
-                      Check Database Structure
-                    </button>
-                  </div>
                 </div>{' '}
                 <button
                   onClick={handleRetry}

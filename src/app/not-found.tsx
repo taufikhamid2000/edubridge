@@ -4,13 +4,13 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
-import { logDebug } from '@/lib/debug';
+import { logger } from '@/lib/logger';
 
 export default function NotFound() {
   const pathname = usePathname();
 
   useEffect(() => {
-    logDebug(`404 Page not found: ${pathname}`);
+    logger.debug(`404 Page not found: ${pathname}`);
 
     // If this is a topic page, log additional details
     if (pathname?.includes('/quiz/')) {
@@ -18,7 +18,7 @@ export default function NotFound() {
       if (segments.length >= 4) {
         const subject = segments[2];
         const topic = segments[3];
-        logDebug(`Not Found: subject=${subject}, topic=${topic}`);
+        logger.debug(`Not Found: subject=${subject}, topic=${topic}`);
       }
     }
   }, [pathname]);
