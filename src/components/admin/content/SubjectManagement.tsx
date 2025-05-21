@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { logger } from '@/lib/logger';
 import Link from 'next/link';
 import { Subject, createSubject, deleteSubject } from '@/services';
@@ -8,6 +8,10 @@ import {
   DataTableCardView,
   type Column,
   type CardField,
+  SearchBar,
+  FilterSortControls,
+  type SortDirection,
+  Pagination,
 } from '@/components/admin/ui';
 
 interface SubjectManagementProps {
@@ -29,6 +33,73 @@ export default function SubjectManagement({
 }: SubjectManagementProps) {
   const [showNewSubjectForm, setShowNewSubjectForm] = useState(false);
   const [newSubject, setNewSubject] = useState({ name: '', description: '' });
+
+  // Pagination, filtering and sorting state
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [selectedFilter, setSelectedFilter] = useState('all');
+  const [selectedSort, setSelectedSort] = useState('name');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+
+  // Filter options for the subjects
+  const filterOptions = [
+    { id: 'all', label: 'All' },
+    { id: 'with-topics', label: 'With Topics' },
+    { id: 'without-topics', label: 'Without Topics' },
+  ];
+
+  // Sort options for the subjects
+  const sortOptions = [
+    { id: 'name', label: 'Name' },
+    { id: 'topics', label: 'Topics Count' },
+    { id: 'quizzes', label: 'Quizzes Count' },
+  ];
+
+  // Filter and sort subjects
+  const filteredSubjects = useMemo(() => {
+    // First filter by search term
+    let filtered = subjects.filter(
+      (subject) =>
+        subject.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (subject.description &&
+          subject.description.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+
+    // Then apply the selected filter
+    if (selectedFilter === 'with-topics') {
+      filtered = filtered.filter((subject) => subject.topic_count > 0);
+    } else if (selectedFilter === 'without-topics') {
+      filtered = filtered.filter((subject) => subject.topic_count === 0);
+    }
+
+    // Sort the filtered results
+    return filtered.sort((a, b) => {
+      let comparison = 0;
+      if (selectedSort === 'name') {
+        comparison = a.name.localeCompare(b.name);
+      } else if (selectedSort === 'topics') {
+        comparison = (a.topic_count || 0) - (b.topic_count || 0);
+      } else if (selectedSort === 'quizzes') {
+        comparison = (a.quiz_count || 0) - (b.quiz_count || 0);
+      }
+
+      return sortDirection === 'asc' ? comparison : -comparison;
+    });
+  }, [subjects, searchTerm, selectedFilter, selectedSort, sortDirection]);
+
+  // Pagination calculation
+  const totalItems = filteredSubjects.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const paginatedSubjects = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredSubjects.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredSubjects, currentPage, itemsPerPage]);
+
+  // Toggle sort direction
+  const handleSortDirectionToggle = () => {
+    setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+  };
 
   // Function to handle subject creation
   const handleCreateSubject = async (e: React.FormEvent) => {
@@ -216,6 +287,30 @@ export default function SubjectManagement({
         </button>
       </div>
 
+      {/* Search and filter controls */}
+      <div className="mb-4">
+        <SearchBar
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          placeholder="Search subjects..."
+          className="mb-3"
+        />
+
+        <FilterSortControls
+          selectedFilter={selectedFilter}
+          onFilterChange={setSelectedFilter}
+          filterOptions={filterOptions}
+          selectedSort={selectedSort}
+          onSortChange={setSelectedSort}
+          sortOptions={sortOptions}
+          sortDirection={sortDirection}
+          onSortDirectionChange={handleSortDirectionToggle}
+          perPageOptions={[5, 10, 25, 50]}
+          itemsPerPage={itemsPerPage}
+          onItemsPerPageChange={setItemsPerPage}
+        />
+      </div>
+
       {showNewSubjectForm && (
         <div className="mb-6 p-4 border rounded-lg dark:border-gray-700">
           <h3 className="text-lg font-medium mb-3 dark:text-white">
@@ -278,14 +373,29 @@ export default function SubjectManagement({
       )}
 
       <DataTableCardView<Subject>
-        data={subjects}
+        data={paginatedSubjects}
         isLoading={loading}
         columns={columns}
         cardFields={cardFields}
         keyExtractor={(subject) => subject.id}
         emptyMessage="No subjects found. Create your first subject to get started."
+        emptyFilteredMessage="No subjects match your search or filter criteria."
+        isFiltered={searchTerm !== '' || selectedFilter !== 'all'}
         actions={renderActions}
       />
+
+      {/* Pagination controls */}
+      {totalItems > 0 && (
+        <div className="mt-4">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            itemsPerPage={itemsPerPage}
+            totalItems={totalItems}
+            onPageChange={setCurrentPage}
+          />
+        </div>
+      )}
     </div>
   );
 }

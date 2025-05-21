@@ -1,12 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { logger } from '@/lib/logger';
 import { Topic, Chapter, createTopic, deleteTopic } from '@/services';
 import {
   DataTableCardView,
   type Column,
   type CardField,
+  SearchBar,
+  FilterSortControls,
+  type SortDirection,
+  Pagination,
 } from '@/components/admin/ui';
 
 interface TopicManagementProps {
@@ -34,6 +38,82 @@ export default function TopicManagement({
     chapter_id: '',
     content: '',
   });
+
+  // Pagination, filtering and sorting state
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(5);
+  const [chapterFilter, setChapterFilter] = useState<string>('all');
+  const [selectedSort, setSelectedSort] = useState('title');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  // Function to get chapter title by ID
+  const getChapterTitle = useCallback(
+    (chapterId: string) => {
+      const chapter = chapters.find((c) => c.id === chapterId);
+      return chapter ? chapter.title : 'Unknown Chapter';
+    },
+    [chapters]
+  );
+
+  // Sort options for the topics
+  const sortOptions = [
+    { id: 'title', label: 'Title' },
+    { id: 'chapter', label: 'Chapter' },
+    { id: 'date', label: 'Created Date' },
+  ];
+
+  // Filter options (we'll use a custom chapter filter instead)
+  const filterOptions = [{ id: 'all', label: 'All Topics' }];
+
+  // Filter and sort topics
+  const filteredTopics = useMemo(() => {
+    // First filter by search term
+    let filtered = topics.filter((topic) =>
+      topic.title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    // Then apply the chapter filter
+    if (chapterFilter !== 'all') {
+      filtered = filtered.filter((topic) => topic.chapter_id === chapterFilter);
+    }
+
+    // Sort the filtered results
+    return filtered.sort((a, b) => {
+      let comparison = 0;
+      if (selectedSort === 'title') {
+        comparison = a.title.localeCompare(b.title);
+      } else if (selectedSort === 'chapter') {
+        const chapterA = getChapterTitle(a.chapter_id);
+        const chapterB = getChapterTitle(b.chapter_id);
+        comparison = chapterA.localeCompare(chapterB);
+      } else if (selectedSort === 'date') {
+        comparison =
+          new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+      }
+
+      return sortDirection === 'asc' ? comparison : -comparison;
+    });
+  }, [
+    topics,
+    searchTerm,
+    chapterFilter,
+    selectedSort,
+    sortDirection,
+    getChapterTitle,
+  ]);
+
+  // Pagination calculation
+  const totalItems = filteredTopics.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const paginatedTopics = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredTopics.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredTopics, currentPage, itemsPerPage]);
+
+  // Toggle sort direction
+  const handleSortDirectionToggle = () => {
+    setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+  };
 
   // Function to handle topic creation
   const handleCreateTopic = async (e: React.FormEvent) => {
@@ -109,11 +189,6 @@ export default function TopicManagement({
       setLoading(false);
     }
   };
-  // Function to get chapter title by ID
-  const getChapterTitle = (chapterId: string) => {
-    const chapter = chapters.find((c) => c.id === chapterId);
-    return chapter ? chapter.title : 'Unknown Chapter';
-  };
 
   // Define columns for DataTableCardView
   const columns: Column<Topic>[] = [
@@ -187,6 +262,7 @@ export default function TopicManagement({
       Delete
     </button>
   );
+
   return (
     <div>
       <div className="flex justify-between mb-4">
@@ -280,8 +356,50 @@ export default function TopicManagement({
         </form>
       )}
 
+      {/* Search and Filter Controls */}
+      <div className="mb-4 space-y-4">
+        <SearchBar
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          placeholder="Search topics..."
+          className="w-full md:w-64"
+        />
+
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="w-full md:w-auto">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Filter by Chapter
+            </label>
+            <select
+              value={chapterFilter}
+              onChange={(e) => setChapterFilter(e.target.value)}
+              className="w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+            >
+              <option value="all">All Chapters</option>
+              {chapters.map((chapter) => (
+                <option key={chapter.id} value={chapter.id}>
+                  {chapter.title}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <FilterSortControls
+            sortOptions={sortOptions}
+            selectedSort={selectedSort}
+            onSortChange={setSelectedSort}
+            sortDirection={sortDirection}
+            onSortDirectionChange={handleSortDirectionToggle}
+            filterOptions={filterOptions}
+            selectedFilter="all"
+            onFilterChange={() => {}}
+          />
+        </div>
+      </div>
+
+      {/* Topic Data Table */}
       <DataTableCardView<Topic>
-        data={topics}
+        data={paginatedTopics}
         isLoading={loading}
         columns={columns}
         cardFields={cardFields}
@@ -289,6 +407,19 @@ export default function TopicManagement({
         emptyMessage="No topics found. Create your first topic to get started."
         actions={renderActions}
       />
+
+      {/* Pagination */}
+      {totalItems > 0 && (
+        <div className="mt-4">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+            totalItems={totalItems}
+            itemsPerPage={itemsPerPage}
+          />
+        </div>
+      )}
     </div>
   );
 }

@@ -66,37 +66,36 @@ export default function AdminNavigation({
       onCloseMobile();
     }
   };
-
   const navItems = [
     {
       name: 'Dashboard',
       path: '/admin',
-      icon: <LayoutDashboard className="mr-3" size={18} />,
+      icon: <LayoutDashboard className={isCollapsed ? '' : 'mr-3'} size={18} />,
     },
     {
       name: 'Users',
       path: '/admin/users',
-      icon: <Users className="mr-3" size={18} />,
+      icon: <Users className={isCollapsed ? '' : 'mr-3'} size={18} />,
     },
     {
       name: 'Content',
       path: '/admin/content',
-      icon: <BookOpen className="mr-3" size={18} />,
+      icon: <BookOpen className={isCollapsed ? '' : 'mr-3'} size={18} />,
     },
     {
       name: 'Achievements',
       path: '/admin/achievements',
-      icon: <Award className="mr-3" size={18} />,
+      icon: <Award className={isCollapsed ? '' : 'mr-3'} size={18} />,
     },
     {
       name: 'Analytics',
       path: '/admin/analytics',
-      icon: <BarChart3 className="mr-3" size={18} />,
+      icon: <BarChart3 className={isCollapsed ? '' : 'mr-3'} size={18} />,
     },
     {
       name: 'Settings',
       path: '/admin/settings',
-      icon: <Settings className="mr-3" size={18} />,
+      icon: <Settings className={isCollapsed ? '' : 'mr-3'} size={18} />,
     },
     {
       name: 'Logs',
@@ -104,7 +103,7 @@ export default function AdminNavigation({
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          className="mr-3"
+          className={isCollapsed ? '' : 'mr-3'}
           width="18"
           height="18"
           viewBox="0 0 24 24"
@@ -128,7 +127,7 @@ export default function AdminNavigation({
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          className="mr-3"
+          className={isCollapsed ? '' : 'mr-3'}
           width="18"
           height="18"
           viewBox="0 0 24 24"
@@ -180,6 +179,7 @@ export default function AdminNavigation({
         <ul className="space-y-2">
           {navItems.map((item) => (
             <li key={item.name}>
+              {' '}
               <Link
                 href={item.path}
                 onClick={handleNavClick}
@@ -187,9 +187,9 @@ export default function AdminNavigation({
                   isActive(item.path)
                     ? 'bg-blue-700 text-white dark:bg-blue-600'
                     : 'hover:bg-gray-800 dark:hover:bg-gray-700'
-                } ${isMobile ? 'active:bg-blue-800' : ''}`}
+                } ${isMobile ? 'active:bg-blue-800' : ''} ${isCollapsed ? 'justify-center' : ''}`}
               >
-                {item.icon}
+                <div className={isCollapsed ? 'mx-auto' : ''}>{item.icon}</div>
                 {!isCollapsed && <span className="text-sm">{item.name}</span>}
               </Link>
             </li>
@@ -198,12 +198,15 @@ export default function AdminNavigation({
       </nav>
 
       <div className="mt-auto pt-8">
+        {' '}
         <Link
           href="/dashboard"
           onClick={handleNavClick}
-          className="flex items-center py-2 px-4 rounded hover:bg-gray-800 dark:hover:bg-gray-700 transition-colors text-gray-400 hover:text-white"
+          className={`flex items-center py-2 px-4 rounded hover:bg-gray-800 dark:hover:bg-gray-700 transition-colors text-gray-400 hover:text-white ${isCollapsed ? 'justify-center' : ''}`}
         >
-          <LogOut className="mr-3" size={18} />
+          <div className={isCollapsed ? 'mx-auto' : ''}>
+            <LogOut className={isCollapsed ? '' : 'mr-3'} size={18} />
+          </div>
           {!isCollapsed && <span className="text-sm">Exit Admin</span>}
         </Link>
       </div>

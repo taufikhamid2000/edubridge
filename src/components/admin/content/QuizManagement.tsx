@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { logger } from '@/lib/logger';
 import Link from 'next/link';
 import {
@@ -16,6 +16,10 @@ import {
   type Column,
   type CardField,
   Message,
+  SearchBar,
+  FilterSortControls,
+  type SortDirection,
+  Pagination,
 } from '@/components/admin/ui';
 
 interface QuizManagementProps {
@@ -45,6 +49,15 @@ export default function QuizManagement({
     time_limit_seconds: 300,
     passing_score: 70,
   });
+
+  // Pagination, filtering and sorting state
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(5);
+  const [topicFilter, setTopicFilter] = useState<string>('all');
+  const [difficultyFilter, setDifficultyFilter] = useState<string>('all');
+  const [selectedSort, setSelectedSort] = useState('name');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
   // Function to fetch quizzes
   const fetchQuizzes = async () => {
@@ -185,11 +198,102 @@ export default function QuizManagement({
       setParentLoading(false);
     }
   };
+
   // Function to get topic title by ID
-  const getTopicTitle = (topicId: string) => {
-    const topic = topics.find((t) => t.id === topicId);
-    return topic ? topic.title : 'Unknown Topic';
+  const getTopicTitle = useCallback(
+    (topicId: string) => {
+      const topic = topics.find((t) => t.id === topicId);
+      return topic ? topic.title : 'Unknown Topic';
+    },
+    [topics]
+  );
+
+  // Sort options for the quizzes
+  const sortOptions = [
+    { id: 'name', label: 'Name' },
+    { id: 'topic', label: 'Topic' },
+    { id: 'difficulty', label: 'Difficulty' },
+    { id: 'questions', label: 'Questions' },
+  ];
+
+  // Filter options
+  const filterOptions = [{ id: 'all', label: 'All Quizzes' }];
+
+  // Difficulty level options
+  const difficultyLevels = [
+    { id: 'all', label: 'All Difficulties' },
+    { id: 'easy', label: 'Easy' },
+    { id: 'medium', label: 'Medium' },
+    { id: 'hard', label: 'Hard' },
+  ];
+
+  // Toggle sort direction
+  const handleSortDirectionToggle = () => {
+    setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
   };
+
+  // Filter and sort quizzes
+  const filteredQuizzes = useMemo(() => {
+    // First filter by search term
+    let filtered = quizzes.filter((quiz) =>
+      quiz.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    // Then apply the topic filter
+    if (topicFilter !== 'all') {
+      filtered = filtered.filter((quiz) => quiz.topic_id === topicFilter);
+    }
+
+    // Apply difficulty filter
+    if (difficultyFilter !== 'all') {
+      filtered = filtered.filter(
+        (quiz) => quiz.difficulty_level === difficultyFilter
+      );
+    }
+
+    // Sort the filtered results
+    return filtered.sort((a, b) => {
+      let comparison = 0;
+      if (selectedSort === 'name') {
+        comparison = a.name.localeCompare(b.name);
+      } else if (selectedSort === 'topic') {
+        const topicA = getTopicTitle(a.topic_id);
+        const topicB = getTopicTitle(b.topic_id);
+        comparison = topicA.localeCompare(topicB);
+      } else if (selectedSort === 'difficulty') {
+        const difficultyOrder = { easy: 1, medium: 2, hard: 3 };
+        const diffA =
+          difficultyOrder[a.difficulty_level as keyof typeof difficultyOrder] ||
+          2;
+        const diffB =
+          difficultyOrder[b.difficulty_level as keyof typeof difficultyOrder] ||
+          2;
+        comparison = diffA - diffB;
+      } else if (selectedSort === 'questions') {
+        const countA = a.question_count || 0;
+        const countB = b.question_count || 0;
+        comparison = countA - countB;
+      }
+
+      return sortDirection === 'asc' ? comparison : -comparison;
+    });
+  }, [
+    quizzes,
+    searchTerm,
+    topicFilter,
+    difficultyFilter,
+    selectedSort,
+    sortDirection,
+    getTopicTitle,
+  ]);
+
+  // Pagination calculation
+  const totalItems = filteredQuizzes.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const paginatedQuizzes = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredQuizzes.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredQuizzes, currentPage, itemsPerPage]);
 
   // Define columns for DataTableCardView
   const columns: Column<Quiz>[] = [
@@ -479,8 +583,67 @@ export default function QuizManagement({
         </form>
       )}
 
+      {/* Search and Filter Controls */}
+      <div className="mb-4 space-y-4">
+        <SearchBar
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          placeholder="Search quizzes..."
+          className="w-full md:w-64"
+        />
+
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="w-full md:w-auto">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Filter by Topic
+            </label>
+            <select
+              value={topicFilter}
+              onChange={(e) => setTopicFilter(e.target.value)}
+              className="w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+            >
+              <option value="all">All Topics</option>
+              {topics.map((topic) => (
+                <option key={topic.id} value={topic.id}>
+                  {topic.title}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="w-full md:w-auto">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Filter by Difficulty
+            </label>
+            <select
+              value={difficultyFilter}
+              onChange={(e) => setDifficultyFilter(e.target.value)}
+              className="w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+            >
+              {difficultyLevels.map((level) => (
+                <option key={level.id} value={level.id}>
+                  {level.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <FilterSortControls
+            sortOptions={sortOptions}
+            selectedSort={selectedSort}
+            onSortChange={setSelectedSort}
+            sortDirection={sortDirection}
+            onSortDirectionChange={handleSortDirectionToggle}
+            filterOptions={filterOptions}
+            selectedFilter="all"
+            onFilterChange={() => {}}
+          />
+        </div>
+      </div>
+
+      {/* Quiz Data Table */}
       <DataTableCardView<Quiz>
-        data={quizzes}
+        data={paginatedQuizzes}
         isLoading={isLoading}
         columns={columns}
         cardFields={cardFields}
@@ -488,6 +651,19 @@ export default function QuizManagement({
         emptyMessage="No quizzes found. Create your first quiz to get started."
         actions={renderActions}
       />
+
+      {/* Pagination */}
+      {totalItems > 0 && (
+        <div className="mt-4">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+            totalItems={totalItems}
+            itemsPerPage={itemsPerPage}
+          />
+        </div>
+      )}
     </div>
   );
 }

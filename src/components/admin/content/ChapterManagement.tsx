@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { logger } from '@/lib/logger';
 import Link from 'next/link';
 import { Chapter, Subject, createChapter, deleteChapter } from '@/services';
@@ -8,6 +8,10 @@ import {
   DataTableCardView,
   type Column,
   type CardField,
+  SearchBar,
+  FilterSortControls,
+  type SortDirection,
+  Pagination,
 } from '@/components/admin/ui';
 
 interface ChapterManagementProps {
@@ -34,7 +38,83 @@ export default function ChapterManagement({
     title: '',
     subject_id: '',
     form: 1,
-  });
+  }); // Pagination, filtering and sorting state
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [selectedSort, setSelectedSort] = useState('title');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  // Dropdown filters
+  const [subjectFilter, setSubjectFilter] = useState<string>('all');
+  const [formFilter, setFormFilter] = useState<number | 'all'>('all');
+  // Sort options for the chapters
+  const sortOptions = [
+    { id: 'title', label: 'Title' },
+    { id: 'subject', label: 'Subject' },
+    { id: 'form', label: 'Form' },
+  ]; // Filter and sort chapters
+  const filteredChapters = useMemo(() => {
+    // First filter by search term
+    let filtered = chapters.filter((chapter) =>
+      chapter.title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    // Then apply the subject filter
+    if (subjectFilter !== 'all') {
+      filtered = filtered.filter(
+        (chapter) => chapter.subject_id === subjectFilter
+      );
+    }
+
+    // Then apply the form filter
+    if (formFilter !== 'all') {
+      filtered = filtered.filter((chapter) => chapter.form === formFilter);
+    }
+
+    // Sort the filtered results
+    return filtered.sort((a, b) => {
+      let comparison = 0;
+      if (selectedSort === 'title') {
+        comparison = a.title.localeCompare(b.title);
+      } else if (selectedSort === 'subject') {
+        const subjectA =
+          subjects.find((s) => s.id === a.subject_id)?.name || '';
+        const subjectB =
+          subjects.find((s) => s.id === b.subject_id)?.name || '';
+        comparison = subjectA.localeCompare(subjectB);
+      } else if (selectedSort === 'form') {
+        comparison = a.form - b.form;
+      }
+
+      return sortDirection === 'asc' ? comparison : -comparison;
+    });
+  }, [
+    chapters,
+    subjects,
+    searchTerm,
+    subjectFilter,
+    selectedSort,
+    sortDirection,
+    formFilter,
+  ]);
+
+  // Pagination calculation
+  const totalItems = filteredChapters.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const paginatedChapters = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredChapters.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredChapters, currentPage, itemsPerPage]);
+  // Toggle sort direction
+  const handleSortDirectionToggle = () => {
+    setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+  };
+
+  // Get unique form numbers for the form filter
+  const uniqueFormNumbers = useMemo(() => {
+    const forms = chapters.map((chapter) => chapter.form);
+    return [...new Set(forms)].sort((a, b) => a - b);
+  }, [chapters]);
 
   // Function to handle chapter creation
   const handleCreateChapter = async (e: React.FormEvent) => {
@@ -196,7 +276,6 @@ export default function ChapterManagement({
       </button>
     </>
   );
-
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
@@ -209,8 +288,86 @@ export default function ChapterManagement({
         >
           {showNewChapterForm ? 'Cancel' : 'Add New Chapter'}
         </button>
-      </div>
+      </div>{' '}
+      {/* Search and filter controls */}
+      <div className="mb-4">
+        <SearchBar
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          placeholder="Search chapters..."
+          className="mb-3"
+        />
 
+        <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3 mb-3">
+          {/* Subject Filter Dropdown */}
+          <div className="w-full md:w-56 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-2">
+            <label
+              htmlFor="subject-filter"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+            >
+              Filter by Subject
+            </label>
+            <select
+              id="subject-filter"
+              value={subjectFilter}
+              onChange={(e) => setSubjectFilter(e.target.value)}
+              className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-gray-700 
+                         dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none 
+                         focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="all">All Subjects</option>
+              {subjects.map((subject) => (
+                <option key={subject.id} value={subject.id}>
+                  {subject.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Form Filter Dropdown */}
+          <div className="w-full md:w-56 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-2">
+            <label
+              htmlFor="form-filter"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+            >
+              Filter by Form
+            </label>
+            <select
+              id="form-filter"
+              value={formFilter === 'all' ? 'all' : formFilter.toString()}
+              onChange={(e) =>
+                setFormFilter(
+                  e.target.value === 'all' ? 'all' : Number(e.target.value)
+                )
+              }
+              className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-gray-700 
+                         dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none 
+                         focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="all">All Forms</option>
+              {uniqueFormNumbers.map((form) => (
+                <option key={form} value={form}>
+                  Form {form}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <FilterSortControls
+          selectedFilter="all"
+          onFilterChange={() => {}}
+          filterOptions={[{ id: 'all', label: 'All' }]}
+          selectedSort={selectedSort}
+          onSortChange={setSelectedSort}
+          sortOptions={sortOptions}
+          sortDirection={sortDirection}
+          onSortDirectionChange={handleSortDirectionToggle}
+          perPageOptions={[5, 10, 25, 50]}
+          itemsPerPage={itemsPerPage}
+          onItemsPerPageChange={setItemsPerPage}
+        />
+      </div>
       {showNewChapterForm && (
         <div className="mb-6 p-4 border rounded-lg dark:border-gray-700">
           <h3 className="text-lg font-medium mb-3 dark:text-white">
@@ -299,14 +456,30 @@ export default function ChapterManagement({
         </div>
       )}
       <DataTableCardView<Chapter>
-        data={chapters}
+        data={paginatedChapters}
         isLoading={loading}
         columns={columns}
         cardFields={cardFields}
         keyExtractor={(chapter) => chapter.id}
         emptyMessage="No chapters found. Create your first chapter to get started."
+        emptyFilteredMessage="No chapters match your search or filter criteria."
+        isFiltered={
+          searchTerm !== '' || subjectFilter !== 'all' || formFilter !== 'all'
+        }
         actions={renderActions}
       />
+      {/* Pagination controls */}
+      {totalItems > 0 && (
+        <div className="mt-4">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            itemsPerPage={itemsPerPage}
+            totalItems={totalItems}
+            onPageChange={setCurrentPage}
+          />
+        </div>
+      )}
     </div>
   );
 }
