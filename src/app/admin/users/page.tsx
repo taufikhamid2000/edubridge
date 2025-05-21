@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
 import AdminNavigation from '@/components/admin/AdminNavigation';
 import Image from 'next/image';
@@ -22,90 +21,80 @@ export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchUsers();
   }, []);
-
   async function fetchUsers() {
     try {
-      setLoading(true); // Join user_profiles with auth.users to get email
-      // Note: This requires proper RLS policies and permissions
-      const { data, error } = await supabase
-        .from('user_profiles')
-        .select(
-          `
-          id,
-          display_name,
-          avatar_url,
-          level,
-          xp,
-          created_at,
-          user_roles:user_id (role)
-        `
-        )
-        .order('created_at', { ascending: false });
+      setLoading(true);
+      setError(null);
 
-      if (error) {
-        throw error;
-      }
+      console.log('Attempting to fetch users via API...');
 
-      // Log the structure for debugging
-      console.log(
-        'First user data:',
-        data && data.length > 0 ? data[0] : 'No data'
-      );
-
-      // Fetch emails separately (if your auth setup allows it)
-      const { data: authUsers, error: authError } = await supabase
-        .from('users')
-        .select('id, email');
-
-      if (authError) {
-        logger.error('Error fetching auth users:', authError);
-      } // Combine the data
-      const usersWithEmail = data?.map((user) => {
-        const authUser = authUsers?.find((au) => au.id === user.id);
-
-        // Extract role from user_roles array
-        let role = 'user'; // default role
-        if (
-          user.user_roles &&
-          Array.isArray(user.user_roles) &&
-          user.user_roles.length > 0
-        ) {
-          role = user.user_roles[0].role;
-        }
-
-        return {
-          id: user.id,
-          display_name: user.display_name,
-          avatar_url: user.avatar_url,
-          level: user.level,
-          xp: user.xp,
-          created_at: user.created_at,
-          email: authUser?.email || 'Email not available',
-          role: role,
-        };
+      // Use the API endpoint instead of direct Supabase access
+      const response = await fetch('/api/admin/users', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include', // Make sure credentials are included
       });
 
-      setUsers(usersWithEmail || []);
+      console.log('API response status:', response.status, response.statusText);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('API error details:', errorData);
+        throw new Error(`API error: ${errorData.error || response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      if (data.users) {
+        setUsers(data.users);
+
+        // Log for debugging
+        if (data.users.length > 0) {
+          console.log('First user data:', data.users[0]);
+        } else {
+          console.log('No user data returned');
+        }
+      }
     } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       logger.error('Error fetching users:', error);
+      setError(errorMessage);
+
+      // More detailed error logging
+      console.error('User fetch error details:', {
+        error,
+        message: errorMessage,
+        timestamp: new Date().toISOString(),
+      });
     } finally {
       setLoading(false);
     }
   }
-
   async function handleRoleChange(userId: string, role: string) {
     try {
-      // Update the user's role in the user_roles table
-      const { error } = await supabase
-        .from('user_roles')
-        .upsert({ user_id: userId, role })
-        .select();
+      setError(null);
 
-      if (error) throw error;
+      // Use the API endpoint to update roles
+      const response = await fetch('/api/admin/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId, role }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`API error: ${errorData.error || response.statusText}`);
+      }
 
       // Update the local state
       setUsers(
@@ -114,6 +103,9 @@ export default function AdminUsersPage() {
 
       logger.log('User role updated successfully');
     } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      setError(errorMessage);
       logger.error('Error updating user role:', error);
     }
   }
@@ -128,6 +120,7 @@ export default function AdminUsersPage() {
       <div className="flex">
         <AdminNavigation />
         <div className="flex-1 p-8">
+          {' '}
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-3xl font-bold dark:text-white">
               Users Management
@@ -142,7 +135,12 @@ export default function AdminUsersPage() {
               />
             </div>{' '}
           </div>
-
+          {error && (
+            <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+              <p className="font-bold">Error:</p>
+              <p>{error}</p>
+            </div>
+          )}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
             {loading ? (
               <div className="p-4 flex justify-center">
