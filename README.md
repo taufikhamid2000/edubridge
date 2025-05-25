@@ -32,6 +32,25 @@ npm install
 npm run dev
 ```
 
+### Database Migrations
+
+For database schema changes, we use Supabase migrations. Apply them as follows:
+
+```bash
+# Using Supabase CLI
+supabase migration up
+
+# Or use our script
+./scripts/apply_quiz_attempts_migration.sh
+```
+
+To fix the "quiz_attempts table not found" error, see the [Quiz Attempts Migration Guide](./docs/database/apply_quiz_attempts_migration.md).
+
+For more details about database schema and management, see the [Database Documentation](./docs/database/).
+npm run dev
+
+````
+
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 ## 📚 Documentation
@@ -62,7 +81,7 @@ This project uses Jest and React Testing Library for testing components, hooks, 
 npm test          # Run tests once
 npm run test:watch    # Run tests in watch mode
 npm run test:coverage # Run tests with coverage report
-```
+````
 
 Tests are organized in the following structure:
 
