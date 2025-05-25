@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JavaScript Callbacks Practice</title>
+  </head>
+  <body>
+    <h1>JavaScript Callbacks Practice</h1>
+    <div id="output"></div>
+    <script>
+      // Helper function to display output in the browser
+      function displayOutput(text) {
+        const output = document.getElementById('output');
+        const p = document.createElement('p');
+        p.textContent = text;
+        output.appendChild(p);
+      }
+
+      // MINUTES 0-15: CALLBACK BASICS
+      // Simple synchronous callback
+      function processData(data, callback) {
+        // Process the data
+        const result = data.toUpperCase();
+        // Call the callback with the processed data
+        callback(result);
+      }
+
+      // Example usage
+      processData('hello callbacks', function (processed) {
+        displayOutput(`Processed: ${processed}`);
+      });
+
+      // Synchronous vs Asynchronous callback
+      function syncOperation(callback) {
+        displayOutput('Sync operation started');
+        callback();
+        displayOutput('Sync operation completed');
+      }
+
+      function asyncOperation(callback) {
+        displayOutput('Async operation started');
+        setTimeout(callback, 2000);
+        displayOutput('Async operation initiated');
+      }
+    </script>
+  </body>
+</html>
