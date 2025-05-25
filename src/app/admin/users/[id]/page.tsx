@@ -45,23 +45,34 @@ export default function AdminUserDetailPage() {
       logger.error('Error in user details page:', error.message);
     }
   }, [error]);
-
-  // Handle user status changes
-  async function handleUserStatusChange(status: 'active' | 'suspended') {
+  // Handle user status changes (enable/disable)
+  async function handleUserStatusChange(isDisabled: boolean) {
     try {
-      // In a real app, you would update the user's status in your database
-      // For now, we'll just log the action
-      logger.log(`Admin action: Set user ${userId} status to ${status}`);
+      // Update the user's disabled status in the database
+      const { toggleUserDisabled } = await import('@/services/adminService');
+      const success = await toggleUserDisabled(userId, isDisabled);
+
+      if (!success) {
+        throw new Error(
+          `Failed to ${isDisabled ? 'disable' : 'enable'} user account`
+        );
+      }
+
+      logger.log(
+        `Admin action: Set user ${userId} ${isDisabled ? 'disabled' : 'enabled'}`
+      );
 
       // Update the local state
       if (user) {
         setUser({
           ...user,
-          status: status,
+          is_disabled: isDisabled,
         });
       }
     } catch (error) {
-      logger.error('Error updating user status:', error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      logger.error('Error updating user status:', errorMessage);
     }
   }
 

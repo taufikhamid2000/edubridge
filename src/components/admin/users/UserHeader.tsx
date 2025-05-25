@@ -3,7 +3,7 @@ import { UserDetail } from './types';
 
 interface UserHeaderProps {
   user: UserDetail;
-  onStatusChange: (status: 'active' | 'suspended') => void;
+  onStatusChange: (isDisabled: boolean) => void;
 }
 
 export default function UserHeader({ user, onStatusChange }: UserHeaderProps) {
@@ -18,20 +18,23 @@ export default function UserHeader({ user, onStatusChange }: UserHeaderProps) {
         </Link>
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
           {user.display_name}
+          {user.is_disabled && (
+            <span className="ml-3 text-sm px-2 py-1 bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100 rounded-md font-semibold">
+              DISABLED
+            </span>
+          )}
         </h1>
       </div>
       <div className="flex space-x-2">
         <button
-          onClick={() => onStatusChange('active')}
-          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+          onClick={() => onStatusChange(!user.is_disabled)}
+          className={`px-4 py-2 ${
+            user.is_disabled
+              ? 'bg-green-500 hover:bg-green-600'
+              : 'bg-red-500 hover:bg-red-600'
+          } text-white rounded`}
         >
-          Activate
-        </button>
-        <button
-          onClick={() => onStatusChange('suspended')}
-          className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-        >
-          Suspend
+          {user.is_disabled ? 'Enable Account' : 'Disable Account'}
         </button>
       </div>
     </div>

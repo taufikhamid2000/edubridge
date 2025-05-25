@@ -26,10 +26,11 @@ interface User {
   xp: number;
   created_at: string;
   role: string;
+  is_disabled?: boolean;
 }
 
 // Filtering options
-type FilterOption = 'all' | 'admin' | 'moderator' | 'user';
+type FilterOption = 'all' | 'admin' | 'moderator' | 'user' | 'disabled';
 type SortOption = 'name' | 'email' | 'level' | 'joined' | 'role';
 
 export default function AdminUsersPage() {
@@ -150,6 +151,57 @@ export default function AdminUsersPage() {
     }
   }
 
+  async function handleToggleDisabled(userId: string) {
+    try {
+      setError(null);
+      setSuccessMessage(null);
+
+      // Find the user we're updating for UI feedback
+      const targetUser = users.find((user) => user.id === userId);
+      if (!targetUser) {
+        throw new Error('User not found');
+      }
+
+      const userName = targetUser.display_name || 'User';
+      const newDisabledState = !targetUser.is_disabled;
+
+      // Set loading state
+      setLoading(true);
+
+      // Use the client-side service to toggle disable status
+      console.log(
+        `${newDisabledState ? 'Disabling' : 'Enabling'} user account...`
+      );
+      const { toggleUserDisabled } = await import('@/services/adminService');
+      const success = await toggleUserDisabled(userId, newDisabledState);
+
+      if (!success) {
+        throw new Error(
+          `Failed to ${newDisabledState ? 'disable' : 'enable'} user account`
+        );
+      }
+
+      // Update the local state
+      setUsers(
+        users.map((user) =>
+          user.id === userId ? { ...user, is_disabled: newDisabledState } : user
+        )
+      );
+
+      // Show success message
+      const action = newDisabledState ? 'disabled' : 'enabled';
+      const message = `Account ${action}: ${userName}`;
+      logger.log(message);
+      setSuccessMessage(message);
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      setError(`Account status update failed: ${errorMessage}`);
+      logger.error('Error updating user account status:', error);
+    } finally {
+      setLoading(false);
+    }
+  }
   const filteredUsers = users.filter((user) => {
     // Apply search filter
     const matchesSearch =
@@ -159,7 +211,14 @@ export default function AdminUsersPage() {
         user.display_name.toLowerCase().includes(searchTerm.toLowerCase()));
 
     // Apply role filter
-    const matchesRole = roleFilter === 'all' || user.role === roleFilter;
+    let matchesRole = false;
+    if (roleFilter === 'all') {
+      matchesRole = true;
+    } else if (roleFilter === 'disabled') {
+      matchesRole = !!user.is_disabled;
+    } else {
+      matchesRole = user.role === roleFilter;
+    }
 
     return matchesSearch && matchesRole;
   });
@@ -227,13 +286,13 @@ export default function AdminUsersPage() {
       setSortDirection('asc');
     }
   };
-
   // Define filter options for the FilterSortControls component
   const filterOptions = [
     { id: 'all', label: 'All' },
     { id: 'admin', label: 'Admin' },
     { id: 'moderator', label: 'Moderator' },
     { id: 'user', label: 'User' },
+    { id: 'disabled', label: 'Disabled' },
   ];
 
   // Define sort options for the FilterSortControls component
@@ -252,10 +311,10 @@ export default function AdminUsersPage() {
       header: 'User',
       render: (user) => (
         <div className="flex items-center">
-          <div className="flex-shrink-0 h-10 w-10">
+          <div className={`flex-shrink-0 h-10 w-10 relative ${user.is_disabled ? 'opacity-60' : ''}`}>
             {user.avatar_url ? (
               <Image
-                className="h-10 w-10 rounded-full object-cover"
+                className={`h-10 w-10 rounded-full object-cover ${user.is_disabled ? 'grayscale' : ''}`}
                 src={user.avatar_url}
                 alt={user.display_name || 'User avatar'}
                 width={40}
@@ -263,16 +322,28 @@ export default function AdminUsersPage() {
                 unoptimized={user.avatar_url.startsWith('data:')}
               />
             ) : (
-              <div className="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400">
+              <div className={`h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 ${user.is_disabled ? 'opacity-60' : ''}`}>
                 {(user.display_name || user.email || '?')
                   .charAt(0)
                   .toUpperCase()}
               </div>
             )}
+            {user.is_disabled && (
+              <div className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 rounded-full border-2 border-white dark:border-gray-800" 
+                title="Account disabled">
+              </div>
+            )}
           </div>
           <div className="ml-4">
-            <div className="text-sm font-medium text-gray-900 dark:text-white">
+            <div className={`text-sm font-medium ${user.is_disabled 
+              ? 'text-gray-500 dark:text-gray-400 line-through' 
+              : 'text-gray-900 dark:text-white'}`}>
               {user.display_name || 'Unnamed User'}
+              {user.is_disabled && (
+                <span className="ml-2 text-xs px-1.5 py-0.5 bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100 rounded-md font-semibold no-underline">
+                  DISABLED
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -335,10 +406,10 @@ export default function AdminUsersPage() {
       isHeader: true,
       render: (user) => (
         <div className="flex items-center mb-3">
-          <div className="flex-shrink-0 h-12 w-12 mr-3">
+          <div className={`flex-shrink-0 h-12 w-12 mr-3 relative ${user.is_disabled ? 'opacity-60' : ''}`}>
             {user.avatar_url ? (
               <Image
-                className="h-12 w-12 rounded-full object-cover"
+                className={`h-12 w-12 rounded-full object-cover ${user.is_disabled ? 'grayscale' : ''}`}
                 src={user.avatar_url}
                 alt={user.display_name || 'User avatar'}
                 width={48}
@@ -346,18 +417,30 @@ export default function AdminUsersPage() {
                 unoptimized={user.avatar_url.startsWith('data:')}
               />
             ) : (
-              <div className="h-12 w-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400">
+              <div className={`h-12 w-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 ${user.is_disabled ? 'opacity-60' : ''}`}>
                 {(user.display_name || user.email || '?')
                   .charAt(0)
                   .toUpperCase()}
               </div>
             )}
+            {user.is_disabled && (
+              <div className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 rounded-full border-2 border-white dark:border-gray-800" 
+                title="Account disabled">
+              </div>
+            )}
           </div>
           <div>
-            <div className="text-base font-medium text-gray-900 dark:text-gray-100">
+            <div className={`text-base font-medium ${user.is_disabled 
+              ? 'text-gray-500 dark:text-gray-400' 
+              : 'text-gray-900 dark:text-gray-100'}`}>
               {user.display_name || 'Unnamed User'}
+              {user.is_disabled && (
+                <span className="ml-2 text-xs px-1.5 py-0.5 bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100 rounded-md font-semibold">
+                  DISABLED
+                </span>
+              )}
             </div>
-            <div className="text-sm text-gray-500 dark:text-gray-400 break-all">
+            <div className={`text-sm text-gray-500 dark:text-gray-400 break-all ${user.is_disabled ? 'line-through' : ''}`}>
               {user.email}
             </div>
           </div>
@@ -399,7 +482,6 @@ export default function AdminUsersPage() {
       ),
     },
   ];
-
   const renderActions = (user: User) => (
     <>
       <Link
@@ -409,12 +491,14 @@ export default function AdminUsersPage() {
         View
       </Link>
       <span className="mx-2 dark:text-gray-400">|</span>
-      <button className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
-        Disable
+      <button
+        onClick={() => handleToggleDisabled(user.id)}
+        className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+      >
+        {user.is_disabled ? 'Enable' : 'Disable'}
       </button>
     </>
   );
-
   const renderMobileActions = (user: User) => (
     <div className="flex justify-between text-sm font-medium gap-2 mt-3">
       <Link
@@ -423,8 +507,11 @@ export default function AdminUsersPage() {
       >
         View Details
       </Link>
-      <button className="flex-1 text-center text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 py-2 px-3 border border-red-500 rounded focus:outline-none focus:ring-2 focus:ring-red-500">
-        Disable Account
+      <button
+        onClick={() => handleToggleDisabled(user.id)}
+        className="flex-1 text-center text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 py-2 px-3 border border-red-500 rounded focus:outline-none focus:ring-2 focus:ring-red-500"
+      >
+        {user.is_disabled ? 'Enable Account' : 'Disable Account'}
       </button>
     </div>
   );

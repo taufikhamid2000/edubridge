@@ -163,6 +163,38 @@ export async function updateUserRole(
 }
 
 /**
+ * Toggle a user's disabled status
+ * @param userId The ID of the user to update
+ * @param isDisabled The new disabled status
+ * @returns True if the update was successful, false otherwise
+ */
+export async function toggleUserDisabled(
+  userId: string,
+  isDisabled: boolean
+): Promise<boolean> {
+  try {
+    // Update the user_profiles table
+    const { error } = await supabase
+      .from('user_profiles')
+      .update({
+        is_disabled: isDisabled,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', userId);
+
+    if (error) {
+      logger.error('Error updating user disabled status:', error);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    logger.error('Failed to update user disabled status:', error);
+    return false;
+  }
+}
+
+/**
  * Interface for admin log entries
  */
 export interface AdminLogEntry {
@@ -255,8 +287,7 @@ export async function fetchAdminUsers(): Promise<{
       };
     }
 
-    // User is confirmed as admin, proceed with fetch
-    // Get users and their roles - users first
+    // User is confirmed as admin, proceed with fetch    // Get users and their roles - users first
     const { data: users, error: usersError } = await supabase.from(
       'user_profiles'
     ).select(`
@@ -265,7 +296,8 @@ export async function fetchAdminUsers(): Promise<{
         avatar_url,
         level,
         xp,
-        created_at
+        created_at,
+        is_disabled
       `);
 
     if (usersError) {

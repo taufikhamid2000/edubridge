@@ -39,7 +39,8 @@ export interface UserDetail {
   created_at: string;
   role: string;
   last_login: string;
-  status?: 'active' | 'suspended';
+  status?: 'active' | 'suspended'; // Legacy status field - use is_disabled instead
+  is_disabled?: boolean;
   achievements: Achievement[];
   quiz_history: QuizAttempt[];
 }
