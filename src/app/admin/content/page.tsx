@@ -12,7 +12,7 @@ import {
   fetchAdminChapters,
   fetchAdminTopics,
 } from '@/services';
-import SubjectManagement from '@/components/admin/content/SubjectManagement';
+import SubjectManagement from '@/components/admin/content/SubjectManagementSimple';
 import ChapterManagement from '@/components/admin/content/ChapterManagement';
 import TopicManagement from '@/components/admin/content/TopicManagement';
 import QuizManagement from '@/components/admin/content/QuizManagement';
