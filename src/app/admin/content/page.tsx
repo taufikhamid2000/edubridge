@@ -4,14 +4,12 @@ import { useEffect, useState, useCallback } from 'react';
 import { logger } from '@/lib/logger';
 import { supabase } from '@/lib/supabase';
 import { AdminLayout, Message } from '@/components/admin/ui';
-import {
-  Subject,
-  Chapter,
-  Topic,
-  fetchAdminSubjects,
-  fetchAdminChapters,
-  fetchAdminTopics,
-} from '@/services';
+import { Subject } from '@/services/subjectService';
+import { Chapter } from '@/services/chapterService';
+import { Topic } from '@/services/topicService';
+import { fetchAdminSubjects } from '@/services/subjectService';
+import { fetchAdminChapters } from '@/services/chapterService';
+import { fetchAdminTopics } from '@/services/topicService';
 import SubjectManagement from '@/components/admin/content/SubjectManagementSimple';
 import ChapterManagement from '@/components/admin/content/ChapterManagement';
 import TopicManagement from '@/components/admin/content/TopicManagement';

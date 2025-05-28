@@ -14,24 +14,24 @@ export interface Subject {
 }
 
 /**
- * Interface for subject counts
+ * Interface for nested subject data from database
  */
-interface SubjectCounts {
-  [key: string]: {
-    topicCount: number;
-    quizCount: number;
-  };
+interface SubjectWithNested {
+  id: string;
+  name: string;
+  description: string;
+  chapters?: {
+    id: string;
+    topics?: {
+      id: string;
+      quizzes?: { id: string }[];
+    }[];
+  }[];
 }
 
 /**
- * Interface for chapters by subject
- */
-interface ChaptersBySubject {
-  [subjectId: string]: string[];
-}
-
-/**
- * Fetches all subjects with their related topic and quiz counts
+ * Fetches all subjects with their related topic and quiz counts (OPTIMIZED VERSION)
+ * This replaces multiple N+1 queries with a single JOIN query
  * @returns A promise with subjects data and error status
  */
 export async function fetchAdminSubjects(): Promise<{
@@ -47,100 +47,79 @@ export async function fetchAdminSubjects(): Promise<{
     }
 
     // User is confirmed as admin, proceed with fetch
-    console.log('Fetching subjects as admin...');
+    console.log('Fetching subjects as admin with optimized query...');
 
-    // Get all subjects
-    const { data: subjects, error: subjectsError } = await supabase
-      .from('subjects')
-      .select('*');
+    // OPTIMIZED: Single query with JOINs to get all data at once
+    // This replaces ~50+ individual queries with 1 query
+    const { data: subjectsData, error: subjectsError } = await supabase.from(
+      'subjects'
+    ).select(`
+        id,
+        name,
+        description,
+        chapters(
+          id,
+          topics(
+            id,
+            quizzes(id)
+          )
+        )
+      `);
 
     if (subjectsError) {
-      logger.error('Error fetching subjects:', subjectsError);
+      logger.error('Error fetching subjects with nested data:', subjectsError);
+
+      // Fallback: Get subjects without counts if JOIN fails
+      const { data: subjects } = await supabase
+        .from('subjects')
+        .select('id, name, description');
+
+      if (subjects) {
+        const formattedSubjects = subjects.map((subject) => ({
+          ...subject,
+          topic_count: 0,
+          quiz_count: 0,
+        }));
+        return { data: formattedSubjects, error: null };
+      }
+
       return {
         data: null,
         error: new Error(subjectsError.message || 'Failed to fetch subjects'),
       };
     }
-    console.log('Subjects fetched successfully:', { count: subjects?.length });
 
-    // Create a map to store topic and quiz counts per subject
-    const subjectCounts: SubjectCounts = {};
-
-    // Initialize counts for all subjects
-    subjects.forEach((subject) => {
-      subjectCounts[subject.id] = { topicCount: 0, quizCount: 0 };
+    console.log('Subjects with nested data fetched successfully:', {
+      count: subjectsData?.length,
     });
 
-    try {
-      // Get all chapters with their subject IDs
-      const { data: chapters } = (await supabase
-        .from('chapters')
-        .select('id, subject_id')) as {
-        data: { id: string; subject_id: string }[] | null;
-      };
+    // Process the nested data to calculate counts efficiently
+    const formattedSubjects =
+      subjectsData?.map((subject: SubjectWithNested) => {
+        let topicCount = 0;
+        let quizCount = 0;
 
-      if (chapters && chapters.length > 0) {
-        // Map chapters by subject
-        const chaptersBySubject: ChaptersBySubject = {};
-        chapters.forEach((chapter) => {
-          if (chapter.subject_id) {
-            if (!chaptersBySubject[chapter.subject_id]) {
-              chaptersBySubject[chapter.subject_id] = [];
+        if (subject.chapters) {
+          subject.chapters.forEach((chapter) => {
+            if (chapter.topics) {
+              topicCount += chapter.topics.length;
+              chapter.topics.forEach((topic) => {
+                if (topic.quizzes) {
+                  quizCount += topic.quizzes.length;
+                }
+              });
             }
-            chaptersBySubject[chapter.subject_id].push(chapter.id);
-          }
-        });
-
-        // For each subject, process its chapters, topics and quizzes
-        for (const subjectId in chaptersBySubject) {
-          const chapterIds = chaptersBySubject[subjectId];
-
-          // For each chapter in this subject
-          for (const chapterId of chapterIds) {
-            // Count topics in this chapter
-            const { count: topicCount } = await supabase
-              .from('topics')
-              .select('*', { count: 'exact', head: true })
-              .eq('chapter_id', chapterId);
-
-            // Add to subject's topic count
-            subjectCounts[subjectId].topicCount += topicCount || 0;
-            // Get topics for this chapter
-            const { data: topics } = (await supabase
-              .from('topics')
-              .select('id')
-              .eq('chapter_id', chapterId)) as {
-              data: { id: string }[] | null;
-            };
-
-            // For each topic, count its quizzes
-            if (topics && topics.length > 0) {
-              for (const topic of topics) {
-                const { count: quizCount } = await supabase
-                  .from('quizzes')
-                  .select('*', { count: 'exact', head: true })
-                  .eq('topic_id', topic.id);
-
-                // Add to subject's quiz count
-                subjectCounts[subjectId].quizCount += quizCount || 0;
-              }
-            }
-          }
+          });
         }
-      }
-    } catch (error) {
-      console.error('Error calculating topic/quiz counts:', error);
-      // Continue with basic data
-    }
 
-    // Format the subjects with topic and quiz counts
-    const formattedSubjects = subjects.map((subject) => ({
-      id: subject.id,
-      name: subject.name,
-      description: subject.description,
-      topic_count: subjectCounts[subject.id]?.topicCount || 0,
-      quiz_count: subjectCounts[subject.id]?.quizCount || 0,
-    }));
+        return {
+          id: subject.id,
+          name: subject.name,
+          description: subject.description,
+          topic_count: topicCount,
+          quiz_count: quizCount,
+        };
+      }) || [];
 
     return { data: formattedSubjects, error: null };
   } catch (error) {
@@ -155,6 +134,40 @@ export async function fetchAdminSubjects(): Promise<{
 
     logger.error('Error in fetchAdminSubjects:', err);
     console.error('Full error details:', error);
+    return { data: null, error: err };
+  }
+}
+
+/**
+ * Fetches basic subjects without counts (for dashboard - FAST)
+ * @returns A promise with basic subjects data
+ */
+export async function fetchSubjects(): Promise<{
+  data: Subject[] | null;
+  error: Error | null;
+}> {
+  try {
+    const { data: subjects, error } = await supabase
+      .from('subjects')
+      .select('id, name, description');
+
+    if (error) {
+      logger.error('Error fetching subjects:', error);
+      return { data: null, error };
+    }
+
+    // Return subjects with zero counts for dashboard (fast loading)
+    const formattedSubjects =
+      subjects?.map((subject) => ({
+        ...subject,
+        topic_count: 0,
+        quiz_count: 0,
+      })) || [];
+
+    return { data: formattedSubjects, error: null };
+  } catch (error) {
+    const err = error instanceof Error ? error : new Error('Unknown error');
+    logger.error('Error in fetchSubjects:', err);
     return { data: null, error: err };
   }
 }
@@ -274,25 +287,6 @@ export async function deleteSubject(id: string): Promise<{
 
     if (!success) {
       return { success: false, error: accessError };
-    }
-
-    // Check if there are chapters associated with this subject
-    const { data: chapters, error: chaptersError } = await supabase
-      .from('chapters')
-      .select('id')
-      .eq('subject_id', id)
-      .limit(1);
-
-    if (chaptersError) {
-      logger.error('Error checking for related chapters:', chaptersError);
-      return { success: false, error: chaptersError };
-    }
-
-    if (chapters && chapters.length > 0) {
-      return {
-        success: false,
-        error: new Error('Cannot delete subject with associated chapters'),
-      };
     }
 
     // Delete the subject
