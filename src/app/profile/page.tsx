@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { User, Achievement } from '@/types/users';
 import { Quiz } from '@/types/topics';
@@ -16,7 +16,7 @@ import QuizTable from '@/components/topic/QuizTable';
 import { supabase } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
 
-export default function ProfilePage() {
+function ProfileContent() {
   const searchParams = useSearchParams();
   const userId = searchParams.get('userId'); // Get userId from query params
   const [user, setUser] = useState<User | null>(null);
@@ -32,7 +32,8 @@ export default function ProfilePage() {
   useEffect(() => {
     const loadProfileData = async () => {
       try {
-        setLoading(true); // Check if user is logged in
+        setLoading(true);
+        // Check if user is logged in
         const { data } = await supabase.auth.getSession();
         if (!data.session) {
           setError('You need to be logged in to view profiles.');
@@ -41,7 +42,9 @@ export default function ProfilePage() {
         }
 
         const targetUserId = userId || data.session.user.id;
-        setIsOwnProfile(targetUserId === data.session.user.id); // Fetch user profile data
+        setIsOwnProfile(targetUserId === data.session.user.id);
+
+        // Fetch user profile data
         let userData, userError;
         if (userId) {
           // Fetch specific user profile
@@ -109,11 +112,14 @@ export default function ProfilePage() {
           achievementsData = result.data;
           achievementsError = result.error;
         }
+
         if (achievementsError) {
           logger.error('Achievements fetch error:', achievementsError);
           // We'll continue even if achievements fail to load
         }
-        setAchievements(achievementsData || []); // Fetch user created quizzes with subject slug for proper URL generation
+        setAchievements(achievementsData || []);
+
+        // Fetch user created quizzes with subject slug for proper URL generation
         const targetUserIdForQuizzes = userId || data.session.user.id;
         const { data: createdQuizzesData, error: createdQuizzesError } =
           await supabase
@@ -135,10 +141,13 @@ export default function ProfilePage() {
             )
             .eq('created_by', targetUserIdForQuizzes)
             .order('created_at', { ascending: false });
+
         if (createdQuizzesError) {
           logger.error('Created quizzes fetch error:', createdQuizzesError);
           // We'll continue even if created quizzes fail to load
-        } // Transform the quiz data to include subject_slug for proper URL generation
+        }
+
+        // Transform the quiz data to include subject_slug for proper URL generation
         interface QuizWithRelations {
           id: string;
           name: string;
@@ -176,12 +185,15 @@ export default function ProfilePage() {
     };
 
     loadProfileData();
-  }, [userId]); // Reset tab to 'stats' if viewing someone else's profile and settings tab was active
+  }, [userId]);
+
+  // Reset tab to 'stats' if viewing someone else's profile and settings tab was active
   useEffect(() => {
     if (!isOwnProfile && activeTab === 'settings') {
       setActiveTab('stats');
     }
   }, [isOwnProfile, activeTab]);
+
   // Render loading state
   if (loading) {
     return (
@@ -195,6 +207,7 @@ export default function ProfilePage() {
       </div>
     );
   }
+
   // Render error state
   if (error || !user) {
     return (
@@ -218,11 +231,14 @@ export default function ProfilePage() {
       </div>
     );
   }
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Profile Header with Avatar and Basic Info */}
-        <ProfileHeader user={user} /> {/* Tab Navigation */}
+        <ProfileHeader user={user} />
+
+        {/* Tab Navigation */}
         <div className="bg-white dark:bg-gray-800 shadow rounded-lg mt-6 overflow-hidden">
           <div className="border-b border-gray-200 dark:border-gray-700">
             <nav className="flex -mb-px">
@@ -235,7 +251,7 @@ export default function ProfilePage() {
                 onClick={() => setActiveTab('stats')}
               >
                 Stats & Progress
-              </button>{' '}
+              </button>
               <button
                 className={`px-6 py-4 text-sm font-medium ${
                   activeTab === 'achievements'
@@ -269,7 +285,8 @@ export default function ProfilePage() {
                 </button>
               )}
             </nav>
-          </div>{' '}
+          </div>
+
           {/* Tab Content */}
           <div className="p-6">
             {activeTab === 'stats' && <ProfileStats user={user} />}
@@ -278,7 +295,7 @@ export default function ProfilePage() {
                 achievements={achievements}
                 loading={loading}
               />
-            )}{' '}
+            )}
             {activeTab === 'created-quizzes' && (
               <QuizTable
                 quizzes={createdQuizzes}
@@ -330,5 +347,22 @@ export default function ProfilePage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ProfilePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading profile...</p>
+          </div>
+        </div>
+      }
+    >
+      <ProfileContent />
+    </Suspense>
   );
 }
