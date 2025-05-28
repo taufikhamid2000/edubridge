@@ -1,8 +1,15 @@
 import { Quiz } from '@/types/topics';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, ReactNode } from 'react';
 
 export interface QuizTableProps {
   quizzes: Quiz[];
+  showCreator?: boolean; // Whether to show creator column
+  showActions?: boolean; // Whether to show actions column
+  renderActions?: (quiz: Quiz) => ReactNode; // Custom actions renderer
+  getQuizLink?: (quiz: Quiz) => string; // Custom quiz link generator
+  emptyMessage?: string; // Custom empty state message
+  title?: string; // Optional title
+  showResultCount?: boolean; // Whether to show result count
 }
 
 type SortDirection = 'asc' | 'desc' | null;
@@ -10,7 +17,16 @@ type StatusFilter = 'all' | 'verified' | 'unverified';
 
 const ITEMS_PER_PAGE = 5;
 
-export default function QuizTable({ quizzes: initialQuizzes }: QuizTableProps) {
+export default function QuizTable({
+  quizzes: initialQuizzes,
+  showCreator = true,
+  showActions = true,
+  renderActions,
+  getQuizLink,
+  emptyMessage,
+  title,
+  showResultCount = true,
+}: QuizTableProps) {
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
 
   // Search and filter states
@@ -37,6 +53,16 @@ export default function QuizTable({ quizzes: initialQuizzes }: QuizTableProps) {
     setCurrentPage(1);
   }, [initialQuizzes]);
 
+  // Default quiz link generator (for topic pages)
+  const defaultGetQuizLink = (quiz: Quiz) => {
+    return `/quiz/${window.location.pathname.split('/')[2]}/${window.location.pathname.split('/')[3]}/play/${quiz.id}`;
+  };
+
+  // Default actions renderer (empty for topic pages)
+  const defaultRenderActions = () => (
+    <span className="text-gray-400 dark:text-gray-600 text-sm italic">-</span>
+  );
+
   // Filter and search quizzes
   const filteredQuizzes = useMemo(() => {
     return initialQuizzes.filter((quiz) => {
@@ -44,14 +70,17 @@ export default function QuizTable({ quizzes: initialQuizzes }: QuizTableProps) {
       if (statusFilter === 'verified' && !quiz.verified) return false;
       if (statusFilter === 'unverified' && quiz.verified) return false;
 
-      // Search filter - check both name and creator
+      // Search filter - check name, display_name, and creator email
       if (searchTerm) {
         const searchTermLower = searchTerm.toLowerCase();
         const nameMatch = quiz.name.toLowerCase().includes(searchTermLower);
+        const displayNameMatch =
+          quiz.display_name &&
+          quiz.display_name.toLowerCase().includes(searchTermLower);
         const creatorMatch =
           quiz.email &&
           quiz.email.split('@')[0].toLowerCase().includes(searchTermLower);
-        return nameMatch || creatorMatch;
+        return nameMatch || displayNameMatch || creatorMatch;
       }
 
       return true;
@@ -83,6 +112,14 @@ export default function QuizTable({ quizzes: initialQuizzes }: QuizTableProps) {
 
   return (
     <div className="mt-6">
+      {title && (
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+            {title}
+          </h3>
+        </div>
+      )}
+
       <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         {/* Search input */}
         <div className="relative">
@@ -166,20 +203,24 @@ export default function QuizTable({ quizzes: initialQuizzes }: QuizTableProps) {
       </div>
 
       {/* Result count */}
-      <div className="text-sm text-gray-500 dark:text-gray-400 mb-2">
-        {sortedQuizzes.length === 0
-          ? 'No quizzes found'
-          : `Showing ${sortedQuizzes.length} ${sortedQuizzes.length === 1 ? 'quiz' : 'quizzes'}`}
-      </div>
+      {showResultCount && (
+        <div className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+          {sortedQuizzes.length === 0
+            ? 'No quizzes found'
+            : `Showing ${sortedQuizzes.length} ${sortedQuizzes.length === 1 ? 'quiz' : 'quizzes'}`}
+        </div>
+      )}
 
       <div className="overflow-x-auto rounded-lg shadow">
         <table className="table-auto w-full">
           <thead>
             <tr className="bg-gray-100 dark:bg-gray-800">
               <th className="px-4 py-2 text-left">Quiz Code</th>
-              <th className="px-4 py-2 text-left hidden sm:table-cell">
-                Created by
-              </th>
+              {showCreator && (
+                <th className="px-4 py-2 text-left hidden sm:table-cell">
+                  Created by
+                </th>
+              )}
               <th
                 className="px-4 py-2 text-left cursor-pointer select-none group"
                 onClick={handleSort}
@@ -217,24 +258,30 @@ export default function QuizTable({ quizzes: initialQuizzes }: QuizTableProps) {
                         : 'Newest first'
                       : 'Click to sort'}
                   </span>
-                </div>{' '}
+                </div>
               </th>
               <th className="px-4 py-2 text-left hidden sm:table-cell">
                 Status
               </th>
-              <th className="px-4 py-2 text-right">Options</th>
+              {showActions && <th className="px-4 py-2 text-right">Actions</th>}
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
             {paginatedQuizzes.length === 0 ? (
               <tr>
                 <td
-                  colSpan={5}
-                  className="text-center py-4 text-gray-500 dark:text-gray-400"
+                  colSpan={
+                    showCreator && showActions
+                      ? 5
+                      : showCreator || showActions
+                        ? 4
+                        : 3
+                  }
+                  className="text-center py-8 text-gray-500 dark:text-gray-400"
                 >
                   {searchTerm || statusFilter !== 'all'
                     ? 'No quizzes match your search criteria'
-                    : 'No quizzes available for this topic yet'}
+                    : emptyMessage || 'No quizzes available'}
                 </td>
               </tr>
             ) : (
@@ -246,12 +293,18 @@ export default function QuizTable({ quizzes: initialQuizzes }: QuizTableProps) {
                   <td className="px-4 py-3">
                     <div className="flex items-center">
                       <a
-                        href={`/quiz/${window.location.pathname.split('/')[2]}/${window.location.pathname.split('/')[3]}/play/${quiz.id}`}
+                        href={
+                          getQuizLink
+                            ? getQuizLink(quiz)
+                            : defaultGetQuizLink(quiz)
+                        }
                         className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
                         onClick={(e) => {
                           e.preventDefault();
-                          // Navigate to quiz play page
-                          window.location.href = `/quiz/${window.location.pathname.split('/')[2]}/${window.location.pathname.split('/')[3]}/play/${quiz.id}`;
+                          const link = getQuizLink
+                            ? getQuizLink(quiz)
+                            : defaultGetQuizLink(quiz);
+                          window.location.href = link;
                         }}
                       >
                         {quiz.name}
@@ -272,9 +325,36 @@ export default function QuizTable({ quizzes: initialQuizzes }: QuizTableProps) {
                       </span>
                     </div>
                   </td>
-                  <td className="px-4 py-3 hidden sm:table-cell">
-                    {quiz.email?.split('@')[0] || 'Unknown'}
-                  </td>
+                  {showCreator && (
+                    <td className="px-4 py-3 hidden sm:table-cell">
+                      {quiz.created_by && quiz.created_by !== 'Unknown' ? (
+                        <button
+                          onClick={() => {
+                            window.open(
+                              `/profile?userId=${quiz.created_by}`,
+                              '_blank'
+                            );
+                          }}
+                          className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline cursor-pointer"
+                          title={`View ${
+                            quiz.display_name ||
+                            quiz.email?.split('@')[0] ||
+                            'user'
+                          }'s profile (opens in new tab)`}
+                        >
+                          {quiz.display_name ||
+                            quiz.email?.split('@')[0] ||
+                            'Unknown User'}
+                        </button>
+                      ) : (
+                        <span className="text-gray-500 dark:text-gray-400">
+                          {quiz.display_name ||
+                            quiz.email?.split('@')[0] ||
+                            'Unknown'}
+                        </span>
+                      )}
+                    </td>
+                  )}
                   <td className="px-4 py-3">
                     {new Date(quiz.created_at).toLocaleDateString()}
                   </td>
@@ -286,17 +366,18 @@ export default function QuizTable({ quizzes: initialQuizzes }: QuizTableProps) {
                           : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300'
                       }`}
                     >
-                      {quiz.verified ? 'Verified' : 'Unverified'}{' '}
+                      {quiz.verified ? 'Verified' : 'Unverified'}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-right">
-                    <div className="flex items-center justify-end space-x-2">
-                      {/* Actions column kept for future functionality */}
-                      <span className="text-gray-400 dark:text-gray-600 text-sm italic">
-                        -
-                      </span>
-                    </div>
-                  </td>
+                  {showActions && (
+                    <td className="px-4 py-3 text-right">
+                      <div className="flex items-center justify-end space-x-2">
+                        {renderActions
+                          ? renderActions(quiz)
+                          : defaultRenderActions()}
+                      </div>
+                    </td>
+                  )}
                 </tr>
               ))
             )}

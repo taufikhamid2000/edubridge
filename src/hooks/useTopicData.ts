@@ -67,30 +67,43 @@ export function useTopicData(subject: string, topic: string) {
         } // Set the chapter data, which might be null if no valid chapter was found
         setChapterData(chapter);
         try {
-          // First query the actual quizzes table to get unique quiz IDs
-          const { data: uniqueQuizzes, error: quizzesError } = await supabase
+          // Fetch basic quizzes first
+          const { data: basicQuizzes, error: quizzesError } = await supabase
             .from('quizzes')
             .select('*')
             .eq('topic_id', topic);
 
-          if (quizzesError || !uniqueQuizzes) {
+          if (quizzesError || !basicQuizzes) {
             setQuizzes([]);
             return;
           }
 
-          // Then join with user info if needed
-          const { data: quizzesData } = await supabase
-            .from('quizzes_with_email')
-            .select('*')
-            .eq('topic_id', topic)
-            .in(
-              'id',
-              uniqueQuizzes.map((quiz) => quiz.id)
-            );
+          // Get creator information for each quiz
+          const quizzesWithCreators = await Promise.all(
+            basicQuizzes.map(async (quiz) => {
+              try {
+                // Try to get user profile info using created_by as UUID
+                const { data: profile } = await supabase
+                  .from('user_profiles')
+                  .select('display_name')
+                  .eq('id', quiz.created_by)
+                  .single();
 
-          // If we have data from the view, use that (it has email info)
-          // Otherwise fall back to the basic quiz data
-          setQuizzes(quizzesData || uniqueQuizzes || []);
+                return {
+                  ...quiz,
+                  display_name: profile?.display_name || null,
+                };
+              } catch {
+                // If that fails, the created_by might not be a valid UUID
+                return {
+                  ...quiz,
+                  display_name: null,
+                };
+              }
+            })
+          );
+
+          setQuizzes(quizzesWithCreators);
         } catch {
           setQuizzes([]);
         }

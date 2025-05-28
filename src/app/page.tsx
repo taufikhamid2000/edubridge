@@ -1,12 +1,51 @@
 /* eslint-disable react/no-unescaped-entities */
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabase';
 
 export default function HomePage() {
   const router = useRouter();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
+  // Check authentication status
+  useEffect(() => {
+    const checkAuthStatus = async () => {
+      try {
+        const {
+          data: { session },
+          error,
+        } = await supabase.auth.getSession();
+
+        if (error) {
+          console.warn('Session check error:', error);
+          setIsLoggedIn(false);
+        } else {
+          setIsLoggedIn(!!session);
+        }
+      } catch (error) {
+        console.error('Error checking auth status:', error);
+        setIsLoggedIn(false);
+      } finally {
+        setIsCheckingAuth(false);
+      }
+    };
+
+    checkAuthStatus();
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      setIsLoggedIn(!!session);
+      setIsCheckingAuth(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   // Handle parallax effect on scroll
   useEffect(() => {
@@ -77,15 +116,20 @@ export default function HomePage() {
             <span className="inline-block text-yellow-300">Bridge</span>
           </h1>
           <p className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto font-light">
-            Fast-track your academic success with daily quizzes, rewards, and
-            friendly competition
-          </p>
+            Earn up to RM1000 when you join EduBridge – and make your school
+            proud!
+          </p>{' '}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
               className="inline-block uppercase tracking-wide rounded-full shadow-lg transition-all duration-300 ease-in-out px-8 py-4 bg-white text-blue-600 font-medium hover:bg-gray-100 hover:scale-105 transform"
-              onClick={() => router.push('/auth')}
+              onClick={() => router.push(isLoggedIn ? '/dashboard' : '/auth')}
+              disabled={isCheckingAuth}
             >
-              Get Started 🚀
+              {isCheckingAuth
+                ? 'Loading...'
+                : isLoggedIn
+                  ? 'Access your dashboard'
+                  : 'Sign Up Now 🚀'}
             </button>{' '}
             <button
               className="inline-block uppercase tracking-wide rounded-full shadow-lg transition-all duration-300 ease-in-out px-8 py-4 bg-transparent border-2 border-white text-white font-medium hover:bg-white/10 hover:scale-105 transform"
@@ -96,7 +140,6 @@ export default function HomePage() {
               Learn More 📄
             </button>
           </div>
-
           {/* Stats preview */}
           <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-white/20 backdrop-blur-lg rounded-lg p-6 transform transition-all hover:scale-105">
@@ -135,40 +178,85 @@ export default function HomePage() {
             </span>
           </h2>
           <div className="h-1 w-20 bg-yellow-400 mx-auto"></div>
-        </div>
+        </div>{' '}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-8 mb-16 border border-gray-100 dark:border-gray-700 transform transition-all hover:shadow-2xl">
-          <div className="flex flex-col md:flex-row gap-8 items-center">
-            <div className="md:w-1/2">
-              <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-lg flex justify-center">
-                <div className="relative h-40 w-40">
-                  <div className="w-full h-full flex items-center justify-center">
-                    {/* Using Next.js public folder SVG directly */}
-                    <svg
-                      className="h-32 w-32 text-blue-600 dark:text-blue-400"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                    >
-                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="md:w-1/2">
-              <h3 className="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-100">
-                Gamified Microlearning Platform
-              </h3>
-              <p className="text-lg mb-6 text-gray-600 dark:text-gray-300">
-                EduBridge is a lightweight, gamified microlearning platform
-                built to help Malaysian Form 4 and Form 5 students strengthen
-                their academic skills through daily engagement. By offering
-                fast, rewarding quiz experiences, EduBridge motivates students
-                to build consistent study habits, earn recognition 🏆, and
-                achieve measurable academic growth.
+          <div className="max-w-4xl mx-auto">
+            <div className="prose prose-lg max-w-none text-gray-700 dark:text-gray-300">
+              <h2 className="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-100">
+                Earn up to RM1000 when you join EduBridge – and make your school
+                proud!
+              </h2>
+
+              <p className="text-lg mb-6">
+                EduBridge isn't just about preparing for your SPM – it's a
+                revolution in how Malaysian students learn, compete, and get
+                rewarded.
               </p>
-              <p className="text-sm text-gray-500 dark:text-gray-400 italic">
-                The platform operates independently, without claiming alignment
-                with any official examination board or curriculum.
+
+              <p className="text-lg mb-6">
+                As a Quiz Answerer, you'll complete quizzes, collect points, and
+                climb the leaderboard. But this isn't just about personal glory:
+                at the end of the year, the top students will win up to RM1000
+                in cash prizes! Imagine walking into your exam hall knowing
+                you've already scored a major win.
+              </p>
+
+              <p className="text-lg mb-6">
+                But why stop at solo success? EduBridge lets you represent your
+                school. Your points don't just boost your own ranking – they
+                contribute to your school's total. Imagine Sekolah Menengah
+                Kebangsaan Ayer Jernih outperforming MRSM Tawau. Pergh. The
+                bragging rights would be legendary! Watch the leaderboard as
+                your school rises through the ranks, bringing pride (yeah its
+                impossible tho).
+              </p>
+
+              <p className="text-lg mb-6">
+                And it's not just the students paying attention. KPM be like:
+                "Alamak, this analytics says students from Klang, Selangor are
+                actually far behind. What are they doing? Maybe we gotta send in
+                some reinforcement." EduBridge doesn't just gamify studying – it
+                generates real insights that spotlight where schools shine and
+                where they need extra support.
+              </p>
+
+              <p className="text-lg mb-6">
+                Here's the kicker: The KPM tried to switch away from exam-based
+                education. Oh yeah? Watch this. EduBridge isn't just embracing
+                exams – we're making them worth your time.
+              </p>
+
+              <p className="text-lg mb-6">
+                Meanwhile, the elite school's headmaster be like: "We can't lose
+                to fools like them." Slowly pulls out her rotan. "Get back to
+                https://edubridge-sigma.vercel.app/, students." (For legal
+                purposes, this is a joke.)
+              </p>
+
+              <p className="text-lg mb-6">
+                If you've got a knack for creativity, become a Quiz Maker.
+                Design quizzes that attract thousands of answers, and you'll
+                earn real money. With ad engagement rates of RM2–RM6.50 per 1000
+                attempts, your viral quizzes could generate hundreds – maybe
+                even RM1000 or more. Yes, this one's open to all, not just
+                students.
+              </p>
+
+              <p className="text-lg mb-6">
+                Whether you're competing solo, representing your school, or
+                creating quizzes, EduBridge is your chance to turn study time
+                into earning time.
+              </p>
+
+              <p className="text-lg mb-6 font-semibold">
+                Join EduBridge today. Master your subjects, make money, and
+                maybe even watch your school crush the competition.
+              </p>
+
+              <p className="text-lg italic">
+                "Hey Taufik, isn't this a scam?"
+                <br />
+                Yes. Yes it is. (For legal purposes, this is also a joke.)
               </p>
             </div>
           </div>
