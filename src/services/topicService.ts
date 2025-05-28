@@ -9,7 +9,6 @@ export interface Topic {
   id: string;
   chapter_id: string;
   title: string;
-  content: string;
   order_index: number;
   created_at: string;
   updated_at: string;
@@ -104,7 +103,6 @@ export async function fetchAdminTopics(): Promise<{
 export async function createTopic(topicData: {
   title: string;
   chapter_id: string;
-  content: string;
   order_index?: number;
 }): Promise<{
   id: string | null;
@@ -136,15 +134,12 @@ export async function createTopic(topicData: {
       }
 
       orderIndex = maxOrderData ? maxOrderData.order_index + 1 : 0;
-    }
-
-    // Insert the new topic
+    } // Insert the new topic
     const { data, error } = await supabase
       .from('topics')
       .insert({
         title: topicData.title,
         chapter_id: topicData.chapter_id,
-        content: topicData.content,
         order_index: orderIndex,
       })
       .select('id')

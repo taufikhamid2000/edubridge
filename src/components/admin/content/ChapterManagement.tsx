@@ -37,7 +37,7 @@ export default function ChapterManagement({
   const [newChapter, setNewChapter] = useState({
     title: '',
     subject_id: '',
-    form: 1,
+    form: 4,
   }); // Pagination, filtering and sorting state
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -127,9 +127,27 @@ export default function ChapterManagement({
         setError('Chapter title is required');
         return;
       }
-
       if (!newChapter.subject_id) {
         setError('Subject selection is required');
+        return;
+      }
+
+      // Check for duplicate chapter title within the same subject and form
+      const existingChapter = chapters.find(
+        (chapter) =>
+          chapter.title.toLowerCase().trim() ===
+            newChapter.title.toLowerCase().trim() &&
+          chapter.subject_id === newChapter.subject_id &&
+          chapter.form === newChapter.form
+      );
+
+      if (existingChapter) {
+        const subjectName =
+          subjects.find((s) => s.id === newChapter.subject_id)?.name ||
+          'Unknown Subject';
+        setError(
+          `A chapter with the title "${newChapter.title}" already exists for ${subjectName} Form ${newChapter.form}`
+        );
         return;
       }
 
@@ -148,10 +166,8 @@ export default function ChapterManagement({
       }
 
       // Refresh chapters list
-      await refreshChapters();
-
-      // Reset form and hide it
-      setNewChapter({ title: '', subject_id: '', form: 1 });
+      await refreshChapters(); // Reset form and hide it
+      setNewChapter({ title: '', subject_id: '', form: 4 });
       setShowNewChapterForm(false);
       setSuccessMessage(`Chapter "${newChapter.title}" created successfully!`);
     } catch (error) {
@@ -420,7 +436,7 @@ export default function ChapterManagement({
                   </option>
                 ))}
               </select>
-            </div>
+            </div>{' '}
             <div className="mb-3">
               <label
                 htmlFor="chapter-form"
@@ -428,10 +444,8 @@ export default function ChapterManagement({
               >
                 Form
               </label>
-              <input
+              <select
                 id="chapter-form"
-                type="number"
-                min="1"
                 value={newChapter.form}
                 onChange={(e) =>
                   setNewChapter({
@@ -440,8 +454,10 @@ export default function ChapterManagement({
                   })
                 }
                 className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                placeholder="Enter form number"
-              />
+              >
+                <option value={4}>Form 4</option>
+                <option value={5}>Form 5</option>
+              </select>
             </div>
             <div className="flex justify-end">
               <button

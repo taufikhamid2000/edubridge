@@ -5,21 +5,35 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { signOut } from '@/lib/auth';
+import { verifyAdminAccess } from '@/services/adminAuthService';
 import type { User } from '@supabase/supabase-js';
 import { JSX } from 'react/jsx-dev-runtime';
 import Image from 'next/image';
 
 export default function Header(): JSX.Element {
   const [user, setUser] = useState<User | null>(null);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [menuOpen, setMenuOpen] = useState(false);
-
   useEffect(() => {
     async function init() {
       const {
         data: { session },
       } = await supabase.auth.getSession();
       setUser(session?.user ?? null);
+
+      // Check admin status if user is logged in
+      if (session?.user) {
+        try {
+          const { isAdmin: adminStatus } = await verifyAdminAccess();
+          setIsAdmin(adminStatus);
+        } catch (error) {
+          console.error('Error checking admin status:', error);
+          setIsAdmin(false);
+        }
+      } else {
+        setIsAdmin(false);
+      }
 
       const saved = localStorage.getItem('theme') as 'light' | 'dark' | null;
       const initial = saved ?? 'dark';
@@ -28,6 +42,30 @@ export default function Header(): JSX.Element {
       document.documentElement.classList.add(initial);
     }
     init();
+
+    // Listen for auth state changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      setUser(session?.user ?? null);
+
+      // Check admin status when auth state changes
+      if (session?.user) {
+        try {
+          const { isAdmin: adminStatus } = await verifyAdminAccess();
+          setIsAdmin(adminStatus);
+        } catch (error) {
+          console.error('Error checking admin status:', error);
+          setIsAdmin(false);
+        }
+      } else {
+        setIsAdmin(false);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
@@ -89,6 +127,11 @@ export default function Header(): JSX.Element {
                 <Link href="/profile" className="header-menu-link">
                   Profile
                 </Link>
+                {isAdmin && (
+                  <Link href="/admin" className="header-menu-link">
+                    Admin
+                  </Link>
+                )}
                 <button
                   type="button"
                   className="header-menu-link"

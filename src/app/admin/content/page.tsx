@@ -7,9 +7,11 @@ import { AdminLayout, Message } from '@/components/admin/ui';
 import { Subject } from '@/services/subjectService';
 import { Chapter } from '@/services/chapterService';
 import { Topic } from '@/services/topicService';
+import { Quiz } from '@/services/quizService';
 import { fetchAdminSubjects } from '@/services/subjectService';
 import { fetchAdminChapters } from '@/services/chapterService';
 import { fetchAdminTopics } from '@/services/topicService';
+import { fetchAdminQuizzes } from '@/services/quizService';
 import SubjectManagement from '@/components/admin/content/SubjectManagementSimple';
 import ChapterManagement from '@/components/admin/content/ChapterManagement';
 import TopicManagement from '@/components/admin/content/TopicManagement';
@@ -19,6 +21,7 @@ export default function AdminContentPage() {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [topics, setTopics] = useState<Topic[]>([]);
+  const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<
     'subjects' | 'chapters' | 'topics' | 'quizzes'
@@ -150,6 +153,10 @@ export default function AdminContentPage() {
       }
 
       setChapters(data);
+      console.log('Admin content page - chapters fetched:', {
+        chaptersCount: data.length,
+        chapters: data.map((c) => ({ id: c.id, title: c.title })),
+      });
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
@@ -218,7 +225,59 @@ export default function AdminContentPage() {
     } finally {
       setLoading(false);
     }
-  }, []); // Function to handle current content refresh based on active tab
+  }, []);
+
+  // Function to fetch quizzes - wrapped in useCallback to avoid dependency issues
+  const fetchQuizzes = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      console.log('Attempting to fetch quizzes via client-side service...');
+
+      // Check admin status first
+      const adminCheck = await checkAdminStatus();
+      if (!adminCheck.isAdmin) {
+        throw new Error(
+          `${adminCheck.message}. Please check login-first.md for manual fix instructions.`
+        );
+      }
+
+      // Use the contentService instead of direct Supabase calls
+      console.log('Admin check passed, calling fetchAdminQuizzes');
+      const { data, error } = await fetchAdminQuizzes();
+
+      if (error) {
+        console.error('contentService error:', error);
+        throw new Error(
+          `Failed to fetch quizzes: ${error.message || 'Unknown error'} (Check browser console for more details)`
+        );
+      }
+
+      if (!data) {
+        throw new Error('No data returned from content service');
+      }
+
+      setQuizzes(data);
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      logger.error('Error fetching quizzes:', error);
+      setError(errorMessage);
+
+      console.error('Quiz fetch error details:', {
+        error,
+        message: errorMessage,
+        errorType: typeof error,
+        hasFields:
+          error && typeof error === 'object' ? Object.keys(error) : 'N/A',
+        timestamp: new Date().toISOString(),
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+  // Function to handle current content refresh based on active tab
   const refreshCurrentContent = async () => {
     if (activeTab === 'subjects') {
       await fetchSubjects();
@@ -226,6 +285,8 @@ export default function AdminContentPage() {
       await fetchChapters();
     } else if (activeTab === 'topics') {
       await fetchTopics();
+    } else if (activeTab === 'quizzes') {
+      await fetchQuizzes();
     }
   };
 
@@ -255,14 +316,22 @@ export default function AdminContentPage() {
     if (activeTab === 'chapters') {
       fetchChapters();
     }
-  }, [activeTab, fetchChapters]);
-
-  // Fetch topics when active tab changes
+  }, [activeTab, fetchChapters]); // Fetch topics when active tab changes
   useEffect(() => {
     if (activeTab === 'topics') {
-      fetchTopics();
+      // Fetch both chapters and topics since topics depend on chapters for the dropdown
+      fetchChapters().then(() => {
+        fetchTopics();
+      });
     }
-  }, [activeTab, fetchTopics]);
+  }, [activeTab, fetchChapters, fetchTopics]);
+
+  // Fetch quizzes when active tab changes
+  useEffect(() => {
+    if (activeTab === 'quizzes') {
+      fetchQuizzes();
+    }
+  }, [activeTab, fetchQuizzes]);
   return (
     <AdminLayout
       title="Content Management"
@@ -360,14 +429,16 @@ export default function AdminContentPage() {
             setSuccessMessage={setSuccessMessage}
             refreshTopics={fetchTopics}
           />
-        )}
+        )}{' '}
         {activeTab === 'quizzes' && (
           <QuizManagement
+            quizzes={quizzes}
             topics={topics}
             loading={loading}
             setLoading={setLoading}
             setError={setError}
             setSuccessMessage={setSuccessMessage}
+            refreshQuizzes={fetchQuizzes}
           />
         )}
       </div>

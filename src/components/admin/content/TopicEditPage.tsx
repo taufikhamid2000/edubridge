@@ -11,7 +11,6 @@ interface Topic {
   id: string;
   chapter_id: string;
   title: string;
-  content?: string;
   order_index: number;
   created_at: string;
   updated_at: string;
@@ -52,11 +51,9 @@ export default function TopicEditPage() {
   // UI state
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-
   // Form state
   const [formState, setFormState] = useState<Record<string, unknown>>({
     title: '',
-    content: '',
     chapter_id: '',
     order_index: 0,
   });
@@ -102,12 +99,9 @@ export default function TopicEditPage() {
         if (!chapterError && chapterData && chapterData.subjects) {
           setParentSubject(chapterData.subjects as Subject);
         }
-      }
-
-      // Update form state
+      } // Update form state
       setFormState({
         title: topic.title,
-        content: topic.content || '',
         chapter_id: topic.chapter_id,
         order_index: topic.order_index,
       });
@@ -142,7 +136,6 @@ export default function TopicEditPage() {
         .from('topics')
         .update({
           title: topic.title,
-          content: topic.content,
           chapter_id: topic.chapter_id,
           order_index: Number(topic.order_index),
           updated_at: new Date().toISOString(),
@@ -212,7 +205,6 @@ export default function TopicEditPage() {
 
     loadTopic();
   }, [topicId, router]);
-
   // Form fields definition
   const formFields: FormField[] = [
     {
@@ -221,13 +213,6 @@ export default function TopicEditPage() {
       type: 'text',
       placeholder: 'Enter topic title',
       required: true,
-    },
-    {
-      key: 'content',
-      label: 'Content',
-      type: 'textarea',
-      placeholder: 'Enter topic content (optional)',
-      helpText: 'You can use markdown formatting',
     },
     {
       key: 'chapter_id',
