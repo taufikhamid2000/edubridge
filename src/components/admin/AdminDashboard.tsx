@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
+import {
+  fetchDashboardStats,
+  DashboardStats,
+} from '@/services/dashboardStatsService';
 
 interface StatsCard {
   title: string;
@@ -10,38 +13,21 @@ interface StatsCard {
 }
 
 export default function AdminDashboard() {
-  const [usersCount, setUsersCount] = useState<number>(0);
-  const [quizzesCount, setQuizzesCount] = useState<number>(0);
-  const [subjectsCount, setSubjectsCount] = useState<number>(0);
+  const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     async function fetchAdminStats() {
       setLoading(true);
       try {
-        // Fetch user count
-        const { count: userCount, error: userError } = await supabase
-          .from('user_profiles')
-          .select('*', { count: 'exact', head: true });
+        // Use optimized dashboard stats service instead of individual queries
+        const { data: dashboardStats, error } = await fetchDashboardStats();
 
-        if (userError) throw userError;
-        setUsersCount(userCount || 0);
+        if (error) {
+          throw error;
+        }
 
-        // For quizzes count (assuming you have a quizzes table)
-        const { count: quizCount, error: quizError } = await supabase
-          .from('quizzes')
-          .select('*', { count: 'exact', head: true });
-
-        if (quizError) throw quizError;
-        setQuizzesCount(quizCount || 0);
-
-        // For subjects count (assuming you have a subjects table)
-        const { count: subjectCount, error: subjectError } = await supabase
-          .from('subjects')
-          .select('*', { count: 'exact', head: true });
-
-        if (subjectError) throw subjectError;
-        setSubjectsCount(subjectCount || 0);
+        setStats(dashboardStats);
       } catch (error) {
         logger.error('Error fetching admin stats:', error);
       } finally {
@@ -54,9 +40,10 @@ export default function AdminDashboard() {
   return (
     <div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        {' '}
         <StatCard
           title="Total Users"
-          value={loading ? '...' : usersCount}
+          value={loading ? '...' : stats?.totalUsers || 0}
           change={5.25}
           icon={
             <div className="rounded-full bg-blue-100 dark:bg-blue-900/30 p-3">
@@ -79,7 +66,7 @@ export default function AdminDashboard() {
         />{' '}
         <StatCard
           title="Total Quizzes"
-          value={loading ? '...' : quizzesCount}
+          value={loading ? '...' : stats?.totalQuizzes || 0}
           change={2.5}
           icon={
             <div className="rounded-full bg-green-100 dark:bg-green-900/30 p-3">
@@ -102,7 +89,7 @@ export default function AdminDashboard() {
         />{' '}
         <StatCard
           title="Subjects"
-          value={loading ? '...' : subjectsCount}
+          value={loading ? '...' : stats?.totalSubjects || 0}
           change={0}
           icon={
             <div className="rounded-full bg-purple-100 dark:bg-purple-900/30 p-3">

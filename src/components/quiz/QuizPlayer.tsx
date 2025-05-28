@@ -14,6 +14,8 @@ interface QuizPlayerProps {
   questions: Question[];
   timeLimit?: number; // Time limit in minutes
   userId: string;
+  subject?: string; // Added for navigation
+  topic?: string; // Added for navigation
   onComplete?: () => void;
 }
 
@@ -23,6 +25,8 @@ export default function QuizPlayer({
   questions,
   timeLimit,
   userId,
+  subject,
+  topic,
   onComplete,
 }: QuizPlayerProps) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -34,6 +38,16 @@ export default function QuizPlayer({
   );
   const [quizStarted, setQuizStarted] = useState(false);
   const router = useRouter();
+
+  // Function to reset quiz state for retaking
+  const resetQuiz = () => {
+    setCurrentQuestionIndex(0);
+    setAnswers({});
+    setQuizCompleted(false);
+    setScore(0);
+    setTimeRemaining(timeLimit ? timeLimit * 60 : 0);
+    setQuizStarted(false);
+  };
 
   // Start quiz timer when quiz is started
   useEffect(() => {
@@ -190,7 +204,6 @@ export default function QuizPlayer({
       </div>
     );
   }
-
   if (quizCompleted) {
     return (
       <QuizResults
@@ -198,8 +211,14 @@ export default function QuizPlayer({
         totalQuestions={questions.length}
         answers={answers}
         questions={questions}
-        onRetake={() => router.refresh()}
-        onViewAll={() => router.push('/dashboard')}
+        onRetake={resetQuiz}
+        onViewAll={() => {
+          if (subject && topic) {
+            router.push(`/quiz/${subject}/${topic}`);
+          } else {
+            router.push('/dashboard');
+          }
+        }}
       />
     );
   }

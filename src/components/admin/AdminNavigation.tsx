@@ -13,9 +13,16 @@ import {
   ChevronLeft,
 } from 'lucide-react';
 
-export default function AdminNavigation() {
+interface AdminNavigationProps {
+  onCloseMobile?: () => void;
+}
+
+export default function AdminNavigation({
+  onCloseMobile,
+}: AdminNavigationProps) {
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const [theme] = useState<'light' | 'dark'>(() => {
     if (typeof window !== 'undefined') {
       return (localStorage.getItem('theme') as 'light' | 'dark') || 'dark';
@@ -23,9 +30,29 @@ export default function AdminNavigation() {
     return 'dark';
   });
 
-  // Apply theme changes
+  // Apply theme changes and check for mobile view
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark');
+
+    // Check if we're on mobile
+    const checkMobile = () => {
+      const mobileView = window.innerWidth < 768;
+      setIsMobile(mobileView);
+      // Auto-collapse sidebar on small screens
+      if (mobileView) {
+        setIsCollapsed(true);
+      }
+    };
+
+    // Initial check
+    checkMobile();
+
+    // Add resize listener
+    window.addEventListener('resize', checkMobile);
+
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
   }, [theme]);
 
   // Toggle sidebar function
@@ -33,36 +60,42 @@ export default function AdminNavigation() {
     setIsCollapsed(!isCollapsed);
   };
 
+  // Handle navigation item click on mobile to close the sidebar
+  const handleNavClick = () => {
+    if (isMobile && onCloseMobile) {
+      onCloseMobile();
+    }
+  };
   const navItems = [
     {
       name: 'Dashboard',
       path: '/admin',
-      icon: <LayoutDashboard className="mr-3" size={18} />,
+      icon: <LayoutDashboard className={isCollapsed ? '' : 'mr-3'} size={18} />,
     },
     {
       name: 'Users',
       path: '/admin/users',
-      icon: <Users className="mr-3" size={18} />,
+      icon: <Users className={isCollapsed ? '' : 'mr-3'} size={18} />,
     },
     {
       name: 'Content',
       path: '/admin/content',
-      icon: <BookOpen className="mr-3" size={18} />,
+      icon: <BookOpen className={isCollapsed ? '' : 'mr-3'} size={18} />,
     },
     {
       name: 'Achievements',
       path: '/admin/achievements',
-      icon: <Award className="mr-3" size={18} />,
+      icon: <Award className={isCollapsed ? '' : 'mr-3'} size={18} />,
     },
     {
       name: 'Analytics',
       path: '/admin/analytics',
-      icon: <BarChart3 className="mr-3" size={18} />,
+      icon: <BarChart3 className={isCollapsed ? '' : 'mr-3'} size={18} />,
     },
     {
       name: 'Settings',
       path: '/admin/settings',
-      icon: <Settings className="mr-3" size={18} />,
+      icon: <Settings className={isCollapsed ? '' : 'mr-3'} size={18} />,
     },
     {
       name: 'Logs',
@@ -70,7 +103,7 @@ export default function AdminNavigation() {
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          className="mr-3"
+          className={isCollapsed ? '' : 'mr-3'}
           width="18"
           height="18"
           viewBox="0 0 24 24"
@@ -94,7 +127,7 @@ export default function AdminNavigation() {
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          className="mr-3"
+          className={isCollapsed ? '' : 'mr-3'}
           width="18"
           height="18"
           viewBox="0 0 24 24"
@@ -123,7 +156,7 @@ export default function AdminNavigation() {
 
   return (
     <div
-      className={`${isCollapsed ? 'w-16' : 'w-64'} transition-all duration-300 min-h-screen bg-gray-900 dark:bg-gray-800 text-white p-4`}
+      className={`${isCollapsed ? 'w-16' : 'w-64'} transition-all duration-300 min-h-screen bg-gray-900 dark:bg-gray-800 text-white p-4 ${isMobile ? 'shadow-lg' : ''}`}
     >
       <div className="mb-8 flex items-center justify-between">
         {!isCollapsed && <h2 className="text-xl font-bold">EduBridge Admin</h2>}
@@ -146,16 +179,18 @@ export default function AdminNavigation() {
         <ul className="space-y-2">
           {navItems.map((item) => (
             <li key={item.name}>
+              {' '}
               <Link
                 href={item.path}
+                onClick={handleNavClick}
                 className={`flex items-center py-2 px-4 rounded transition-colors ${
                   isActive(item.path)
                     ? 'bg-blue-700 text-white dark:bg-blue-600'
                     : 'hover:bg-gray-800 dark:hover:bg-gray-700'
-                }`}
+                } ${isMobile ? 'active:bg-blue-800' : ''} ${isCollapsed ? 'justify-center' : ''}`}
               >
-                {item.icon}
-                {!isCollapsed && item.name}
+                <div className={isCollapsed ? 'mx-auto' : ''}>{item.icon}</div>
+                {!isCollapsed && <span className="text-sm">{item.name}</span>}
               </Link>
             </li>
           ))}
@@ -163,12 +198,16 @@ export default function AdminNavigation() {
       </nav>
 
       <div className="mt-auto pt-8">
+        {' '}
         <Link
           href="/dashboard"
-          className="flex items-center py-2 px-4 rounded hover:bg-gray-800 dark:hover:bg-gray-700 transition-colors text-gray-400 hover:text-white"
+          onClick={handleNavClick}
+          className={`flex items-center py-2 px-4 rounded hover:bg-gray-800 dark:hover:bg-gray-700 transition-colors text-gray-400 hover:text-white ${isCollapsed ? 'justify-center' : ''}`}
         >
-          <LogOut className="mr-3" size={18} />
-          {!isCollapsed && 'Exit Admin'}
+          <div className={isCollapsed ? 'mx-auto' : ''}>
+            <LogOut className={isCollapsed ? '' : 'mr-3'} size={18} />
+          </div>
+          {!isCollapsed && <span className="text-sm">Exit Admin</span>}
         </Link>
       </div>
     </div>

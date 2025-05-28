@@ -111,6 +111,22 @@ export async function submitQuizAttempt({
     // Log attempt data for debugging
     logger.log('Submitting quiz attempt:', { quizId, userId, score });
 
+    // Validate UUID format
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(userId)) {
+      logger.error('Invalid userId format:', userId);
+      throw new Error(
+        `Invalid userId format: ${userId}. Expected UUID format.`
+      );
+    }
+    if (!uuidRegex.test(quizId)) {
+      logger.error('Invalid quizId format:', quizId);
+      throw new Error(
+        `Invalid quizId format: ${quizId}. Expected UUID format.`
+      );
+    }
+
     // For now, we'll create a more resilient approach that doesn't depend on a specific table
     // First, check if the quiz_attempts table exists
     const { error: checkError } = await supabase
@@ -122,16 +138,14 @@ export async function submitQuizAttempt({
         return { data: null, error: err };
       }); // If we can't verify the table exists, store results in localStorage as a fallback
     if (checkError) {
-      logger.log('Using localStorage fallback for quiz results');
-      // Store in localStorage as fallback
+      logger.log('Using localStorage fallback for quiz results'); // Store in localStorage as fallback
       const attemptData = {
         id: `local-${Date.now()}`,
         quiz_id: quizId,
         user_id: userId,
         score: score,
         completed: true,
-        started_at: new Date().toISOString(),
-        completed_at: new Date().toISOString(),
+        created_at: new Date().toISOString(),
       };
 
       // Get existing attempts or initialize empty array
@@ -149,9 +163,7 @@ export async function submitQuizAttempt({
     const earnedXp = Math.round(score * 10); // 10 XP per correct answer
 
     // Update user stats for leaderboard
-    await updateUserStats(userId, earnedXp, true);
-
-    // If table exists, proceed with normal insert
+    await updateUserStats(userId, earnedXp, true); // If table exists, proceed with normal insert
     const { data: attemptData, error: attemptError } = await supabase
       .from('quiz_attempts')
       .insert([
@@ -160,24 +172,24 @@ export async function submitQuizAttempt({
           user_id: userId,
           score: score,
           completed: true,
-          started_at: new Date().toISOString(),
-          completed_at: new Date().toISOString(),
+          // Add additional fields that match your schema
+          quiz_title: null,
+          subject: null,
+          topic: null,
+          time_taken: null,
         },
       ])
       .select()
       .single();
     if (attemptError) {
-      logger.error('Insert error details:', attemptError);
-
-      // Fallback to localStorage if insert fails
+      logger.error('Insert error details:', attemptError); // Fallback to localStorage if insert fails
       const fallbackData = {
         id: `local-${Date.now()}`,
         quiz_id: quizId,
         user_id: userId,
         score: score,
         completed: true,
-        started_at: new Date().toISOString(),
-        completed_at: new Date().toISOString(),
+        created_at: new Date().toISOString(),
       };
 
       // Store in localStorage as fallback

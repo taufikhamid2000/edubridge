@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
+import { useOAuthRedirect } from '@/hooks/useOAuthRedirect';
 
 // Import dashboard components
 import WelcomeBanner from '@/components/dashboard/WelcomeBanner';
@@ -46,15 +47,30 @@ function DashboardClient() {
   const [categories, setCategories] = useState<string[]>([]);
   const subjectsPerPage = 6;
 
+  // Use OAuth redirect hook to handle clean URLs after OAuth
+  const { cleanUrlTokens } = useOAuthRedirect('/dashboard');
+
   useEffect(() => {
+    // Clean URL tokens immediately if present
+    cleanUrlTokens();
+
     const fetchData = async () => {
       const {
         data: { session },
+        error: sessionError,
       } = await supabase.auth.getSession();
+
+      if (sessionError) {
+        logger.error('Session error:', sessionError);
+        router.replace('/auth');
+        return;
+      }
+
       if (!session) {
         router.replace('/auth');
         return;
       }
+
       try {
         logger.log('Fetching subjects from Supabase...');
         // Fetch subjects from Supabase
@@ -122,9 +138,8 @@ function DashboardClient() {
         setLoading(false);
       }
     };
-
     fetchData();
-  }, [router]);
+  }, [router, cleanUrlTokens]);
 
   const handleSubjectClick = (slug: string) => {
     router.push(`/quiz/${slug}/chapters`);

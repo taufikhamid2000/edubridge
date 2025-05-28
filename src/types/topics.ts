@@ -34,6 +34,9 @@ export interface Quiz {
   verified: boolean;
   topic_id: string;
   email?: string;
+  display_name?: string;
+  subject_slug?: string; // Added for proper URL generation in profile page
+  topic_title?: string; // Added for display purposes
 }
 
 export interface Question {
@@ -63,6 +66,9 @@ export interface QuizAttempt {
   quiz_id: string;
   score: number;
   completed: boolean;
-  started_at: string;
-  completed_at?: string;
+  quiz_title?: string;
+  subject?: string;
+  topic?: string;
+  time_taken?: number;
+  created_at: string;
 }
