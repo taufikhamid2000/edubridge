@@ -48,6 +48,10 @@ export default function Auth() {
           redirectTo: window.location.origin + '/dashboard',
           // Specify scopes to ensure token refresh works correctly
           scopes: 'email profile',
+          // Use PKCE flow for better security and cleaner redirects
+          queryParams: {
+            prompt: 'select_account',
+          },
         },
       });
 

@@ -17,12 +17,38 @@ const queryClient = new QueryClient({
   },
 });
 
+/**
+ * Clean OAuth tokens from URL hash to ensure clean redirects
+ */
+const cleanOAuthTokensFromUrl = () => {
+  if (typeof window === 'undefined') return;
+
+  const hash = window.location.hash;
+
+  // Check if URL contains OAuth tokens
+  if (
+    hash &&
+    (hash.includes('access_token=') ||
+      hash.includes('refresh_token=') ||
+      hash.includes('expires_at=') ||
+      hash.includes('token_type='))
+  ) {
+    // Clean the URL by removing the hash
+    const cleanUrl = window.location.pathname + window.location.search;
+    window.history.replaceState(null, '', cleanUrl);
+    logger.info('Cleaned OAuth tokens from URL hash');
+  }
+};
+
 export default function Providers({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // Initialize console override in production
     if (process.env.NODE_ENV === 'production') {
       initConsoleOverride();
     }
+
+    // Clean URL immediately on mount if tokens are present
+    cleanOAuthTokensFromUrl();
 
     // Add a periodic session check to prevent token issues
     const checkInterval = setInterval(
@@ -48,10 +74,18 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       if (event === 'TOKEN_REFRESHED') {
         logger.info('Auth token refreshed successfully');
 
+        // Clean URL after token refresh
+        cleanOAuthTokensFromUrl();
+
         // Optional: Update query client to reflect newly authenticated state
         queryClient.invalidateQueries();
       } else if (event === 'SIGNED_IN') {
         logger.info('User signed in successfully');
+
+        // Clean URL after successful sign in
+        setTimeout(() => {
+          cleanOAuthTokensFromUrl();
+        }, 100); // Small delay to ensure Supabase has processed the tokens
       } else if (event === 'SIGNED_OUT') {
         logger.info('User signed out');
       } else if (event === 'USER_UPDATED') {
@@ -81,9 +115,20 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         }
       }
     });
+
+    // Additional cleanup on page visibility change (when user returns to tab)
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        setTimeout(cleanOAuthTokensFromUrl, 50);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
     return () => {
       subscription.unsubscribe();
       clearInterval(checkInterval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, []);
 

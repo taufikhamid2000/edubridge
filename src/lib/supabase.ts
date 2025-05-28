@@ -36,6 +36,9 @@ export const supabase = createClient(supabaseUrl || '', supabaseAnonKey || '', {
     autoRefreshToken: true,
     storageKey: 'edubridge-auth-storage-key',
     detectSessionInUrl: true,
+    // Optimize OAuth flow settings
+    flowType: 'pkce', // Use PKCE flow for better security
+    debug: process.env.NODE_ENV === 'development',
   },
   global: {
     // Add request headers for tracking the source environment
@@ -44,6 +47,14 @@ export const supabase = createClient(supabaseUrl || '', supabaseAnonKey || '', {
       'x-is-vercel':
         process.env.NEXT_PUBLIC_VERCEL_ENV === 'production' ? 'true' : 'false',
     },
+  },
+  db: {
+    schema: 'public',
+  },
+  realtime: {
+    // Optimize realtime settings
+    heartbeatIntervalMs: 30000,
+    reconnectAfterMs: (tries: number) => Math.min(tries * 1000, 30000),
   },
 });
 
