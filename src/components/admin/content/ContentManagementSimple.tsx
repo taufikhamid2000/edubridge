@@ -51,6 +51,9 @@ export interface ContentManagementProps<T> {
 
   // Base route for edit pages
   baseRoute?: string;
+
+  // Creation control
+  disableCreation?: boolean;
 }
 
 export default function ContentManagement<T extends { id: string }>({
@@ -83,6 +86,9 @@ export default function ContentManagement<T extends { id: string }>({
 
   // Base route for edit pages
   baseRoute = '',
+
+  // Creation control
+  disableCreation = false,
 }: ContentManagementProps<T>) {
   // Show/hide form state
   const [showNewItemForm, setShowNewItemForm] = useState(false);
@@ -250,19 +256,21 @@ export default function ContentManagement<T extends { id: string }>({
 
   return (
     <div>
+      {' '}
       {/* Header with title and add button */}
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold dark:text-white">
           {entityNamePlural} Management
         </h2>
-        <button
-          onClick={() => setShowNewItemForm(!showNewItemForm)}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600"
-        >
-          {showNewItemForm ? 'Cancel' : `Add New ${entityName}`}
-        </button>
+        {!disableCreation && (
+          <button
+            onClick={() => setShowNewItemForm(!showNewItemForm)}
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600"
+          >
+            {showNewItemForm ? 'Cancel' : `Add New ${entityName}`}
+          </button>
+        )}
       </div>
-
       {/* Search and filter controls */}
       <div className="mb-4">
         <SearchBar
@@ -286,7 +294,6 @@ export default function ContentManagement<T extends { id: string }>({
           onItemsPerPageChange={setItemsPerPage}
         />
       </div>
-
       {/* New item form */}
       {showNewItemForm && (
         <div className="mb-6 p-4 border rounded-lg dark:border-gray-700">
@@ -307,7 +314,6 @@ export default function ContentManagement<T extends { id: string }>({
           </form>
         </div>
       )}
-
       {/* Data table */}
       <DataTableCardView<T>
         data={paginatedItems}
@@ -320,7 +326,6 @@ export default function ContentManagement<T extends { id: string }>({
         isFiltered={isFilterApplied}
         actions={renderActions}
       />
-
       {/* Pagination controls */}
       {totalItems > 0 && (
         <div className="mt-4">

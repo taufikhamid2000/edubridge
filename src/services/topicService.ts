@@ -8,7 +8,7 @@ import { checkAdminAccess } from './adminAuthService';
 export interface Topic {
   id: string;
   chapter_id: string;
-  title: string;
+  name: string;
   order_index: number;
   created_at: string;
   updated_at: string;
@@ -101,7 +101,7 @@ export async function fetchAdminTopics(): Promise<{
  * @returns A promise with the created topic ID or error
  */
 export async function createTopic(topicData: {
-  title: string;
+  name: string;
   chapter_id: string;
   order_index?: number;
 }): Promise<{
@@ -132,13 +132,14 @@ export async function createTopic(topicData: {
         logger.error('Error getting max order index:', maxOrderError);
         return { id: null, error: maxOrderError };
       }
-
       orderIndex = maxOrderData ? maxOrderData.order_index + 1 : 0;
-    } // Insert the new topic
+    }
+
+    // Insert the new topic
     const { data, error } = await supabase
       .from('topics')
       .insert({
-        title: topicData.title,
+        name: topicData.name,
         chapter_id: topicData.chapter_id,
         order_index: orderIndex,
       })

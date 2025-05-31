@@ -37,15 +37,14 @@ export default function TopicManagement({
       return chapter ? chapter.title : 'Unknown Chapter';
     },
     [chapters]
-  );
-  // Define columns for data table
+  ); // Define columns for data table
   const columns: Column<Topic>[] = [
     {
-      key: 'title',
+      key: 'name',
       header: 'Title',
       render: (topic: Topic) => (
         <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-          {topic.title}
+          {topic.name}
         </div>
       ),
     },
@@ -68,16 +67,15 @@ export default function TopicManagement({
       ),
     },
   ];
-
   // Define card fields for mobile view
   const cardFields: CardField<Topic>[] = [
     {
-      key: 'title',
+      key: 'name',
       label: 'Title',
       isHeader: true,
       render: (topic: Topic) => (
         <div className="text-base font-medium text-gray-900 dark:text-gray-100">
-          {topic.title}
+          {topic.name}
         </div>
       ),
     },
@@ -99,10 +97,9 @@ export default function TopicManagement({
         </div>
       ),
     },
-  ];
-  // Initial form state
+  ]; // Initial form state
   const initialFormState = {
-    title: '',
+    name: '',
     chapter_id: '',
   };
 
@@ -123,11 +120,11 @@ export default function TopicManagement({
         <input
           id="topic-title"
           type="text"
-          value={String(formState.title || '')}
+          value={String(formState.name || '')}
           onChange={(e) =>
             setFormState({
               ...formState,
-              title: e.target.value,
+              name: e.target.value,
             })
           }
           className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
@@ -174,13 +171,13 @@ export default function TopicManagement({
     // Validate chapter selection
     if (!item.chapter_id) {
       return { id: null, error: new Error('Please select a chapter') };
-    } // Convert the generic item to the shape expected by createTopic
+    }
+    // Convert the generic item to the shape expected by createTopic
     return createTopic({
-      title: String(item.title || ''),
+      name: String(item.name || ''),
       chapter_id: String(item.chapter_id),
     });
   };
-
   return (
     <ContentManagement<Topic>
       // Core data
@@ -199,11 +196,12 @@ export default function TopicManagement({
       refreshItems={refreshTopics}
       createItem={createItemAdapter}
       deleteItem={deleteTopic}
-      // Form handling
+      // Navigation
+      baseRoute="/admin/content/topics" // Form handling
       initialFormState={initialFormState}
       renderForm={renderTopicForm}
       // Search functionality
-      searchField="title"
+      searchField="name"
     />
   );
 }

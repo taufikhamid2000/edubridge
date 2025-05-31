@@ -344,7 +344,6 @@ export default function QuizManagement({
 
     return { success: true, error: null };
   };
-
   return (
     <ContentManagement<Quiz>
       // Core data
@@ -369,6 +368,8 @@ export default function QuizManagement({
       searchField="name"
       // Base route for edit pages (for future use)
       baseRoute="/admin/quizzes"
+      // Disable creation since quizzes should be created through quiz builder
+      disableCreation={true}
     />
   );
 }

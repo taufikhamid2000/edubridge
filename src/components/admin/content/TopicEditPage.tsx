@@ -239,20 +239,13 @@ export default function TopicEditPage() {
     { key: 'updated_at', label: 'Last updated' },
     { key: 'id', label: 'ID' },
   ];
-
   // Render quizzes tab content
   const renderQuizzesTab = () => (
     <div>
-      <div className="flex justify-between items-center mb-4">
+      <div className="mb-4">
         <h2 className="text-lg font-medium text-gray-900 dark:text-white">
           Quizzes
         </h2>
-        <Link
-          href={`/admin/content/quizzes/new?topic=${topicId}`}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600"
-        >
-          Add New Quiz
-        </Link>
       </div>
 
       {quizzes.length === 0 ? (

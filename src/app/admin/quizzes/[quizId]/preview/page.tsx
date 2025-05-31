@@ -55,9 +55,12 @@ export default function AdminQuizPreviewPage() {
         .from('quizzes')
         .select(
           `
-          *,
-          subjects(name),
-          topics(name)
+          *,          topics(
+            name,
+            chapters(
+              subjects(name)
+            )
+          )
         `
         )
         .eq('id', quizId)
@@ -68,15 +71,13 @@ export default function AdminQuizPreviewPage() {
       if (!quizData) {
         setError('Quiz not found');
         return;
-      }
-
-      // Format quiz data
+      } // Format quiz data
       const formattedQuiz: QuizData = {
         id: quizData.id,
-        title: quizData.title,
+        title: quizData.name, // quizzes table has 'name' column
         description: quizData.description,
-        subject_name: quizData.subjects?.name,
-        topic_name: quizData.topics?.name,
+        subject_name: quizData.topics?.chapters?.subjects?.name,
+        topic_name: quizData.topics?.name, // topics table has 'name' column
         difficulty: quizData.difficulty,
         time_limit: quizData.time_limit,
         passing_score: quizData.passing_score,
@@ -175,10 +176,9 @@ export default function AdminQuizPreviewPage() {
       setCurrentQuestionIndex(currentQuestionIndex - 1);
     }
   }
-
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <div className="flex">
           <AdminNavigation />
           <div className="flex-1 p-8 flex items-center justify-center">
@@ -188,20 +188,19 @@ export default function AdminQuizPreviewPage() {
       </div>
     );
   }
-
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <div className="flex">
           <AdminNavigation />
           <div className="flex-1 p-8">
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6">
+            <div className="bg-red-100 dark:bg-red-900/20 border border-red-400 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded relative mb-6">
               <span className="block sm:inline">{error}</span>
             </div>
             <div className="text-center">
               <button
                 onClick={() => router.push('/admin/quizzes')}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white rounded"
               >
                 Back to Quizzes
               </button>
@@ -211,10 +210,9 @@ export default function AdminQuizPreviewPage() {
       </div>
     );
   }
-
   if (questions.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <div className="flex">
           <AdminNavigation />
           <div className="flex-1 p-8">
@@ -222,21 +220,21 @@ export default function AdminQuizPreviewPage() {
               <div>
                 <Link
                   href={`/admin/quizzes/${quizId}/questions`}
-                  className="text-blue-600 hover:text-blue-800 mb-2 inline-flex items-center"
+                  className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 mb-2 inline-flex items-center"
                 >
                   ← Back to Questions
                 </Link>
-                <h1 className="text-3xl font-bold">
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
                   {quiz?.title || 'Quiz'}: Preview
                 </h1>
               </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
               <div className="text-center py-10">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="mx-auto h-12 w-12 text-gray-400"
+                  className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -248,10 +246,10 @@ export default function AdminQuizPreviewPage() {
                     d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
                   />
                 </svg>
-                <h2 className="mt-2 text-lg font-medium">
+                <h2 className="mt-2 text-lg font-medium text-gray-900 dark:text-white">
                   No questions added yet
                 </h2>
-                <p className="mt-1 text-gray-500">
+                <p className="mt-1 text-gray-500 dark:text-gray-400">
                   {' '}
                   This quiz doesn&apos;t have any questions. Add some questions
                   before previewing.
@@ -259,7 +257,7 @@ export default function AdminQuizPreviewPage() {
                 <div className="mt-6">
                   <Link
                     href={`/admin/quizzes/${quizId}/questions`}
-                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white rounded"
                   >
                     Add Questions
                   </Link>
@@ -273,9 +271,8 @@ export default function AdminQuizPreviewPage() {
   }
 
   const currentQuestion = questions[currentQuestionIndex];
-
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="flex">
         <AdminNavigation />
         <div className="flex-1 p-8">
@@ -284,21 +281,21 @@ export default function AdminQuizPreviewPage() {
               {' '}
               <Link
                 href={`/admin/quizzes/${quizId}/questions`}
-                className="text-blue-600 hover:text-blue-800 mb-2 inline-flex items-center"
+                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 mb-2 inline-flex items-center"
               >
                 ← Back to Questions
               </Link>
-              <h1 className="text-3xl font-bold">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
                 {quiz?.title || 'Quiz'}: Preview
               </h1>
-              <div className="text-gray-500 mt-1">
+              <div className="text-gray-500 dark:text-gray-400 mt-1">
                 {quiz?.subject_name} / {quiz?.topic_name}
               </div>
             </div>
             <div>
               <Link
                 href={`/admin/quizzes/${quizId}/questions`}
-                className="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700"
+                className="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 text-white py-2 px-4 rounded"
               >
                 Manage Questions
               </Link>
@@ -306,24 +303,24 @@ export default function AdminQuizPreviewPage() {
             <div>
               <Link
                 href={`/admin/quizzes/${quizId}/questions`}
-                className="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700"
+                className="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 text-white py-2 px-4 rounded"
               >
                 Manage Questions
               </Link>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow overflow-hidden mb-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden mb-6">
             <div className="p-6">
               <div className="flex justify-between items-center mb-6">
                 <div>
                   <span
                     className={`inline-block px-2 py-1 text-xs font-semibold rounded-full ${
                       (quiz?.difficulty || 'medium') === 'easy'
-                        ? 'bg-green-100 text-green-800'
+                        ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
                         : (quiz?.difficulty || 'medium') === 'medium'
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-red-100 text-red-800'
+                          ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                          : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
                     }`}
                   >
                     {quiz?.difficulty
@@ -331,19 +328,18 @@ export default function AdminQuizPreviewPage() {
                         quiz.difficulty.slice(1)
                       : 'Medium'}
                   </span>
-                  <span className="ml-2 text-gray-500 text-sm">
+                  <span className="ml-2 text-gray-500 dark:text-gray-400 text-sm">
                     {Math.floor((quiz?.time_limit || 0) / 60)} min{' '}
                     {(quiz?.time_limit || 0) % 60} sec
                   </span>
                 </div>{' '}
-                <div className="text-sm font-medium">
+                <div className="text-sm font-medium text-gray-900 dark:text-white">
                   Question {currentQuestionIndex + 1} of{' '}
                   {questions?.length || 0}
                 </div>
-              </div>
-
+              </div>{' '}
               <div className="mb-8">
-                <h2 className="text-xl font-medium mb-4">
+                <h2 className="text-xl font-medium mb-4 text-gray-900 dark:text-white">
                   {currentQuestion?.text}
                 </h2>
 
@@ -384,7 +380,7 @@ export default function AdminQuizPreviewPage() {
                       )}
                       <label
                         htmlFor={`answer-${answer.id}`}
-                        className="ml-3 text-gray-700"
+                        className="ml-3 text-gray-700 dark:text-gray-300"
                       >
                         {answer.text}
                       </label>
@@ -423,27 +419,26 @@ export default function AdminQuizPreviewPage() {
                   ))}
                 </div>
               </div>
-
               <div className="flex justify-between">
+                {' '}
                 <button
                   onClick={handlePreviousQuestion}
                   disabled={currentQuestionIndex === 0}
                   className={`px-4 py-2 rounded ${
                     currentQuestionIndex === 0
-                      ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                      : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                      ? 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+                      : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'
                   }`}
                 >
                   Previous
                 </button>
-
                 <button
                   onClick={handleNextQuestion}
                   disabled={currentQuestionIndex === questions.length - 1}
                   className={`px-4 py-2 rounded ${
                     currentQuestionIndex === questions.length - 1
-                      ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                      : 'bg-blue-600 text-white hover:bg-blue-700'
+                      ? 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+                      : 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white'
                   }`}
                 >
                   Next
@@ -452,11 +447,11 @@ export default function AdminQuizPreviewPage() {
             </div>
           </div>
 
-          <div className="bg-blue-50 rounded-lg p-6 border border-blue-200">
-            <h3 className="font-medium text-blue-800 mb-2">
+          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-6 border border-blue-200 dark:border-blue-800">
+            <h3 className="font-medium text-blue-800 dark:text-blue-200 mb-2">
               Preview Mode Notice
             </h3>
-            <p className="text-blue-700 text-sm">
+            <p className="text-blue-700 dark:text-blue-300 text-sm">
               You are viewing this quiz in admin preview mode. Correct answers
               are marked for your review. Students taking this quiz will not see
               which answers are correct until after submission.

@@ -4,6 +4,8 @@ import {
   fetchDashboardStats,
   DashboardStats,
 } from '@/services/dashboardStatsService';
+import { getAuditDashboardStats } from '@/services/auditService';
+import type { QuizWithAudit, AuditDashboardStats } from '@/types/audit';
 
 interface StatsCard {
   title: string;
@@ -14,20 +16,26 @@ interface StatsCard {
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [auditStats, setAuditStats] = useState<AuditDashboardStats | null>(
+    null
+  );
   const [loading, setLoading] = useState<boolean>(true);
-
   useEffect(() => {
     async function fetchAdminStats() {
       setLoading(true);
       try {
-        // Use optimized dashboard stats service instead of individual queries
-        const { data: dashboardStats, error } = await fetchDashboardStats();
+        // Fetch both dashboard stats and audit stats in parallel
+        const [dashboardResult, auditResult] = await Promise.all([
+          fetchDashboardStats(),
+          getAuditDashboardStats(),
+        ]);
 
-        if (error) {
-          throw error;
+        if (dashboardResult.error) {
+          throw dashboardResult.error;
         }
 
-        setStats(dashboardStats);
+        setStats(dashboardResult.data);
+        setAuditStats(auditResult);
       } catch (error) {
         logger.error('Error fetching admin stats:', error);
       } finally {
@@ -109,8 +117,117 @@ export default function AdminDashboard() {
               </svg>
             </div>
           }
-        />
+        />{' '}
       </div>{' '}
+      {/* Audit System Statistics */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-8">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold dark:text-gray-100">
+            Quiz Audit System
+          </h2>
+          <a
+            href="/admin/quizzes"
+            className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-medium"
+          >
+            View All Quizzes →
+          </a>
+        </div>
+
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="animate-pulse">
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-2"></div>
+                <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-2"></div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+                  {auditStats?.total_unverified_quizzes || 0}
+                </div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">
+                  Unverified Quizzes
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-red-600 dark:text-red-400">
+                  {auditStats?.total_pending_comments || 0}
+                </div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">
+                  Pending Comments
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                  {auditStats?.total_verified_today || 0}
+                </div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">
+                  Verified Today
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                  {auditStats?.total_rejected_today || 0}
+                </div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">
+                  Rejected Today
+                </div>
+              </div>
+            </div>
+
+            {/* Quizzes Needing Review */}
+            {auditStats?.quizzes_needing_review &&
+              auditStats.quizzes_needing_review.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-medium dark:text-gray-200 mb-3">
+                    Quizzes Needing Review
+                  </h3>
+                  <div className="space-y-2">
+                    {auditStats.quizzes_needing_review.map(
+                      (quiz: QuizWithAudit) => (
+                        <div
+                          key={quiz.id}
+                          className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg"
+                        >
+                          <div className="flex-1">
+                            <h4 className="font-medium dark:text-gray-100">
+                              {quiz.name}
+                            </h4>{' '}
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                              Created{' '}
+                              {new Date(quiz.created_at).toLocaleDateString()}
+                            </p>
+                          </div>
+                          <div className="flex items-center space-x-3">
+                            {' '}
+                            {(quiz.unresolved_comments_count || 0) > 0 && (
+                              <span className="bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 text-xs px-2 py-1 rounded-full">
+                                {quiz.unresolved_comments_count} comment
+                                {quiz.unresolved_comments_count !== 1
+                                  ? 's'
+                                  : ''}
+                              </span>
+                            )}
+                            <a
+                              href={`/admin/quizzes/${quiz.id}/audit`}
+                              className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-1 rounded"
+                            >
+                              Review
+                            </a>
+                          </div>
+                        </div>
+                      )
+                    )}
+                  </div>
+                </div>
+              )}
+          </>
+        )}
+      </div>
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-8">
         <h2 className="text-xl font-semibold mb-4 dark:text-gray-100">
           Recent Activities

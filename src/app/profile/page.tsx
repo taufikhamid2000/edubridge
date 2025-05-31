@@ -129,7 +129,7 @@ function ProfileContent() {
               *,
               topics!inner(
                 id,
-                title,
+                name,
                 chapters!inner(
                   id,
                   subjects!inner(
@@ -157,7 +157,7 @@ function ProfileContent() {
           topic_id: string;
           topics?: {
             id: string;
-            title: string;
+            name: string;
             chapters?: {
               id: string;
               subjects?: {
@@ -172,7 +172,7 @@ function ProfileContent() {
         ).map((quiz) => ({
           ...quiz,
           subject_slug: quiz.topics?.chapters?.subjects?.slug,
-          topic_title: quiz.topics?.title,
+          topic_title: quiz.topics?.name,
         }));
 
         setCreatedQuizzes(transformedQuizzes);

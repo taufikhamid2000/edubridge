@@ -21,13 +21,12 @@ export default function ChapterList({
       ...prev,
       [chapterId]: !prev[chapterId],
     }));
-
     if (!topics[chapterId]) {
       // Fetch topics for the chapter if not already fetched
       const { data, error } = await supabase
         .from('topics')
         .select(
-          'id, title, description, difficulty_level, time_estimate_minutes, order_index'
+          'id, name, description, difficulty_level, time_estimate_minutes, order_index'
         )
         .eq('chapter_id', chapterId)
         .order('order_index', { ascending: true });
@@ -82,7 +81,7 @@ export default function ChapterList({
                                 href={`/quiz/${subject}/${topic.id}`}
                                 className="text-green-500 hover:underline"
                               >
-                                {topic.title}
+                                {topic.name}
                               </Link>
                               <p className="text-sm text-gray-600 dark:text-gray-400">
                                 {topic.description ||

@@ -65,9 +65,12 @@ export default function AdminQuizStatsPage() {
       const { data: quizzesData, error: quizzesError } = await supabase.from(
         'quizzes'
       ).select(`
-          id, title, difficulty, question_count, time_limit,
-          subjects(name),
-          topics(name)
+          id, name, difficulty, question_count, time_limit,          topics(
+            name,
+            chapters(
+              subjects(name)
+            )
+          )
         `);
 
       if (quizzesError) throw quizzesError;
@@ -77,27 +80,31 @@ export default function AdminQuizStatsPage() {
         .from('quiz_attempts')
         .select('quiz_id, score, completed');
 
-      if (attemptsError) throw attemptsError;
+      if (attemptsError) throw attemptsError; // Process data for quiz statistics
+      const quizStatsMap: Record<string, QuizStats> = {};
 
-      // Process data for quiz statistics
-      const quizStatsMap: Record<string, QuizStats> = {}; // Initialize quiz stats
+      // Initialize quiz stats
       // Explicitly type the quiz objects
       (
         quizzesData as Array<{
           id: string;
-          title: string;
+          name: string; // quizzes table has 'name' column
           difficulty: string;
           question_count?: number;
           time_limit?: number;
-          subjects?: { name?: string } | null;
-          topics?: { name?: string } | null;
+          topics?: {
+            name?: string; // topics table has 'name' column
+            chapters?: {
+              subjects?: { name?: string } | null;
+            } | null;
+          } | null;
         }>
       ).forEach((quiz) => {
         quizStatsMap[quiz.id] = {
           id: quiz.id,
-          title: quiz.title,
-          subject_name: quiz.subjects?.name || 'Unknown',
-          topic_name: quiz.topics?.name || 'Unknown',
+          title: quiz.name, // Use quiz.name instead of quiz.title
+          subject_name: quiz.topics?.chapters?.subjects?.name || 'Unknown',
+          topic_name: quiz.topics?.name || 'Unknown', // Use topics.name
           difficulty: quiz.difficulty,
           completion_rate: 0,
           avg_score: 0,
@@ -226,23 +233,24 @@ export default function AdminQuizStatsPage() {
 
     return matchesSearch && matchesDifficulty;
   });
-
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="flex">
         <AdminNavigation />
         <div className="flex-1 p-8">
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h1 className="text-3xl font-bold">Quiz Statistics</h1>
-              <p className="text-gray-500 mt-1">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                Quiz Statistics
+              </h1>
+              <p className="text-gray-500 dark:text-gray-400 mt-1">
                 Performance metrics and completion rates for all quizzes
               </p>
             </div>
             <div>
               <Link
                 href="/admin/quizzes"
-                className="text-blue-600 hover:text-blue-800"
+                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
               >
                 ← Back to Quiz Management
               </Link>

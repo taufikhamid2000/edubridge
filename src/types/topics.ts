@@ -1,6 +1,6 @@
 export interface Topic {
   id: string;
-  title: string;
+  name: string;
   description: string | null;
   difficulty_level: number | null;
   time_estimate_minutes: number | null;

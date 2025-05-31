@@ -188,16 +188,14 @@ export async function fetchAdminQuizzes(): Promise<{
             accessError?.message || 'Authentication required. Please log in.',
         },
       };
-    }
-
-    // Fetch quizzes with topic details
+    } // Fetch quizzes with topic details
     const { data, error } = await supabase
       .from('quizzes')
       .select(
         `
         *,
         topics (
-          title,
+          name,
           id
         )
       `
@@ -212,12 +210,10 @@ export async function fetchAdminQuizzes(): Promise<{
           message: error.message || 'Unknown error in fetchAdminQuizzes',
         },
       };
-    }
-
-    // Format quiz data
+    } // Format quiz data
     const formattedQuizzes: Quiz[] = data.map((quiz) => ({
       ...quiz,
-      topic_title: quiz.topics?.title || 'Unknown Topic',
+      topic_title: quiz.topics?.name || 'Unknown Topic',
       topic_id: quiz.topics?.id || quiz.topic_id,
     }));
 
