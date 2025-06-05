@@ -39,7 +39,7 @@ export async function getChaptersBySubjectSlug(subjectSlug: string) {
   // Step 2: Fetch chapters using the subject ID with a more optimized select
   const { data: chaptersData, error: chaptersError } = await supabase
     .from('chapters')
-    .select('id, title, form, order_index')
+    .select('id, name, form, order_index')
     .eq('subject_id', subjectId)
     .order('form', { ascending: true })
     .order('order_index', { ascending: true });

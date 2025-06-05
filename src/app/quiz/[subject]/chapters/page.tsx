@@ -8,9 +8,8 @@ import ChapterList from '@/components/ChapterList';
 export default function ChaptersPage() {
   const params = useParams();
   const subject = params?.subject;
-
   const [chapters, setChapters] = useState<
-    { id: number; title: string; form: number }[]
+    { id: number; name: string; form: number }[]
   >([]);
   const [subjectData, setSubjectData] = useState<{
     id: number;
@@ -37,16 +36,21 @@ export default function ChaptersPage() {
         return getChaptersBySubjectSlug(subjectString);
       })
       .then((data) => {
-        setChapters(
-          data.map((chapter) => ({
-            ...chapter,
-            form: chapter.form !== undefined ? chapter.form : 0,
-          }))
-        );
-        setError(null);
+        if (Array.isArray(data)) {
+          setChapters(
+            data.map((chapter) => ({
+              ...chapter,
+              form: chapter.form !== undefined ? chapter.form : 0,
+            }))
+          );
+          setError(null);
+        } else {
+          throw new Error('Invalid data format received from server');
+        }
       })
-      .catch(() => {
-        setError('Failed to load data. Please try again later.');
+      .catch((err) => {
+        console.error('Error loading chapters:', err);
+        setError(err.message || 'Failed to load data. Please try again later.');
       });
   }, [subject, subjectString]);
 
