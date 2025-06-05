@@ -25,7 +25,7 @@ interface Subject {
 interface Chapter {
   id: string;
   subject_id: string;
-  title: string;
+  name: string;
   form: number;
   order_index: number;
   created_at: string;
@@ -359,7 +359,7 @@ export default function SubjectEditPage() {
                 <tr key={chapter.id}>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900 dark:text-white">
-                      {chapter.title}
+                      {chapter.name}
                     </div>
                   </td>
                   <td className="px-6 py-4">

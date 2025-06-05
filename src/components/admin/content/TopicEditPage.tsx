@@ -28,7 +28,7 @@ interface Quiz {
 
 interface Chapter {
   id: string;
-  title: string;
+  name: string;
   subject_id: string;
 }
 
@@ -74,19 +74,24 @@ export default function TopicEditPage() {
 
       if (!topic) {
         throw new Error(`Topic with ID ${id} not found`);
-      }
-
-      // Fetch all chapters for the dropdown
+      } // Fetch all chapters for the dropdown
       const { data: chaptersData, error: chaptersError } = await supabase
         .from('chapters')
-        .select('id, title, subject_id')
-        .order('title', { ascending: true });
+        .select('id, name, subject_id')
+        .order('name', { ascending: true });
 
       if (chaptersError) {
         throw new Error(`Failed to fetch chapters: ${chaptersError.message}`);
       }
 
-      setChapters(chaptersData || []);
+      // Map the data to match our new Chapter interface
+      setChapters(
+        (chaptersData || []).map((chapter) => ({
+          id: chapter.id,
+          name: chapter.name,
+          subject_id: chapter.subject_id,
+        }))
+      );
 
       // Get parent chapter and subject info
       if (topic.chapter_id) {
@@ -220,7 +225,7 @@ export default function TopicEditPage() {
       type: 'select',
       options: chapters.map((chapter) => ({
         value: chapter.id,
-        label: chapter.title,
+        label: chapter.name,
       })),
       required: true,
     },
@@ -330,7 +335,7 @@ export default function TopicEditPage() {
 
     const chapter = chapters.find((c) => c.id === topic.chapter_id);
     if (chapter) {
-      return `Back to ${chapter.title}`;
+      return `Back to ${chapter.name}`;
     }
 
     return 'Back to Content';

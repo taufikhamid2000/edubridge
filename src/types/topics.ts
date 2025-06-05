@@ -11,7 +11,7 @@ export interface Topic {
 export interface Chapter {
   id: string;
   form: number;
-  title: string;
+  name: string; // Was previously called 'title', standardized as part of field naming conventions
   order_index: number;
 }
 

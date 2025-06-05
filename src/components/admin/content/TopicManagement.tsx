@@ -27,14 +27,13 @@ export default function TopicManagement({
   // Debug: Log chapters data
   console.log('TopicManagement - chapters data:', {
     chaptersCount: chapters.length,
-    chapters: chapters.map((c) => ({ id: c.id, title: c.title })),
+    chapters: chapters.map((c) => ({ id: c.id, title: c.name })), // Using name but keeping title in the debug output
   });
-
   // Function to get chapter title by ID
   const getChapterTitle = useCallback(
     (chapterId: string) => {
       const chapter = chapters.find((c) => c.id === chapterId);
-      return chapter ? chapter.title : 'Unknown Chapter';
+      return chapter ? chapter.name : 'Unknown Chapter';
     },
     [chapters]
   ); // Define columns for data table
@@ -153,10 +152,10 @@ export default function TopicManagement({
           disabled={loading}
           required
         >
-          <option value="">Select a Chapter</option>
+          <option value="">Select a Chapter</option>{' '}
           {chapters.map((chapter) => (
             <option key={chapter.id} value={chapter.id}>
-              {chapter.title}
+              {chapter.name}
             </option>
           ))}{' '}
         </select>

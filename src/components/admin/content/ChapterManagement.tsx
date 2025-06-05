@@ -35,28 +35,28 @@ export default function ChapterManagement({
 }: ChapterManagementProps) {
   const [showNewChapterForm, setShowNewChapterForm] = useState(false);
   const [newChapter, setNewChapter] = useState({
-    title: '',
+    name: '', // Previously called 'title'
     subject_id: '',
     form: 4,
   }); // Pagination, filtering and sorting state
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
-  const [selectedSort, setSelectedSort] = useState('title');
+  const [selectedSort, setSelectedSort] = useState('name');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   // Dropdown filters
   const [subjectFilter, setSubjectFilter] = useState<string>('all');
   const [formFilter, setFormFilter] = useState<number | 'all'>('all');
   // Sort options for the chapters
   const sortOptions = [
-    { id: 'title', label: 'Title' },
+    { id: 'name', label: 'Title' },
     { id: 'subject', label: 'Subject' },
     { id: 'form', label: 'Form' },
   ]; // Filter and sort chapters
   const filteredChapters = useMemo(() => {
     // First filter by search term
     let filtered = chapters.filter((chapter) =>
-      chapter.title.toLowerCase().includes(searchTerm.toLowerCase())
+      chapter.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     // Then apply the subject filter
@@ -69,13 +69,11 @@ export default function ChapterManagement({
     // Then apply the form filter
     if (formFilter !== 'all') {
       filtered = filtered.filter((chapter) => chapter.form === formFilter);
-    }
-
-    // Sort the filtered results
+    } // Sort the filtered results
     return filtered.sort((a, b) => {
       let comparison = 0;
-      if (selectedSort === 'title') {
-        comparison = a.title.localeCompare(b.title);
+      if (selectedSort === 'name') {
+        comparison = a.name.localeCompare(b.name);
       } else if (selectedSort === 'subject') {
         const subjectA =
           subjects.find((s) => s.id === a.subject_id)?.name || '';
@@ -123,36 +121,33 @@ export default function ChapterManagement({
       setLoading(true);
       setError(null);
 
-      if (!newChapter.title.trim()) {
+      if (!newChapter.name.trim()) {
         setError('Chapter title is required');
         return;
       }
       if (!newChapter.subject_id) {
         setError('Subject selection is required');
         return;
-      }
-
-      // Check for duplicate chapter title within the same subject and form
+      } // Check for duplicate chapter name within the same subject and form
       const existingChapter = chapters.find(
         (chapter) =>
-          chapter.title.toLowerCase().trim() ===
-            newChapter.title.toLowerCase().trim() &&
+          chapter.name.toLowerCase().trim() ===
+            newChapter.name.toLowerCase().trim() &&
           chapter.subject_id === newChapter.subject_id &&
           chapter.form === newChapter.form
       );
-
       if (existingChapter) {
         const subjectName =
           subjects.find((s) => s.id === newChapter.subject_id)?.name ||
           'Unknown Subject';
         setError(
-          `A chapter with the title "${newChapter.title}" already exists for ${subjectName} Form ${newChapter.form}`
+          `A chapter with the name "${newChapter.name}" already exists for ${subjectName} Form ${newChapter.form}`
         );
         return;
       }
 
       const { id, error } = await createChapter({
-        title: newChapter.title,
+        name: newChapter.name,
         subject_id: newChapter.subject_id,
         form: newChapter.form,
       });
@@ -163,13 +158,11 @@ export default function ChapterManagement({
 
       if (!id) {
         throw new Error('Failed to create chapter');
-      }
-
-      // Refresh chapters list
+      } // Refresh chapters list
       await refreshChapters(); // Reset form and hide it
-      setNewChapter({ title: '', subject_id: '', form: 4 });
+      setNewChapter({ name: '', subject_id: '', form: 4 });
       setShowNewChapterForm(false);
-      setSuccessMessage(`Chapter "${newChapter.title}" created successfully!`);
+      setSuccessMessage(`Chapter "${newChapter.name}" created successfully!`);
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
@@ -178,10 +171,9 @@ export default function ChapterManagement({
     } finally {
       setLoading(false);
     }
-  };
-  // Function to handle chapter deletion
-  const handleDeleteChapter = async (id: string, title: string) => {
-    if (!confirm(`Are you sure you want to delete the chapter "${title}"?`)) {
+  }; // Function to handle chapter deletion
+  const handleDeleteChapter = async (id: string, name: string) => {
+    if (!confirm(`Are you sure you want to delete the chapter "${name}"?`)) {
       return;
     }
 
@@ -201,7 +193,7 @@ export default function ChapterManagement({
 
       // Refresh the chapter list
       await refreshChapters();
-      setSuccessMessage(`Chapter "${title}" deleted successfully`);
+      setSuccessMessage(`Chapter "${name}" deleted successfully`);
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
@@ -211,15 +203,14 @@ export default function ChapterManagement({
       setLoading(false);
     }
   };
-
   // Define columns for DataTableCardView
   const columns: Column<Chapter>[] = [
     {
-      key: 'title',
+      key: 'name',
       header: 'Title',
       render: (chapter) => (
         <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-          {chapter.title}
+          {chapter.name}
         </div>
       ),
     },
@@ -242,16 +233,15 @@ export default function ChapterManagement({
       ),
     },
   ];
-
   // Define card fields for mobile view
   const cardFields: CardField<Chapter>[] = [
     {
-      key: 'title',
+      key: 'name',
       label: 'Title',
       isHeader: true,
       render: (chapter) => (
         <div className="text-base font-medium text-gray-900 dark:text-gray-100">
-          {chapter.title}
+          {chapter.name}
         </div>
       ),
     },
@@ -274,7 +264,6 @@ export default function ChapterManagement({
       ),
     },
   ];
-
   // Actions render function
   const renderActions = (chapter: Chapter) => (
     <>
@@ -285,7 +274,7 @@ export default function ChapterManagement({
         Edit
       </Link>
       <button
-        onClick={() => handleDeleteChapter(chapter.id, chapter.title)}
+        onClick={() => handleDeleteChapter(chapter.id, chapter.name)}
         className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
       >
         Delete
@@ -392,19 +381,19 @@ export default function ChapterManagement({
           <form onSubmit={handleCreateChapter}>
             <div className="mb-3">
               <label
-                htmlFor="chapter-title"
+                htmlFor="chapter-name"
                 className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
               >
                 Chapter Title
               </label>
               <input
-                id="chapter-title"
+                id="chapter-name"
                 type="text"
-                value={newChapter.title}
+                value={newChapter.name}
                 onChange={(e) =>
                   setNewChapter({
                     ...newChapter,
-                    title: e.target.value,
+                    name: e.target.value,
                   })
                 }
                 className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"

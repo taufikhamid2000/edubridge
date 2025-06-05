@@ -8,7 +8,7 @@ import { checkAdminAccess } from './adminAuthService';
 export interface Chapter {
   id: string;
   subject_id: string;
-  title: string;
+  name: string; // Was previously called 'title', standardized as part of field naming conventions
   form: number;
   order_index: number;
   created_at: string;
@@ -30,16 +30,14 @@ export async function fetchAdminChapters(): Promise<{
 
     if (!success) {
       return { data: null, error };
-    }
-
-    // User is confirmed as admin, proceed with fetch
+    } // User is confirmed as admin, proceed with fetch
     console.log('Fetching chapters as admin...');
 
     // Get all chapters
     const { data: chapters, error: chaptersError } = await supabase
       .from('chapters')
       .select('*')
-      .order('title', { ascending: true });
+      .order('name', { ascending: true });
 
     if (chaptersError) {
       logger.error('Error fetching chapters:', chaptersError);
@@ -102,7 +100,7 @@ export async function fetchAdminChapters(): Promise<{
  * @returns A promise with the created chapter ID or error
  */
 export async function createChapter(chapterData: {
-  title: string;
+  name: string; // Previously called 'title'
   subject_id: string;
   form: number;
   order_index?: number;
@@ -142,7 +140,7 @@ export async function createChapter(chapterData: {
     const { data, error } = await supabase
       .from('chapters')
       .insert({
-        title: chapterData.title,
+        name: chapterData.name, // Previously called 'title'
         subject_id: chapterData.subject_id,
         form: chapterData.form,
         order_index: orderIndex,
@@ -172,7 +170,7 @@ export async function createChapter(chapterData: {
 export async function updateChapter(
   id: string,
   chapterData: {
-    title?: string;
+    name?: string; // Previously called 'title'
     subject_id?: string;
     form?: number;
     order_index?: number;

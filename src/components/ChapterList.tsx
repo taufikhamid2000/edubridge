@@ -8,7 +8,7 @@ export default function ChapterList({
   chapters,
   subject,
 }: {
-  chapters: { id: number; title: string; form: number }[];
+  chapters: { id: number; name: string; form: number }[];
   subject: string;
 }) {
   const [expandedChapters, setExpandedChapters] = useState<
@@ -42,7 +42,6 @@ export default function ChapterList({
       }));
     }
   };
-
   // Group chapters by form
   const groupedChapters = chapters.reduce(
     (acc, chapter) => {
@@ -52,7 +51,7 @@ export default function ChapterList({
       acc[chapter.form].push(chapter);
       return acc;
     },
-    {} as Record<number, { id: number; title: string }[]>
+    {} as Record<number, { id: number; name: string; form: number }[]>
   );
 
   return (
@@ -66,11 +65,12 @@ export default function ChapterList({
               {groupedChapters[Number(form)].map((chapter) => (
                 <li key={chapter.id} className="mb-2">
                   <div>
+                    {' '}
                     <button
                       onClick={() => toggleChapter(chapter.id)}
                       className="text-left w-full bg-gray-200 dark:bg-gray-700 p-2 rounded-md"
                     >
-                      {chapter.title}
+                      {chapter.name}
                     </button>
                     {expandedChapters[chapter.id] && (
                       <ul className="pl-4 mt-2">

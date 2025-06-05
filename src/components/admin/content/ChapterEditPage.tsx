@@ -10,7 +10,7 @@ import Link from 'next/link';
 interface Chapter {
   id: string;
   subject_id: string;
-  title: string;
+  name: string;
   description?: string;
   form: number;
   order_index: number;
@@ -47,10 +47,9 @@ export default function ChapterEditPage() {
   // UI state
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-
   // Form state
   const [formState, setFormState] = useState<Record<string, unknown>>({
-    title: '',
+    name: '',
     description: '',
     form: 0,
     subject_id: '',
@@ -85,11 +84,9 @@ export default function ChapterEditPage() {
         throw new Error(`Failed to fetch subjects: ${subjectsError.message}`);
       }
 
-      setSubjects(subjectsData || []);
-
-      // Update form state
+      setSubjects(subjectsData || []); // Update form state
       setFormState({
-        title: chapter.title,
+        name: chapter.name,
         description: chapter.description || '',
         form: chapter.form,
         subject_id: chapter.subject_id,
@@ -143,14 +140,13 @@ export default function ChapterEditPage() {
       return null;
     }
   };
-
   // Save chapter
   const saveEntity = async (chapter: Chapter) => {
     try {
       const { error } = await supabase
         .from('chapters')
         .update({
-          title: chapter.title,
+          name: chapter.name,
           description: chapter.description,
           form: Number(chapter.form),
           subject_id: chapter.subject_id,
@@ -242,11 +238,10 @@ export default function ChapterEditPage() {
 
     loadChapter();
   }, [chapterId, router]);
-
   // Form fields definition
   const formFields: FormField[] = [
     {
-      key: 'title',
+      key: 'name',
       label: 'Title',
       type: 'text',
       placeholder: 'Enter chapter title',
