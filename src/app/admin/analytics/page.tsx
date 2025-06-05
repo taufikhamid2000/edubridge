@@ -1,4 +1,6 @@
 'use client';
+// Import dynamic config to optimize build
+import './config';
 
 import { useEffect, useState } from 'react';
 import { logger } from '@/lib/logger';

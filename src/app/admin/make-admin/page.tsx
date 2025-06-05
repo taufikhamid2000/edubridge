@@ -1,5 +1,7 @@
 /* eslint-disable react/no-unescaped-entities */
 'use client';
+// Import dynamic config to optimize build
+import './config';
 
 import { useState } from 'react';
 

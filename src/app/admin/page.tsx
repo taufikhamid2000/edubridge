@@ -1,4 +1,10 @@
 'use client';
+// Import dynamic config to optimize build
+import './config';
+
+// Import the dynamic config to make this page dynamic rendering
+// This will exclude it from the static build phase
+import './config';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';

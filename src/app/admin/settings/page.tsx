@@ -1,4 +1,9 @@
 'use client';
+// Import dynamic config to optimize build
+import './config';
+
+// Import dynamic config to optimize build
+import './config';
 
 import { useState } from 'react';
 import AdminNavigation from '@/components/admin/AdminNavigation';

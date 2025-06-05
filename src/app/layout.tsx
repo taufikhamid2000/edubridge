@@ -12,7 +12,12 @@ export const metadata = {
   title: 'EduBridge - Learn, Earn, Grow',
   description:
     'Empowering students and educators with tools to learn, earn and grow.',
-  viewport: 'width=device-width, initial-scale=1',
+};
+
+// Fix the viewport warning by using the correct export
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
 };
 
 export default function RootLayout({

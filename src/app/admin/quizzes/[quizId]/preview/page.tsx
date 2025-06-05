@@ -1,4 +1,6 @@
 'use client';
+// Import dynamic config to optimize build
+import './config';
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';

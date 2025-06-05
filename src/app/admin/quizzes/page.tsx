@@ -1,4 +1,6 @@
 'use client';
+// Import dynamic config to optimize build
+import './config';
 
 import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';

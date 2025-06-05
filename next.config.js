@@ -1,10 +1,17 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  // Temporarily disable for faster builds
-  // output: 'standalone',
-  // Enable source maps in production for better error tracing
-  // productionBrowserSourceMaps: true,
+  // Enable standalone output for production
+  output: 'standalone',
+  // Optimize build performance
+  experimental: {
+    // Improve build performance
+    serverMinification: true,
+    optimizeServerReact: true,
+  },
+  // Skip pre-rendering admin and API routes
+  skipMiddlewareUrlNormalize: true,
+  skipTrailingSlashRedirect: true,
   // Exclude test files from build
   eslint: {
     ignoreDuringBuilds: true,

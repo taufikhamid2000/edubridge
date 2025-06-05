@@ -47,9 +47,30 @@ supabase migration up
 To fix the "quiz_attempts table not found" error, see the [Quiz Attempts Migration Guide](./docs/database/apply_quiz_attempts_migration.md).
 
 For more details about database schema and management, see the [Database Documentation](./docs/database/).
-npm run dev
 
-````
+```bash
+npm run dev
+```
+
+### Optimized Production Builds
+
+For production deployment, we offer optimized build commands:
+
+```bash
+# Standard build
+npm run build
+
+# Optimized build with segment config for admin routes
+npm run build:optimized
+```
+
+The optimized build script creates segment config files that mark admin and API routes as dynamic, which:
+
+1. Reduces build time by skipping pre-rendering of admin pages
+2. Ensures admin data is always fresh at runtime
+3. Improves CI/CD pipeline efficiency
+
+For more details, see the [Build Optimization Summary](./docs/development/build-optimization-summary.md) and [Admin Routes Optimization Guide](./docs/development/admin-routes-optimization.md).
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
@@ -81,7 +102,7 @@ This project uses Jest and React Testing Library for testing components, hooks, 
 npm test          # Run tests once
 npm run test:watch    # Run tests in watch mode
 npm run test:coverage # Run tests with coverage report
-````
+```
 
 Tests are organized in the following structure:
 

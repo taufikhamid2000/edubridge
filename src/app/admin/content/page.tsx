@@ -1,4 +1,9 @@
 'use client';
+// Import dynamic config to optimize build
+import './config';
+
+// Import dynamic config to optimize build
+import './config';
 
 import { useEffect, useState, useCallback } from 'react';
 import { logger } from '@/lib/logger';
@@ -155,7 +160,7 @@ export default function AdminContentPage() {
       setChapters(data);
       console.log('Admin content page - chapters fetched:', {
         chaptersCount: data.length,
-        chapters: data.map((c) => ({ id: c.id, title: c.title })),
+        chapters: data.map((c) => ({ id: c.id, name: c.name })),
       });
     } catch (error) {
       const errorMessage =
