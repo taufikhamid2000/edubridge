@@ -118,12 +118,21 @@ export default function Header(): JSX.Element {
                 Menu
               </button>{' '}
               <div className="header-menu-dropdown">
+                {' '}
                 <Link href="/dashboard" className="header-menu-link">
                   Dashboard
                 </Link>
-                <Link href="/leaderboard" className="header-menu-link">
-                  Leaderboard
-                </Link>{' '}
+                <div className="py-1 border-b border-gray-200 dark:border-gray-700">
+                  <Link href="/leaderboard" className="header-menu-link">
+                    Student Rankings
+                  </Link>
+                  <Link
+                    href="/leaderboard/schools"
+                    className="header-menu-link"
+                  >
+                    School Rankings
+                  </Link>
+                </div>
                 <Link href="/profile" className="header-menu-link">
                   Profile
                 </Link>

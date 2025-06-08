@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import { User } from '@/types/users';
 
@@ -17,115 +17,285 @@ const isValidImageUrl = (url: string): boolean => {
   return url.startsWith('http://') || url.startsWith('https://');
 };
 
-export default function LeaderboardTable({ data }: LeaderboardTableProps) {
-  return (
-    <div className="overflow-x-auto">
-      <table className="min-w-full bg-white">
-        <thead>
-          <tr className="bg-gray-100 border-b border-gray-200">
-            <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">
-              RANK
-            </th>
-            <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">
-              STUDENT
-            </th>
-            <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">
-              LEVEL
-            </th>
-            <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">
-              XP
-            </th>
-            <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">
-              STREAK
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((user, index) => (
-            <tr
-              key={user.id}
-              className={`border-b border-gray-200 ${index < 3 ? 'bg-blue-50' : 'hover:bg-gray-50'}`}
-            >
-              <td className="py-3 px-4 text-gray-800 font-medium">
-                <div className="flex items-center">
-                  {index < 3 ? (
-                    <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center mr-2 ${
-                        index === 0
-                          ? 'bg-yellow-400'
-                          : index === 1
-                            ? 'bg-gray-300'
-                            : 'bg-amber-600'
-                      }`}
-                    >
-                      <span className="text-white font-bold">{index + 1}</span>
-                    </div>
-                  ) : (
-                    <span className="w-8 text-center mr-2">{index + 1}</span>
-                  )}
-                </div>
-              </td>
-              <td className="py-3 px-4 text-sm">
-                <div className="flex items-center">
-                  {' '}
-                  <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mr-3 overflow-hidden">
-                    {user.avatar_url && isValidImageUrl(user.avatar_url) ? (
-                      <Image
-                        src={user.avatar_url}
-                        alt={`${user.display_name || 'User'}'s avatar`}
-                        width={40}
-                        height={40}
-                        className="object-cover"
-                        priority={index < 5} // Prioritize loading for top users
-                        unoptimized={user.avatar_url.startsWith('data:')} // For data URLs
-                        onError={() => {
-                          // This will be handled by the error boundary
-                          console.log(
-                            `Failed to load avatar for user: ${user.id}`
-                          );
-                        }}
-                      />
-                    ) : (
-                      <span className="text-lg font-bold text-blue-500">
-                        {user.display_name?.[0]?.toUpperCase() ||
-                          user.email[0].toUpperCase()}
-                      </span>
-                    )}
-                  </div>
-                  <div>
-                    <p className="font-medium text-gray-800">
-                      {user.display_name || user.email.split('@')[0]}
-                    </p>
-                    <p className="text-xs text-gray-500">{user.email}</p>
-                  </div>
-                </div>
-              </td>
-              <td className="py-3 px-4 text-sm">
-                <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-medium">
-                  Lvl {user.level}
-                </span>
-              </td>
-              <td className="py-3 px-4 text-sm font-medium text-gray-800">
-                {user.xp.toLocaleString()} XP
-              </td>
-              <td className="py-3 px-4 text-sm">
-                <div className="flex items-center">
-                  <span className="text-orange-500 mr-1">🔥</span>
-                  <span className="font-medium">{user.streak} days</span>
-                </div>
-              </td>
-            </tr>
-          ))}
+interface School {
+  name: string;
+  type: string;
+}
 
-          {data.length === 0 && (
-            <tr>
-              <td colSpan={5} className="text-center py-10 text-gray-500">
-                No leaderboard data available
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+// Helper function to get a placeholder school
+const getPlaceholderSchool = (index: number): School => {
+  const schools: School[] = [
+    { name: 'SMK Batu Unjur, Klang', type: 'SMK' },
+    { name: 'MRSM Tawau', type: 'MRSM' },
+    { name: 'SMKA Sheikh Haji Mohd Said, N. Sembilan', type: 'SMKA' },
+    { name: 'Kolej Vokasional Shah Alam', type: 'SMT' },
+    { name: 'SBP Integrasi Gombak', type: 'SBP' },
+    { name: 'Sekolah Seni Malaysia Kuching', type: 'Sekolah Seni' },
+    { name: 'SMJK Chung Ling, Penang', type: 'SMJK' },
+    { name: 'Sekolah Sukan Bukit Jalil', type: 'Sekolah Sukan' },
+    { name: 'SMK Sultan Abdul Samad, Petaling Jaya', type: 'SMK' },
+    { name: 'MRSM Pengkalan Chepa', type: 'MRSM' },
+    { name: 'Sekolah Menengah Sains Tuanku Jaafar', type: 'Sekolah Sains' },
+    { name: 'SMKA Maahad Hamidiah, Kajang', type: 'SMKA' },
+  ];
+  return schools[index % schools.length];
+};
+
+export default function LeaderboardTable({ data }: LeaderboardTableProps) {
+  const [selectedType, setSelectedType] = useState<string>('all');
+  const [isRewardsOpen, setIsRewardsOpen] = useState(false);
+
+  const schoolTypes = [
+    'all',
+    'SMK',
+    'SMKA',
+    'SBP',
+    'MRSM',
+    'SMT',
+    'Sekolah Seni',
+    'Sekolah Sukan',
+    'SMJK',
+    'Sekolah Sains',
+  ];
+
+  const filteredData =
+    selectedType === 'all'
+      ? data
+      : data.filter(
+          (_, index) => getPlaceholderSchool(index).type === selectedType
+        );
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
+        <button
+          onClick={() => setIsRewardsOpen(!isRewardsOpen)}
+          className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+        >
+          <div className="flex items-center space-x-2">
+            <span role="img" aria-label="trophy" className="text-xl">
+              🏆
+            </span>
+            <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
+              Current Reward Pool
+            </h2>
+          </div>
+          <svg
+            className={`w-5 h-5 text-gray-500 transform transition-transform ${
+              isRewardsOpen ? 'rotate-180' : ''
+            }`}
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
+        </button>
+
+        {isRewardsOpen && (
+          <div className="px-6 pb-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="py-4 space-y-4">
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                  <div className="text-yellow-600 dark:text-yellow-400 font-medium">
+                    First Prize
+                  </div>
+                  <div className="text-2xl font-bold text-yellow-700 dark:text-yellow-300">
+                    RM 1,000.00
+                  </div>
+                </div>
+                <div className="p-4 bg-gray-50 dark:bg-gray-700/20 rounded-lg border border-gray-200 dark:border-gray-600">
+                  <div className="text-gray-600 dark:text-gray-400 font-medium">
+                    Second Prize
+                  </div>
+                  <div className="text-2xl font-bold text-gray-700 dark:text-gray-300">
+                    RM 500.00
+                  </div>
+                </div>
+                <div className="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
+                  <div className="text-amber-600 dark:text-amber-400 font-medium">
+                    Third Prize
+                  </div>
+                  <div className="text-2xl font-bold text-amber-700 dark:text-amber-300">
+                    RM 250.00
+                  </div>
+                </div>
+                <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                  <div className="text-blue-600 dark:text-blue-400 font-medium">
+                    Most Active
+                  </div>
+                  <div className="text-2xl font-bold text-blue-700 dark:text-blue-300">
+                    RM 300.00
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end">
+                <button
+                  onClick={() => {
+                    /* Add claim functionality later */
+                  }}
+                  className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:hover:bg-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled
+                >
+                  <svg
+                    className="mr-2 h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"
+                    />
+                  </svg>
+                  Claim Reward
+                  <span className="ml-2 text-xs">(Coming Soon)</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div>
+        <div className="mb-4 overflow-x-auto">
+          <div className="flex space-x-2 pb-2">
+            {schoolTypes.map((type) => (
+              <button
+                key={type}
+                onClick={() => setSelectedType(type)}
+                className={`px-3 py-1 text-sm rounded-full whitespace-nowrap ${
+                  selectedType === type
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                }`}
+              >
+                {type === 'all' ? 'All Schools' : type}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="overflow-x-auto rounded-lg shadow">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead className="bg-gray-50 dark:bg-gray-800">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Rank
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Student
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  School
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
+              {filteredData.map((user, index) => (
+                <tr
+                  key={user.id}
+                  className={`${
+                    index < 3
+                      ? 'bg-blue-50/50 dark:bg-blue-900/20'
+                      : 'hover:bg-gray-50 dark:hover:bg-gray-700/50'
+                  } transition-colors duration-150`}
+                >
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center">
+                      {index < 3 ? (
+                        <div
+                          className={`w-8 h-8 rounded-full flex items-center justify-center mr-2 transition-transform hover:scale-110 ${
+                            index === 0
+                              ? 'bg-yellow-400 dark:bg-yellow-500'
+                              : index === 1
+                                ? 'bg-gray-300 dark:bg-gray-400'
+                                : 'bg-amber-600 dark:bg-amber-700'
+                          }`}
+                        >
+                          <span className="text-white font-bold">
+                            {index + 1}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="w-8 text-center mr-2 text-gray-600 dark:text-gray-400">
+                          {index + 1}
+                        </span>
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center">
+                      <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center mr-3 overflow-hidden">
+                        {user.avatar_url && isValidImageUrl(user.avatar_url) ? (
+                          <Image
+                            src={user.avatar_url}
+                            alt={`${user.display_name || 'User'}'s avatar`}
+                            width={40}
+                            height={40}
+                            className="object-cover"
+                            priority={index < 5}
+                            unoptimized={user.avatar_url.startsWith('data:')}
+                            onError={() => {
+                              console.log(
+                                `Failed to load avatar for user: ${user.id}`
+                              );
+                            }}
+                          />
+                        ) : (
+                          <span className="text-lg font-bold text-blue-500 dark:text-blue-400">
+                            {user.display_name?.[0]?.toUpperCase() ||
+                              user.email[0].toUpperCase()}
+                          </span>
+                        )}
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                          {user.display_name || user.email.split('@')[0]}
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          {user.email}
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div>
+                      <p className="text-sm text-gray-900 dark:text-gray-100">
+                        {getPlaceholderSchool(index).name}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        {getPlaceholderSchool(index).type}
+                      </p>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+
+              {filteredData.length === 0 && (
+                <tr>
+                  <td
+                    colSpan={3}
+                    className="px-6 py-10 text-center text-gray-500 dark:text-gray-400"
+                  >
+                    {selectedType === 'all'
+                      ? 'No leaderboard data available'
+                      : `No students found from ${selectedType} schools`}
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 }
