@@ -204,12 +204,90 @@ function DashboardClient() {
       bgColor: 'bg-yellow-100',
     },
   ];
-
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-[60vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
+      <main className="container mx-auto py-6 px-4 sm:px-6 md:px-8">
+        <div className="text-center mb-8 text-gray-600 dark:text-gray-400 text-sm">
+          <p>
+            Loading your dashboard... If this takes too long, you may need to
+            reload the page to refresh your Supabase session.
+          </p>
+        </div>
+        <div className="animate-pulse space-y-8">
+          {/* Welcome Banner Skeleton */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-48 mb-2"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-64"></div>
+              </div>
+              <div className="flex space-x-4">
+                <div className="h-10 w-10 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                <div className="h-10 w-24 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+              </div>
+            </div>
+          </div>
+
+          {/* Subjects Section Skeleton */}
+          <section>
+            <div className="flex justify-between items-center mb-6">
+              <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-32"></div>
+              <div className="flex space-x-4">
+                <div className="h-10 w-48 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+                <div className="h-10 w-32 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...Array(6)].map((_, i) => (
+                <div
+                  key={i}
+                  className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm"
+                >
+                  <div className="flex items-center mb-4">
+                    <div className="h-12 w-12 bg-gray-200 dark:bg-gray-700 rounded-lg mr-4"></div>
+                    <div className="flex-1">
+                      <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
+                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+                    </div>
+                  </div>
+                  <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full mt-4"></div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Weekly Progress Skeleton */}
+          <section className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
+            <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-40 mb-6"></div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+              <div className="h-20 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+              <div className="h-20 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+              <div className="h-20 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+            </div>
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+          </section>
+
+          {/* Achievements Skeleton */}
+          <section className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
+            <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-44 mb-6"></div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[...Array(3)].map((_, i) => (
+                <div
+                  key={i}
+                  className="p-4 rounded-lg border border-gray-200 dark:border-gray-700"
+                >
+                  <div className="flex items-center mb-3">
+                    <div className="h-10 w-10 bg-gray-200 dark:bg-gray-700 rounded-full mr-3"></div>
+                    <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-24"></div>
+                  </div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full mb-2"></div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                </div>
+              ))}
+            </div>
+          </section>
+        </div>
+      </main>
     );
   }
 

@@ -5,13 +5,15 @@ import { useEffect, useState } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import LoadingState from '@/components/LoadingState';
 
 export default function HomePage() {
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
-  // Check authentication status
+  const [isLoading, setIsLoading] = useState(true);
+  const [isParallaxEnabled, setIsParallaxEnabled] = useState(false);
+  // Authentication effect
   useEffect(() => {
     const checkAuthStatus = async () => {
       try {
@@ -30,48 +32,34 @@ export default function HomePage() {
         console.error('Error checking auth status:', error);
         setIsLoggedIn(false);
       } finally {
-        setIsCheckingAuth(false);
+        setIsLoading(false);
       }
     };
 
-    checkAuthStatus();
-
-    // Listen for auth changes
+    checkAuthStatus(); // Listen for auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
       setIsLoggedIn(!!session);
-      setIsCheckingAuth(false);
     });
 
     return () => subscription.unsubscribe();
   }, []);
-
-  // Handle parallax effect on scroll
+  // Unified parallax effect
   useEffect(() => {
     const handleScroll = () => {
+      if (!isParallaxEnabled) return;
       document.documentElement.style.setProperty(
         '--scroll',
         window.pageYOffset.toString()
       );
     };
 
-    // Check if the device is mobile (based on screen width)
-    const isMobile = window.innerWidth < 768;
-
-    // Only add scroll event listener on non-mobile devices
-    if (!isMobile) {
-      window.addEventListener('scroll', handleScroll, { passive: true });
-      handleScroll(); // Initialize on load
-    } else {
-      // Reset any parallax effects on mobile
-      document.documentElement.style.setProperty('--scroll', '0');
-    }
-
-    // Add resize listener to handle orientation changes
     const handleResize = () => {
-      const newIsMobile = window.innerWidth < 768;
-      if (newIsMobile) {
+      const isMobile = window.innerWidth < 768;
+      setIsParallaxEnabled(!isMobile);
+
+      if (isMobile) {
         document.documentElement.style.setProperty('--scroll', '0');
         window.removeEventListener('scroll', handleScroll);
       } else {
@@ -80,13 +68,25 @@ export default function HomePage() {
       }
     };
 
+    // Initial setup
+    handleResize();
     window.addEventListener('resize', handleResize, { passive: true });
+
+    // Only add scroll listener if parallax is enabled
+    if (isParallaxEnabled) {
+      window.addEventListener('scroll', handleScroll, { passive: true });
+      handleScroll();
+    }
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', handleResize);
     };
-  }, []);
+  }, [isParallaxEnabled]);
+
+  if (isLoading) {
+    return <LoadingState />;
+  }
 
   return (
     <>
@@ -120,16 +120,12 @@ export default function HomePage() {
             proud!
           </p>{' '}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            {' '}
             <button
               className="inline-block uppercase tracking-wide rounded-full shadow-lg transition-all duration-300 ease-in-out px-8 py-4 bg-white text-blue-600 font-medium hover:bg-gray-100 hover:scale-105 transform"
               onClick={() => router.push(isLoggedIn ? '/dashboard' : '/auth')}
-              disabled={isCheckingAuth}
             >
-              {isCheckingAuth
-                ? 'Loading...'
-                : isLoggedIn
-                  ? 'Access your dashboard'
-                  : 'Sign Up Now 🚀'}
+              {isLoggedIn ? 'Access your dashboard' : 'Sign Up Now 🚀'}
             </button>{' '}
             <button
               className="inline-block uppercase tracking-wide rounded-full shadow-lg transition-all duration-300 ease-in-out px-8 py-4 bg-transparent border-2 border-white text-white font-medium hover:bg-white/10 hover:scale-105 transform"
