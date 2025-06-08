@@ -17,7 +17,6 @@ export default function LeaderboardPage() {
   );
   const [subjectFilter, setSubjectFilter] = useState<string | null>(null);
   const [currentUserRank, setCurrentUserRank] = useState<number | null>(null);
-  const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
     async function loadLeaderboardData() {
@@ -52,7 +51,6 @@ export default function LeaderboardPage() {
         setError('An unexpected error occurred. Please try again later.');
       } finally {
         setIsLoading(false);
-        setIsRefreshing(false);
       }
     }
 
@@ -67,11 +65,6 @@ export default function LeaderboardPage() {
     setSubjectFilter(subjectId);
   };
 
-  const handleRefresh = () => {
-    setIsRefreshing(true);
-    setTimeFrame(timeFrame); // This will trigger the useEffect
-  };
-
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
       <LeaderboardHeader currentUserRank={currentUserRank} />
@@ -82,29 +75,7 @@ export default function LeaderboardPage() {
           onTimeFrameChange={handleTimeFrameChange}
           subjectFilter={subjectFilter}
           onSubjectFilterChange={handleSubjectFilterChange}
-        />
-
-        <div className="flex justify-end mb-4">
-          <button
-            onClick={handleRefresh}
-            disabled={isRefreshing || isLoading}
-            className="flex items-center text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors disabled:opacity-50"
-          >
-            <svg
-              className={`w-4 h-4 mr-1 ${isRefreshing ? 'animate-spin' : ''}`}
-              fill="none"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-            </svg>
-            {isRefreshing ? 'Refreshing...' : 'Refresh'}
-          </button>
-        </div>
-
+        />{' '}
         {isLoading ? (
           <div className="text-center py-16">
             <div className="inline-block animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500 dark:border-blue-400"></div>
@@ -141,9 +112,9 @@ export default function LeaderboardPage() {
               {error.includes('No leaderboard data')
                 ? 'Complete quizzes to appear on the leaderboard and compete with other students!'
                 : 'There was a problem loading the leaderboard data. Please try again later.'}
-            </p>
+            </p>{' '}
             <button
-              onClick={handleRefresh}
+              onClick={() => setTimeFrame(timeFrame)}
               className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors shadow-md hover:shadow-lg dark:bg-blue-700 dark:hover:bg-blue-600"
             >
               Try Again
@@ -151,7 +122,7 @@ export default function LeaderboardPage() {
           </div>
         ) : (
           <div className="fade-in animate-fadeIn">
-            <LeaderboardTable data={leaderboardData} />
+            <LeaderboardTable data={leaderboardData} timeFrame={timeFrame} />
             <div className="text-center mt-6 text-sm text-gray-500 dark:text-gray-400">
               Showing top {leaderboardData.length} students • Last updated:{' '}
               {new Date().toLocaleTimeString()}

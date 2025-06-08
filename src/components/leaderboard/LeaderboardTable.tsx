@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { User } from '@/types/users';
+import { getRewardsByTimeFrame } from '@/services/rewardService';
 
 interface LeaderboardTableProps {
   data: User[];
+  timeFrame: 'daily' | 'weekly' | 'allTime';
 }
 
 // Helper function to validate image URLs
@@ -41,9 +44,14 @@ const getPlaceholderSchool = (index: number): School => {
   return schools[index % schools.length];
 };
 
-export default function LeaderboardTable({ data }: LeaderboardTableProps) {
+export default function LeaderboardTable({
+  data,
+  timeFrame,
+}: LeaderboardTableProps) {
   const [selectedType, setSelectedType] = useState<string>('all');
   const [isRewardsOpen, setIsRewardsOpen] = useState(false);
+
+  const rewards = getRewardsByTimeFrame(timeFrame);
 
   const schoolTypes = [
     'all',
@@ -103,45 +111,49 @@ export default function LeaderboardTable({ data }: LeaderboardTableProps) {
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
                   <div className="text-yellow-600 dark:text-yellow-400 font-medium">
-                    First Prize
+                    {rewards[0].name}
                   </div>
                   <div className="text-2xl font-bold text-yellow-700 dark:text-yellow-300">
-                    RM 1,000.00
+                    RM {rewards[0].amount.toFixed(2)}
                   </div>
                 </div>
                 <div className="p-4 bg-gray-50 dark:bg-gray-700/20 rounded-lg border border-gray-200 dark:border-gray-600">
                   <div className="text-gray-600 dark:text-gray-400 font-medium">
-                    Second Prize
+                    {rewards[1].name}
                   </div>
                   <div className="text-2xl font-bold text-gray-700 dark:text-gray-300">
-                    RM 500.00
+                    RM {rewards[1].amount.toFixed(2)}
                   </div>
                 </div>
                 <div className="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
                   <div className="text-amber-600 dark:text-amber-400 font-medium">
-                    Third Prize
+                    {rewards[2].name}
                   </div>
                   <div className="text-2xl font-bold text-amber-700 dark:text-amber-300">
-                    RM 250.00
+                    RM {rewards[2].amount.toFixed(2)}
                   </div>
                 </div>
                 <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
                   <div className="text-blue-600 dark:text-blue-400 font-medium">
-                    Most Active
+                    {rewards[3].name}
                   </div>
                   <div className="text-2xl font-bold text-blue-700 dark:text-blue-300">
-                    RM 300.00
+                    RM {rewards[3].amount.toFixed(2)}
                   </div>
                 </div>
               </div>
 
-              <div className="flex justify-end">
-                <button
-                  onClick={() => {
-                    /* Add claim functionality later */
-                  }}
-                  className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:hover:bg-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-gray-600 dark:text-gray-400">
+                  {timeFrame === 'daily'
+                    ? 'Daily rewards reset at midnight MYT'
+                    : timeFrame === 'weekly'
+                      ? 'Weekly rewards reset every Sunday at midnight MYT'
+                      : 'All-time rewards are updated monthly'}
+                </div>
+                <Link
+                  href="/rewards"
+                  className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:hover:bg-blue-500 transition-colors"
                 >
                   <svg
                     className="mr-2 h-5 w-5"
@@ -157,8 +169,12 @@ export default function LeaderboardTable({ data }: LeaderboardTableProps) {
                     />
                   </svg>
                   Claim Reward
-                  <span className="ml-2 text-xs">(Coming Soon)</span>
-                </button>
+                </Link>
+              </div>
+
+              <div className="text-xs text-center text-gray-500 dark:text-gray-400">
+                Top 3 performers and most active participants are eligible for
+                rewards
               </div>
             </div>
           </div>
