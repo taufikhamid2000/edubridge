@@ -12,6 +12,7 @@ import SubjectSearch from '@/components/dashboard/SubjectSearch';
 import SubjectGrid from '@/components/dashboard/SubjectGrid';
 import WeeklyProgress from '@/components/dashboard/WeeklyProgress';
 import Achievements from '@/components/dashboard/Achievements';
+import RandomQuizzes from '@/components/dashboard/RandomQuizzes';
 
 interface User {
   email: string;
@@ -294,9 +295,9 @@ function DashboardClient() {
   return (
     <main className="container mx-auto py-6 px-4 sm:px-6 md:px-8">
       <div className="flex flex-col gap-8 sm:gap-10 md:gap-12">
-        {/* Welcome Section */}
-        <WelcomeBanner user={user} />
-
+        {/* Welcome Section */} <WelcomeBanner user={user} />
+        {/* Random Quizzes Section */}
+        <RandomQuizzes />
         {/* Subjects Section with Search and Filters */}
         <section id="subjects-section">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 sm:mb-6">
@@ -332,14 +333,12 @@ function DashboardClient() {
             handlePageChange={handlePageChange}
           />
         </section>
-
         {/* Weekly Progress Section */}
         <WeeklyProgress
           quizzesCompleted={7}
           quizzesTotal={10}
           averageScore={85}
         />
-
         {/* Recent Achievements Section */}
         <Achievements achievements={achievements} />
       </div>
