@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface User {
   email: string;
@@ -15,6 +16,8 @@ interface WelcomeBannerProps {
 }
 
 const WelcomeBanner = ({ user }: WelcomeBannerProps) => {
+  const router = useRouter();
+
   if (!user) return null;
 
   return (
@@ -35,15 +38,53 @@ const WelcomeBanner = ({ user }: WelcomeBannerProps) => {
         </p>{' '}
         <p className="mt-4 text-sm sm:text-base">
           Your current streak: <strong>{user.streak} days</strong>
-        </p>
-        <div className="mt-6 flex items-center">
+        </p>{' '}
+        <div className="mt-6 flex items-center space-x-4">
           <a
             href="/leaderboard"
             className="inline-flex items-center px-4 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 transition-all rounded-lg text-sm font-medium"
           >
             <span className="mr-2">🏆</span>
             View Leaderboard
-          </a>
+          </a>{' '}
+          <button
+            onClick={async () => {
+              try {
+                const response = await fetch('/api/quizzes/random');
+                const data = await response.json();
+
+                if (!response.ok) throw new Error(data.error);
+                router.push(
+                  `/quiz/${data.subject_slug}/${data.topic_id}/play/${data.quiz_id}`
+                );
+              } catch (error) {
+                console.error('Error fetching random quiz:', error);
+                alert('Failed to find a random quiz. Please try again later.');
+              }
+            }}
+            className="inline-flex items-center px-4 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 transition-all rounded-lg text-sm font-medium"
+          >
+            <span className="mr-2">🎯</span>
+            Try Random Quiz
+          </button>
+          <button
+            onClick={async () => {
+              try {
+                const response = await fetch('/api/topics/random');
+                const data = await response.json();
+
+                if (!response.ok) throw new Error(data.error);
+                router.push(`/quiz/${data.subject_slug}/${data.topic_id}`);
+              } catch (error) {
+                console.error('Error fetching random topic:', error);
+                alert('Failed to find a random topic. Please try again later.');
+              }
+            }}
+            className="inline-flex items-center px-4 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 transition-all rounded-lg text-sm font-medium"
+          >
+            <span className="mr-2">🎲</span>
+            Explore Random Topic
+          </button>
         </div>
       </div>
     </section>

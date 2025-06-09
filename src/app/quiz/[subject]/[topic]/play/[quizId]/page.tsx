@@ -8,6 +8,13 @@ import { Question, Quiz } from '@/types/topics';
 import { logger } from '@/lib/logger';
 import { supabase } from '@/lib/supabase';
 
+interface TopicContext {
+  topicTitle: string;
+  chapterTitle: string;
+  subjectName: string;
+  form?: number;
+}
+
 export default function PlayQuizPage() {
   const params = useParams();
   const router = useRouter();
@@ -21,6 +28,7 @@ export default function PlayQuizPage() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
+  const [topicContext, setTopicContext] = useState<TopicContext | null>(null);
 
   // Check authentication
   useEffect(() => {
@@ -78,6 +86,46 @@ export default function PlayQuizPage() {
           return;
         }
 
+        // Fetch topic context with proper table relationships and column names
+        const { data: topicData, error: topicError } = await supabase
+          .from('topics')
+          .select(
+            `
+            name,
+            chapters:chapters!inner (
+              name,
+              form,
+              subjects:subjects!inner (
+                name
+              )
+            )
+          `
+          )
+          .eq('id', topic)
+          .single();
+
+        if (topicError) {
+          logger.error('Error fetching topic context:', topicError);
+        } else if (topicData && topicData.chapters) {
+          const chapter = Array.isArray(topicData.chapters)
+            ? topicData.chapters[0]
+            : topicData.chapters;
+
+          const subjectObj =
+            chapter.subjects && Array.isArray(chapter.subjects)
+              ? chapter.subjects[0]
+              : chapter.subjects;
+
+          if (chapter && subjectObj) {
+            setTopicContext({
+              topicTitle: topicData.name,
+              chapterTitle: chapter.name,
+              subjectName: subjectObj.name,
+              form: chapter.form,
+            });
+          }
+        }
+
         setQuiz(quizData.quiz);
         setQuestions(quizData.questions);
       } catch (err) {
@@ -93,7 +141,8 @@ export default function PlayQuizPage() {
     }
 
     fetchQuizData();
-  }, [quizId, authLoading, userId]);
+  }, [quizId, authLoading, userId, topic]);
+
   if (loading || authLoading) {
     return (
       <div className="container mx-auto py-8 px-4">
@@ -139,7 +188,6 @@ export default function PlayQuizPage() {
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="max-w-3xl mx-auto">
-        {' '}
         <QuizPlayer
           quizId={quizId}
           quizName={quiz.name}
@@ -148,6 +196,7 @@ export default function PlayQuizPage() {
           userId={userId}
           subject={subject}
           topic={topic}
+          topicContext={topicContext}
           onComplete={() => {
             // Handle quiz completion
             logger.log('Quiz completed');

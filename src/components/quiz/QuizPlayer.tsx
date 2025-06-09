@@ -8,6 +8,13 @@ import { useRouter } from 'next/navigation';
 import { submitQuizAttempt } from '@/lib/quiz';
 import { logger } from '@/lib/logger';
 
+interface TopicContext {
+  topicTitle: string;
+  chapterTitle: string;
+  subjectName: string;
+  form?: number;
+}
+
 interface QuizPlayerProps {
   quizId: string;
   quizName: string;
@@ -17,6 +24,7 @@ interface QuizPlayerProps {
   subject?: string; // Added for navigation
   topic?: string; // Added for navigation
   onComplete?: () => void;
+  topicContext?: TopicContext | null;
 }
 
 export default function QuizPlayer({
@@ -28,6 +36,7 @@ export default function QuizPlayer({
   subject,
   topic,
   onComplete,
+  topicContext,
 }: QuizPlayerProps) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string[]>>({});
@@ -182,6 +191,20 @@ export default function QuizPlayer({
     return (
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
         <h2 className="text-2xl font-bold mb-4">Quiz: {quizName}</h2>
+        {topicContext && (
+          <div className="mb-4 text-gray-600 dark:text-gray-300">
+            <p className="mb-1">
+              <strong>Topic:</strong> {topicContext.topicTitle}
+            </p>
+            <p className="mb-1">
+              <strong>Chapter:</strong> {topicContext.chapterTitle} (Form{' '}
+              {topicContext.form})
+            </p>
+            <p className="mb-1">
+              <strong>Subject:</strong> {topicContext.subjectName}
+            </p>
+          </div>
+        )}
         <div className="mb-6">
           <p className="text-gray-600 dark:text-gray-300 mb-2">
             This quiz contains {questions.length} questions.
