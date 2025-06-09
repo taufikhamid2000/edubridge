@@ -39,10 +39,10 @@ const WelcomeBanner = ({ user }: WelcomeBannerProps) => {
         <p className="mt-4 text-sm sm:text-base">
           Your current streak: <strong>{user.streak} days</strong>
         </p>{' '}
-        <div className="mt-6 flex items-center space-x-4">
+        <div className="mt-6 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:space-x-4">
           <a
             href="/leaderboard"
-            className="inline-flex items-center px-4 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 transition-all rounded-lg text-sm font-medium"
+            className="inline-flex items-center justify-center px-4 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 transition-all rounded-lg text-sm font-medium"
           >
             <span className="mr-2">🏆</span>
             View Leaderboard
@@ -62,7 +62,7 @@ const WelcomeBanner = ({ user }: WelcomeBannerProps) => {
                 alert('Failed to find a random quiz. Please try again later.');
               }
             }}
-            className="inline-flex items-center px-4 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 transition-all rounded-lg text-sm font-medium"
+            className="inline-flex items-center justify-center px-4 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 transition-all rounded-lg text-sm font-medium"
           >
             <span className="mr-2">🎯</span>
             Try Random Quiz
@@ -80,7 +80,7 @@ const WelcomeBanner = ({ user }: WelcomeBannerProps) => {
                 alert('Failed to find a random topic. Please try again later.');
               }
             }}
-            className="inline-flex items-center px-4 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 transition-all rounded-lg text-sm font-medium"
+            className="inline-flex items-center justify-center px-4 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 transition-all rounded-lg text-sm font-medium"
           >
             <span className="mr-2">🎲</span>
             Explore Random Topic

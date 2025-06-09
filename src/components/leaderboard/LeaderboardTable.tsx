@@ -274,9 +274,12 @@ export default function LeaderboardTable({
                         )}
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                        <Link
+                          href={`/profile?userId=${user.id}`}
+                          className="text-sm font-medium text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                        >
                           {user.display_name || user.email.split('@')[0]}
-                        </p>
+                        </Link>
                         <p className="text-xs text-gray-500 dark:text-gray-400">
                           {user.email}
                         </p>
