@@ -1,3 +1,5 @@
+import { SchoolRole } from './schools';
+
 // User types for leaderboard and profile features
 export interface User {
   id: string;
@@ -9,6 +11,8 @@ export interface User {
   level: number;
   lastQuizDate?: string;
   created_at?: string;
+  school_id?: string;
+  school_role?: SchoolRole;
 }
 
 // User achievements

@@ -32,10 +32,10 @@ export async function fetchUserProfile(): Promise<{
         level,
         streak,
         daily_xp,
-        weekly_xp,
-        last_quiz_date,
+        weekly_xp,        last_quiz_date,
         created_at,
-        updated_at
+        updated_at,
+        school_id
       `
       )
       .eq('id', currentUserId)
@@ -113,6 +113,7 @@ export async function fetchUserProfile(): Promise<{
         level: profileData.level || 1,
         lastQuizDate: profileData.last_quiz_date,
         created_at: profileData.created_at,
+        school_id: profileData.school_id,
       };
 
       return { data: userData, error: null };
@@ -144,6 +145,7 @@ export async function fetchUserProfile(): Promise<{
 export async function updateUserProfile(profileData: {
   display_name?: string;
   avatar_url?: string;
+  school_id?: string;
 }): Promise<{ success: boolean; error: Error | null }> {
   try {
     // Get current user
@@ -163,6 +165,7 @@ export async function updateUserProfile(profileData: {
       .update({
         display_name: profileData.display_name,
         avatar_url: profileData.avatar_url,
+        school_id: profileData.school_id,
         updated_at: new Date().toISOString(),
       })
       .eq('id', currentUserId);

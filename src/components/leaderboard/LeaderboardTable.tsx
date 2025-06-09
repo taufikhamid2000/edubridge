@@ -21,6 +21,7 @@ const isValidImageUrl = (url: string): boolean => {
 };
 
 interface School {
+  id: string;
   name: string;
   type: string;
 }
@@ -28,18 +29,66 @@ interface School {
 // Helper function to get a placeholder school
 const getPlaceholderSchool = (index: number): School => {
   const schools: School[] = [
-    { name: 'SMK Batu Unjur, Klang', type: 'SMK' },
-    { name: 'MRSM Tawau', type: 'MRSM' },
-    { name: 'SMKA Sheikh Haji Mohd Said, N. Sembilan', type: 'SMKA' },
-    { name: 'Kolej Vokasional Shah Alam', type: 'SMT' },
-    { name: 'SBP Integrasi Gombak', type: 'SBP' },
-    { name: 'Sekolah Seni Malaysia Kuching', type: 'Sekolah Seni' },
-    { name: 'SMJK Chung Ling, Penang', type: 'SMJK' },
-    { name: 'Sekolah Sukan Bukit Jalil', type: 'Sekolah Sukan' },
-    { name: 'SMK Sultan Abdul Samad, Petaling Jaya', type: 'SMK' },
-    { name: 'MRSM Pengkalan Chepa', type: 'MRSM' },
-    { name: 'Sekolah Menengah Sains Tuanku Jaafar', type: 'Sekolah Sains' },
-    { name: 'SMKA Maahad Hamidiah, Kajang', type: 'SMKA' },
+    {
+      id: 'd2a4b5c6-e7f8-4a3b-9c2d-1e0f3a4b5c6d',
+      name: 'SMK Batu Unjur',
+      type: 'SMK',
+    },
+    {
+      id: 'f8e7d6c5-b4a3-2f1e-9d8c-7b6a5f4e3d2c',
+      name: 'MRSM Tawau',
+      type: 'MRSM',
+    },
+    {
+      id: 'a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d',
+      name: 'SMKA Sheikh Haji Mohd Said',
+      type: 'SMKA',
+    },
+    {
+      id: 'b2c3d4e5-f6a7-8b9c-0d1e-2f3a4b5c6d7e',
+      name: 'Kolej Vokasional Shah Alam',
+      type: 'KV',
+    },
+    {
+      id: 'c3d4e5f6-a7b8-9c0d-1e2f-3a4b5c6d7e8f',
+      name: 'SBP Integrasi Gombak',
+      type: 'SBP',
+    },
+    {
+      id: 'd4e5f6a7-b8c9-0d1e-2f3a-4b5c6d7e8f9a',
+      name: 'Sekolah Seni Malaysia Kuching',
+      type: 'Sekolah Seni',
+    },
+    {
+      id: 'e5f6a7b8-c9d0-1e2f-3a4b-5c6d7e8f9a0b',
+      name: 'SMJK Chung Ling',
+      type: 'SMJK',
+    },
+    {
+      id: 'f6a7b8c9-d0e1-2f3a-4b5c-6d7e8f9a0b1c',
+      name: 'Sekolah Sukan Bukit Jalil',
+      type: 'Sekolah Sukan',
+    },
+    {
+      id: 'a7b8c9d0-e1f2-3a4b-5c6d-7e8f9a0b1c2d',
+      name: 'SMK Sultan Abdul Samad',
+      type: 'SMK',
+    },
+    {
+      id: 'b8c9d0e1-f2a3-4b5c-6d7e-8f9a0b1c2d3e',
+      name: 'MRSM Pengkalan Chepa',
+      type: 'MRSM',
+    },
+    {
+      id: 'c9d0e1f2-a3b4-5c6d-7e8f-9a0b1c2d3e4f',
+      name: 'Sekolah Menengah Sains Tuanku Jaafar',
+      type: 'Sekolah Sains',
+    },
+    {
+      id: 'd0e1f2a3-b4c5-6d7e-8f9a-0b1c2d3e4f5a',
+      name: 'SMKA Maahad Hamidiah',
+      type: 'SMKA',
+    },
   ];
   return schools[index % schools.length];
 };
@@ -287,10 +336,14 @@ export default function LeaderboardTable({
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
+                    {' '}
                     <div>
-                      <p className="text-sm text-gray-900 dark:text-gray-100">
+                      <Link
+                        href={`/schools/${getPlaceholderSchool(index).id}`}
+                        className="text-sm font-medium text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                      >
                         {getPlaceholderSchool(index).name}
-                      </p>
+                      </Link>
                       <p className="text-xs text-gray-500 dark:text-gray-400">
                         {getPlaceholderSchool(index).type}
                       </p>

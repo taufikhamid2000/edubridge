@@ -1,11 +1,19 @@
 ﻿'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { User } from '@/types/users';
 import { updateUserProfile } from '@/services/profileService';
 import { supabase } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
 import Image from 'next/image';
+
+interface School {
+  id: string;
+  name: string;
+  type: string;
+  district: string;
+  state: string;
+}
 
 interface ProfileSettingsProps {
   user: User;
@@ -20,6 +28,60 @@ export default function ProfileSettings({ user }: ProfileSettingsProps) {
   const [successMessage, setSuccessMessage] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [schools, setSchools] = useState<School[]>([]);
+  const [selectedSchoolId, setSelectedSchoolId] = useState<string>(
+    user.school_id || ''
+  );
+  const [isLoadingSchools, setIsLoadingSchools] = useState<boolean>(true);
+  const [schoolSearch, setSchoolSearch] = useState<string>('');
+  const [selectedState, setSelectedState] = useState<string>('all');
+  const [selectedType, setSelectedType] = useState<string>('all');
+
+  // Get unique states and types for filters
+  const states = [
+    'all',
+    ...new Set(schools.map((school) => school.state)),
+  ].sort();
+  const types = [
+    'all',
+    ...new Set(schools.map((school) => school.type)),
+  ].sort();
+
+  // Filter schools based on search and filters
+  const filteredSchools = schools.filter((school) => {
+    const matchesSearch =
+      school.name.toLowerCase().includes(schoolSearch.toLowerCase()) ||
+      school.district.toLowerCase().includes(schoolSearch.toLowerCase());
+    const matchesState =
+      selectedState === 'all' || school.state === selectedState;
+    const matchesType = selectedType === 'all' || school.type === selectedType;
+    return matchesSearch && matchesState && matchesType;
+  });
+
+  // Fetch schools on component mount
+  useEffect(() => {
+    const fetchSchools = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('schools')
+          .select('id, name, type, district, state')
+          .order('name');
+
+        if (error) {
+          logger.error('Error fetching schools:', error);
+          return;
+        }
+
+        setSchools(data || []);
+      } catch (err) {
+        logger.error('Error in fetchSchools:', err);
+      } finally {
+        setIsLoadingSchools(false);
+      }
+    };
+
+    fetchSchools();
+  }, []);
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
@@ -51,12 +113,11 @@ export default function ProfileSettings({ user }: ProfileSettingsProps) {
           .from('user-avatars')
           .getPublicUrl(filePath);
         updatedAvatarUrl = data.publicUrl;
-      }
-
-      // Update profile
+      } // Update profile
       const { success, error } = await updateUserProfile({
         display_name: displayName,
         avatar_url: updatedAvatarUrl,
+        school_id: selectedSchoolId,
       });
 
       if (error) {
@@ -132,6 +193,7 @@ export default function ProfileSettings({ user }: ProfileSettingsProps) {
 
       <form onSubmit={handleSubmit}>
         <div className="space-y-6">
+          {' '}
           {/* Display Name Field */}
           <div>
             <label
@@ -149,8 +211,102 @@ export default function ProfileSettings({ user }: ProfileSettingsProps) {
               placeholder="Your display name"
               required
             />
-          </div>
+          </div>{' '}
+          {/* School Selection */}
+          <div className="space-y-4">
+            <label
+              htmlFor="school"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
+              School
+            </label>
 
+            {/* Search and Filters */}
+            <div className="grid gap-3 md:grid-cols-3">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search schools..."
+                  value={schoolSearch}
+                  onChange={(e) => setSchoolSearch(e.target.value)}
+                  className="w-full px-3 py-2 pl-9 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                />
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg
+                    className="h-4 w-4 text-gray-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                </div>
+              </div>
+
+              <select
+                value={selectedState}
+                onChange={(e) => setSelectedState(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              >
+                <option value="all">All States</option>
+                {states
+                  .filter((state) => state !== 'all')
+                  .map((state) => (
+                    <option key={state} value={state}>
+                      {state}
+                    </option>
+                  ))}
+              </select>
+
+              <select
+                value={selectedType}
+                onChange={(e) => setSelectedType(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              >
+                <option value="all">All Types</option>
+                {types
+                  .filter((type) => type !== 'all')
+                  .map((type) => (
+                    <option key={type} value={type}>
+                      {type}
+                    </option>
+                  ))}
+              </select>
+            </div>
+
+            {/* School Selection Dropdown */}
+            <div>
+              <select
+                id="school"
+                value={selectedSchoolId}
+                onChange={(e) => setSelectedSchoolId(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                disabled={isLoadingSchools}
+              >
+                <option value="">Select your school</option>
+                {filteredSchools.map((school) => (
+                  <option key={school.id} value={school.id}>
+                    {school.name} ({school.type}) - {school.district},{' '}
+                    {school.state}
+                  </option>
+                ))}
+              </select>
+              {isLoadingSchools ? (
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                  Loading schools...
+                </p>
+              ) : (
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                  {filteredSchools.length} schools found
+                </p>
+              )}
+            </div>
+          </div>
           {/* Avatar Upload */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -192,7 +348,6 @@ export default function ProfileSettings({ user }: ProfileSettingsProps) {
               Recommended: Square image, max 5MB (JPG, PNG, GIF)
             </p>
           </div>
-
           {/* Submit Button */}
           <div>
             <button
