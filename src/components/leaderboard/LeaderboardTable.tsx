@@ -263,6 +263,13 @@ export default function LeaderboardTable({
                         <div>
                           <Link
                             href={`/profile/${user.id}`}
+                            onClick={() =>
+                              console.log('Clicking profile link for:', {
+                                userId: user.id,
+                                profileUrl: `/profile/${user.id}`,
+                                displayName: user.display_name,
+                              })
+                            }
                             className="text-sm font-medium text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                           >
                             {user.display_name}
