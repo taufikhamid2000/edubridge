@@ -71,7 +71,7 @@ export async function fetchSchoolLeaderboard(): Promise<{
     ] as const;
 
     // Process and format the data
-    const schools: School[] = (schoolData as SchoolDBResponse[])
+    const schools: School[] = (schoolData as SchoolDBResponse[]) // Only filter out completely invalid schools
       .filter((school) => {
         if (!school || !school.id || !school.name || !school.type) {
           logger.warn('Invalid school data:', school);
@@ -79,10 +79,6 @@ export async function fetchSchoolLeaderboard(): Promise<{
         }
         if (!VALID_SCHOOL_TYPES.includes(school.type)) {
           logger.warn(`Invalid school type: ${school.type}`);
-          return false;
-        }
-        if (!school.school_stats) {
-          logger.warn(`No stats available for school: ${school.name}`);
           return false;
         }
         return true;
@@ -94,14 +90,19 @@ export async function fetchSchoolLeaderboard(): Promise<{
         district: school.district || 'Unknown',
         state: school.state || 'Unknown',
         totalStudents: school.total_students || 0,
-        averageScore:
-          Math.round(school.school_stats[0].average_score * 10) / 10,
-        participationRate:
-          Math.round(school.school_stats[0].participation_rate * 10) / 10,
-        totalQuizzesTaken: school.school_stats[0].total_quizzes_taken,
-        totalQuestionsAnswered: school.school_stats[0].total_questions_answered,
-        correctAnswers: school.school_stats[0].correct_answers,
-        lastUpdated: school.school_stats[0].last_calculated_at,
+        averageScore: school.school_stats?.[0]?.average_score
+          ? Math.round(school.school_stats[0].average_score * 10) / 10
+          : 0,
+        participationRate: school.school_stats?.[0]?.participation_rate
+          ? Math.round(school.school_stats[0].participation_rate * 10) / 10
+          : 0,
+        totalQuizzesTaken: school.school_stats?.[0]?.total_quizzes_taken || 0,
+        totalQuestionsAnswered:
+          school.school_stats?.[0]?.total_questions_answered || 0,
+        correctAnswers: school.school_stats?.[0]?.correct_answers || 0,
+        lastUpdated:
+          school.school_stats?.[0]?.last_calculated_at ||
+          new Date().toISOString(),
         rank: index + 1,
       }));
 

@@ -200,12 +200,12 @@ export default function LeaderboardTable({
             </thead>
             <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
               {filteredData.map((user, index) => {
-                console.log('User data:', {
-                  id: user.id,
-                  school_id: user.school_id,
-                  is_school_visible: user.is_school_visible,
-                  school: user.school,
-                });
+                // console.log('User data:', {
+                //   id: user.id,
+                //   school_id: user.school_id,
+                //   is_school_visible: user.is_school_visible,
+                //   school: user.school,
+                // });
                 return (
                   <tr
                     key={user.id}
@@ -263,13 +263,13 @@ export default function LeaderboardTable({
                         <div>
                           <Link
                             href={`/profile/${user.id}`}
-                            onClick={() =>
-                              console.log('Clicking profile link for:', {
-                                userId: user.id,
-                                profileUrl: `/profile/${user.id}`,
-                                displayName: user.display_name,
-                              })
-                            }
+                            // onClick={() =>
+                            //   console.log('Clicking profile link for:', {
+                            //     userId: user.id,
+                            //     profileUrl: `/profile/${user.id}`,
+                            //     displayName: user.display_name,
+                            //   })
+                            // }
                             className="text-sm font-medium text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                           >
                             {user.display_name}

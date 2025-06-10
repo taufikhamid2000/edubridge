@@ -25,13 +25,12 @@ export default function ProfileHeader({ user }: ProfileHeaderProps) {
   const avatarUrl: string = isValidImageUrl(user.avatar_url)
     ? user.avatar_url!
     : defaultAvatarUrl;
-
   // Format the date in a consistent way for both server and client
   const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat('en-US', {
+    return new Intl.DateTimeFormat('en-GB', {
       year: 'numeric',
-      month: 'numeric',
-      day: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
     }).format(date);
   };
 

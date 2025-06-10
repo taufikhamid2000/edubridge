@@ -95,7 +95,7 @@ export async function fetchLeaderboard(
 
     // Execute the query
     const { data: profileData, error } = await query;
-    console.log('Raw profile data:', profileData);
+    // console.log('Raw profile data:', profileData);
 
     if (error) {
       throw error;
@@ -104,7 +104,7 @@ export async function fetchLeaderboard(
     // Map profiles to User type with school info
     const data = ((profileData as unknown as UserProfileResponse[]) || []).map(
       (profile) => {
-        console.log('Profile from DB:', profile);
+        // console.log('Profile from DB:', profile);
         const mappedUser = {
           id: profile.id,
           email: '', // Email is not needed for leaderboard
@@ -120,7 +120,7 @@ export async function fetchLeaderboard(
           school_id: profile.school_id,
           school: profile.school || undefined, // School data is a single object
         } as User;
-        console.log('Mapped user:', mappedUser);
+        // console.log('Mapped user:', mappedUser);
         return mappedUser;
       }
     );

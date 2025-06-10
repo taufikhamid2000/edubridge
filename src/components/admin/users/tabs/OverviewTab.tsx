@@ -30,10 +30,15 @@ export default function OverviewTab({ user }: OverviewTabProps) {
         <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
           <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">
             Member Since
-          </div>
+          </div>{' '}
           <div className="text-2xl font-bold text-gray-900 dark:text-white">
+            {' '}
             {user?.created_at
-              ? new Date(user.created_at).toLocaleDateString()
+              ? new Date(user.created_at).toLocaleDateString('en-GB', {
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: 'numeric',
+                })
               : 'N/A'}
           </div>
         </div>
