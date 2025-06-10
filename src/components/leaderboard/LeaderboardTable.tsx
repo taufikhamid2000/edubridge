@@ -23,43 +23,7 @@ const isValidImageUrl = (url: string | undefined): boolean => {
   return url.startsWith('http://') || url.startsWith('https://');
 };
 
-interface School {
-  id: string;
-  name: string;
-  type: string;
-}
-
-// Helper function to get a placeholder school
-const getPlaceholderSchool = (index: number): School => {
-  const schools: School[] = [
-    {
-      id: 'f8e7d6c5-b4a3-2f1e-9d8c-7b6a5f4e3d2c',
-      name: 'MRSM Tawau',
-      type: 'MRSM',
-    },
-    {
-      id: 'a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d',
-      name: 'SMKA Sheikh Haji Mohd Said',
-      type: 'SMKA',
-    },
-    {
-      id: 'b2c3d4e5-f6a7-8b9c-0d1e-2f3a4b5c6d7e',
-      name: 'Kolej Vokasional Shah Alam',
-      type: 'KV',
-    },
-    {
-      id: 'c3d4e5f6-a7b8-9c0d-1e2f-3a4b5c6d7e8f',
-      name: 'SBP Integrasi Gombak',
-      type: 'SBP',
-    },
-    {
-      id: 'd4e5f6a7-b8c9-0d1e-2f3a-4b5c6d7e8f9a',
-      name: 'Sekolah Seni Malaysia Kuching',
-      type: 'Sekolah Seni',
-    },
-  ];
-  return schools[index % schools.length];
-};
+// School types for filtering have been moved to schoolTypes array
 
 export default function LeaderboardTable({
   data,
@@ -82,12 +46,14 @@ export default function LeaderboardTable({
     'SMJK',
     'Sekolah Sains',
   ];
-
   const filteredData =
     selectedType === 'all'
       ? data
       : data.filter(
-          (_, index) => getPlaceholderSchool(index).type === selectedType
+          (user) =>
+            user.school_id !== null &&
+            user.is_school_visible &&
+            user.school?.type === selectedType
         );
 
   return (
@@ -233,86 +199,107 @@ export default function LeaderboardTable({
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-              {filteredData.map((user, index) => (
-                <tr
-                  key={user.id}
-                  className={`${
-                    index < 3
-                      ? 'bg-blue-50/50 dark:bg-blue-900/20'
-                      : 'hover:bg-gray-50 dark:hover:bg-gray-700/50'
-                  } transition-colors duration-150`}
-                >
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      {index < 3 ? (
-                        <div
-                          className={`w-8 h-8 rounded-full flex items-center justify-center mr-2 transition-transform hover:scale-110 ${
-                            index === 0
-                              ? 'bg-yellow-400 dark:bg-yellow-500'
-                              : index === 1
-                                ? 'bg-gray-300 dark:bg-gray-400'
-                                : 'bg-amber-600 dark:bg-amber-700'
-                          }`}
-                        >
-                          <span className="text-white font-bold">
-                            {index + 1}
-                          </span>
-                        </div>
-                      ) : (
-                        <span className="w-8 text-center mr-2 text-gray-600 dark:text-gray-400">
-                          {index + 1}
-                        </span>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center mr-3 overflow-hidden">
-                        {isValidImageUrl(user.avatar_url) ? (
-                          <Image
-                            src={user.avatar_url!}
-                            alt={`${user.display_name}'s avatar`}
-                            width={40}
-                            height={40}
-                            className="object-cover"
-                            priority={index < 5}
-                            unoptimized={
-                              user.avatar_url?.startsWith('data:') ||
-                              user.avatar_url?.includes('ui-avatars.com')
-                            }
-                          />
+              {filteredData.map((user, index) => {
+                console.log('User data:', {
+                  id: user.id,
+                  school_id: user.school_id,
+                  is_school_visible: user.is_school_visible,
+                  school: user.school,
+                });
+                return (
+                  <tr
+                    key={user.id}
+                    className={`${
+                      index < 3
+                        ? 'bg-blue-50/50 dark:bg-blue-900/20'
+                        : 'hover:bg-gray-50 dark:hover:bg-gray-700/50'
+                    } transition-colors duration-150`}
+                  >
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        {index < 3 ? (
+                          <div
+                            className={`w-8 h-8 rounded-full flex items-center justify-center mr-2 transition-transform hover:scale-110 ${
+                              index === 0
+                                ? 'bg-yellow-400 dark:bg-yellow-500'
+                                : index === 1
+                                  ? 'bg-gray-300 dark:bg-gray-400'
+                                  : 'bg-amber-600 dark:bg-amber-700'
+                            }`}
+                          >
+                            <span className="text-white font-bold">
+                              {index + 1}
+                            </span>
+                          </div>
                         ) : (
-                          <span className="text-lg font-bold text-blue-500 dark:text-blue-400">
-                            {user.display_name?.[0]?.toUpperCase() || 'U'}
+                          <span className="w-8 text-center mr-2 text-gray-600 dark:text-gray-400">
+                            {index + 1}
                           </span>
                         )}
                       </div>
-                      <div>
-                        <Link
-                          href={`/profile/${user.id}`}
-                          className="text-sm font-medium text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                        >
-                          {user.display_name}
-                        </Link>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center mr-3 overflow-hidden">
+                          {isValidImageUrl(user.avatar_url) ? (
+                            <Image
+                              src={user.avatar_url!}
+                              alt={`${user.display_name}'s avatar`}
+                              width={40}
+                              height={40}
+                              className="object-cover"
+                              priority={index < 5}
+                              unoptimized={
+                                user.avatar_url?.startsWith('data:') ||
+                                user.avatar_url?.includes('ui-avatars.com')
+                              }
+                            />
+                          ) : (
+                            <span className="text-lg font-bold text-blue-500 dark:text-blue-400">
+                              {user.display_name?.[0]?.toUpperCase() || 'U'}
+                            </span>
+                          )}
+                        </div>
+                        <div>
+                          <Link
+                            href={`/profile/${user.id}`}
+                            className="text-sm font-medium text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                          >
+                            {user.display_name}
+                          </Link>
+                        </div>
                       </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {' '}
-                    <div>
-                      <Link
-                        href={`/schools/${getPlaceholderSchool(index).id}`}
-                        className="text-sm font-medium text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                      >
-                        {getPlaceholderSchool(index).name}
-                      </Link>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {getPlaceholderSchool(index).type}
-                      </p>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {' '}
+                      <div>
+                        {' '}
+                        {user.school_id === null ? (
+                          <span className="text-sm text-gray-500 dark:text-gray-400">
+                            Not specified
+                          </span>
+                        ) : user.is_school_visible ? (
+                          <>
+                            <Link
+                              href={`/schools/${user.school_id}`}
+                              className="text-sm font-medium text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                            >
+                              {user.school?.name}
+                            </Link>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                              {user.school?.type}
+                            </p>
+                          </>
+                        ) : (
+                          <span className="text-sm text-gray-500 dark:text-gray-400">
+                            Hidden by user for privacy
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
 
               {filteredData.length === 0 && (
                 <tr>

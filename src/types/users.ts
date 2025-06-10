@@ -1,6 +1,14 @@
 import { SchoolRole } from './schools';
 
 // User types for leaderboard and profile features
+export interface School {
+  id: string;
+  name: string;
+  type: string;
+  district: string;
+  state: string;
+}
+
 export interface User {
   id: string;
   email: string;
@@ -14,6 +22,7 @@ export interface User {
   school_id?: string;
   school_role?: SchoolRole;
   is_school_visible?: boolean;
+  school?: School;
 }
 
 // User achievements

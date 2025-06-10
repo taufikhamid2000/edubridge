@@ -5,9 +5,30 @@ import { logger } from '@/lib/logger';
 /**
  * Fetches leaderboard data with optional filtering
  */
+interface UserProfileResponse {
+  id: string;
+  display_name: string | null;
+  xp: number;
+  level: number;
+  streak: number;
+  avatar_url: string | null;
+  last_quiz_date: string | null;
+  is_school_visible: boolean;
+  school_role: string | null;
+  school_id: string | null;
+  school: {
+    id: string;
+    name: string;
+    type: string;
+    district: string;
+    state: string;
+  } | null;
+  daily_xp: number;
+  weekly_xp: number;
+}
+
 export async function fetchLeaderboard(
   timeFrame: 'daily' | 'weekly' | 'allTime' = 'allTime',
-  subjectId: string | null = null,
   limit = 100
 ): Promise<{
   data: User[] | null;
@@ -17,7 +38,9 @@ export async function fetchLeaderboard(
   try {
     // Get current user for rank calculation
     const { data: sessionData } = await supabase.auth.getSession();
-    const currentUserId = sessionData?.session?.user?.id; // Query user profiles
+    const currentUserId = sessionData?.session?.user?.id;
+
+    // Query user profiles with school data
     let query = supabase
       .from('user_profiles')
       .select(
@@ -29,13 +52,21 @@ export async function fetchLeaderboard(
         streak,
         avatar_url,
         last_quiz_date,
+        daily_xp,
+        weekly_xp,
         is_school_visible,
-        school_role
+        school_role,
+        school_id,
+        school:schools(
+          id,
+          name,
+          type,
+          district,
+          state
+        )
       `
-      )
-      // Only show active students who have made their school visible
+      ) // Only show active students
       .eq('school_role', 'student')
-      .eq('is_school_visible', true)
       .eq('is_disabled', false);
 
     // Apply time frame filter
@@ -59,57 +90,51 @@ export async function fetchLeaderboard(
       query = query.order('xp', { ascending: false });
     }
 
-    // Apply subject filter if provided
-    if (subjectId) {
-      // We need to join with the quiz_attempts table to filter by subject
-      // This requires a more complex query that might be better handled by a database view or function
-      // For now, we'll just log that this feature is coming soon
-      logger.log(
-        'Subject filtering not yet implemented in leaderboard service'
-      );
-    }
-
     // Limit the number of results
-    query = query.limit(limit); // Execute the query
+    query = query.limit(limit);
+
+    // Execute the query
     const { data: profileData, error } = await query;
+    console.log('Raw profile data:', profileData);
 
     if (error) {
       throw error;
-    } // Map profiles to User type
-    const data = (profileData || []).map((profile) => {
-      return {
-        id: profile.id,
-        display_name:
-          profile.display_name || `User ${profile.id.substring(0, 6)}`,
-        avatar_url: profile.avatar_url,
-        xp: profile.xp,
-        level: profile.level,
-        streak: profile.streak,
-        lastQuizDate: profile.last_quiz_date,
-        is_school_visible: profile.is_school_visible,
-        school_role: profile.school_role,
-      } as User;
-    });
+    }
+
+    // Map profiles to User type with school info
+    const data = ((profileData as unknown as UserProfileResponse[]) || []).map(
+      (profile) => {
+        console.log('Profile from DB:', profile);
+        const mappedUser = {
+          id: profile.id,
+          email: '', // Email is not needed for leaderboard
+          display_name:
+            profile.display_name || `User ${profile.id.substring(0, 6)}`,
+          avatar_url: profile.avatar_url,
+          xp: profile.xp,
+          level: profile.level,
+          streak: profile.streak,
+          lastQuizDate: profile.last_quiz_date,
+          is_school_visible: profile.is_school_visible,
+          school_role: profile.school_role,
+          school_id: profile.school_id,
+          school: profile.school || undefined, // School data is a single object
+        } as User;
+        console.log('Mapped user:', mappedUser);
+        return mappedUser;
+      }
+    );
 
     // Calculate current user's rank if user is logged in
     let currentUserRank = null;
     if (currentUserId && data) {
       const userIndex = data.findIndex((user) => user.id === currentUserId);
       currentUserRank = userIndex !== -1 ? userIndex + 1 : null;
-
-      // If user is not in top results, we need to find their actual rank
-      if (userIndex === -1) {
-        // This would require counting all users with higher XP
-        // For better performance, this should be done with a dedicated database function
-        logger.log(
-          'User rank calculation for users outside top results not yet implemented'
-        );
-      }
     }
 
     return { data, error: null, currentUserRank };
   } catch (error) {
-    logger.error('Error in fetchLeaderboard:', error);
+    logger.error('Error fetching leaderboard:', error);
     return { data: null, error: error as Error, currentUserRank: null };
   }
 }

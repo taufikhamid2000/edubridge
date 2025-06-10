@@ -2,6 +2,23 @@ import { supabase } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
 import { School, SchoolType } from '@/types/leaderboard';
 
+interface SchoolDBResponse {
+  id: string;
+  name: string;
+  type: SchoolType;
+  district: string | null;
+  state: string | null;
+  total_students: number | null;
+  school_stats: Array<{
+    average_score: number;
+    participation_rate: number;
+    total_quizzes_taken: number;
+    total_questions_answered: number;
+    correct_answers: number;
+    last_calculated_at: string;
+  }>;
+}
+
 /**
  * Fetches school leaderboard data with rankings based on quiz performance
  */
@@ -10,7 +27,6 @@ export async function fetchSchoolLeaderboard(): Promise<{
   error: Error | null;
 }> {
   try {
-    // Get schools with their stats in a single query
     const { data: schoolData, error } = await supabase
       .from('schools')
       .select(
@@ -21,14 +37,17 @@ export async function fetchSchoolLeaderboard(): Promise<{
         district,
         state,
         total_students,
-        school_stats!left (
+        school_stats (
           average_score,
-          participation_rate
-        ),
-        users:student_profiles!left (count)
+          participation_rate,
+          total_quizzes_taken,
+          total_questions_answered,
+          correct_answers,
+          last_calculated_at
+        )
       `
       )
-      .order('name'); // Temporary sort by name since stats might be null
+      .order('school_stats(average_score)', { ascending: false });
 
     if (error) {
       logger.error('Database error fetching schools:', error);
@@ -38,6 +57,7 @@ export async function fetchSchoolLeaderboard(): Promise<{
     if (!schoolData) {
       throw new Error('No schools found in the database');
     }
+
     const VALID_SCHOOL_TYPES = [
       'SMK',
       'SMKA',
@@ -51,45 +71,39 @@ export async function fetchSchoolLeaderboard(): Promise<{
     ] as const;
 
     // Process and format the data
-    const schools: School[] = schoolData
+    const schools: School[] = (schoolData as SchoolDBResponse[])
       .filter((school) => {
-        // Validate required fields
         if (!school || !school.id || !school.name || !school.type) {
           logger.warn('Invalid school data:', school);
           return false;
         }
-        // Validate school type
-        if (!VALID_SCHOOL_TYPES.includes(school.type as SchoolType)) {
+        if (!VALID_SCHOOL_TYPES.includes(school.type)) {
           logger.warn(`Invalid school type: ${school.type}`);
+          return false;
+        }
+        if (!school.school_stats) {
+          logger.warn(`No stats available for school: ${school.name}`);
           return false;
         }
         return true;
       })
-      .map((school) => {
-        // Default values for optional fields
-        const stats = school.school_stats?.[0] || {};
-        return {
-          id: school.id,
-          name: school.name,
-          type: school.type as SchoolType,
-          district: school.district || 'Unknown',
-          state: school.state || 'Unknown',
-          totalStudents: school.total_students || 0,
-          averageScore: Math.round((stats.average_score || 0) * 10) / 10, // Round to 1 decimal
-          participationRate:
-            Math.round((stats.participation_rate || 0) * 10) / 10,
-          rank: 0, // Will be set after sorting
-        };
-      })
-      // Sort by average score descending, and then by participation rate
-      .sort((a, b) => {
-        const scoreDiff = b.averageScore - a.averageScore;
-        return scoreDiff !== 0
-          ? scoreDiff
-          : b.participationRate - a.participationRate;
-      })
-      // Assign ranks after sorting
-      .map((school, index) => ({ ...school, rank: index + 1 }));
+      .map((school, index) => ({
+        id: school.id,
+        name: school.name,
+        type: school.type,
+        district: school.district || 'Unknown',
+        state: school.state || 'Unknown',
+        totalStudents: school.total_students || 0,
+        averageScore:
+          Math.round(school.school_stats[0].average_score * 10) / 10,
+        participationRate:
+          Math.round(school.school_stats[0].participation_rate * 10) / 10,
+        totalQuizzesTaken: school.school_stats[0].total_quizzes_taken,
+        totalQuestionsAnswered: school.school_stats[0].total_questions_answered,
+        correctAnswers: school.school_stats[0].correct_answers,
+        lastUpdated: school.school_stats[0].last_calculated_at,
+        rank: index + 1,
+      }));
 
     return { data: schools, error: null };
   } catch (error) {
@@ -112,22 +126,14 @@ export async function fetchSchoolStats(): Promise<{
   };
 }> {
   try {
-    // Get counts and stats in parallel
     const [schoolsResult, studentsResult, statsResult, historyResult] =
       await Promise.all([
-        // Get total schools count
         supabase.from('schools').select('*', { count: 'exact', head: true }),
-
-        // Get total students count
         supabase
           .from('user_profiles')
           .select('*', { count: 'exact', head: true })
           .eq('school_role', 'student'),
-
-        // Get participation rates
         supabase.from('school_stats').select('participation_rate'),
-
-        // Get last month's stats for growth calculation
         supabase
           .from('school_stats_history')
           .select('*')
@@ -147,13 +153,14 @@ export async function fetchSchoolStats(): Promise<{
     const schoolCount = schoolsResult.count || 0;
     const studentCount = studentsResult.count || 0;
 
+    // Only include schools with actual participation in the average
     const averageParticipation =
-      statsResult.data.reduce(
-        (acc, stat) => acc + (stat.participation_rate || 0),
-        0
-      ) / (statsResult.data.length || 1);
+      statsResult.data
+        .filter((stat) => stat.participation_rate > 0)
+        .reduce((acc, stat) => acc + stat.participation_rate, 0) /
+      (statsResult.data.filter((stat) => stat.participation_rate > 0).length ||
+        1);
 
-    // Calculate growth rates comparing to last month's data
     const lastMonthStats = historyResult.data;
     const growthRates = {
       schools:
@@ -181,14 +188,13 @@ export async function fetchSchoolStats(): Promise<{
       averageParticipation,
       totalStudents: studentCount,
       growthRates: {
-        schools: Math.round(growthRates.schools * 10) / 10, // Round to 1 decimal
+        schools: Math.round(growthRates.schools * 10) / 10,
         participation: Math.round(growthRates.participation * 10) / 10,
         students: Math.round(growthRates.students * 10) / 10,
       },
     };
   } catch (error) {
     logger.error('Error fetching school stats:', error);
-    // Return defaults if there's an error
     return {
       totalSchools: 0,
       averageParticipation: 0,
