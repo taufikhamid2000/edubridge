@@ -6,7 +6,7 @@ import { logger } from '@/lib/logger';
  * Fetches leaderboard data with optional filtering
  */
 export async function fetchLeaderboard(
-  timeFrame: 'daily' | 'weekly' | 'allTime' = 'weekly',
+  timeFrame: 'daily' | 'weekly' | 'allTime' = 'allTime',
   subjectId: string | null = null,
   limit = 100
 ): Promise<{
@@ -18,15 +18,25 @@ export async function fetchLeaderboard(
     // Get current user for rank calculation
     const { data: sessionData } = await supabase.auth.getSession();
     const currentUserId = sessionData?.session?.user?.id; // Query user profiles
-    let query = supabase.from('user_profiles').select(`
+    let query = supabase
+      .from('user_profiles')
+      .select(
+        `
         id,
         display_name,
         xp,
         level,
         streak,
         avatar_url,
-        last_quiz_date
-      `);
+        last_quiz_date,
+        is_school_visible,
+        school_role
+      `
+      )
+      // Only show active students who have made their school visible
+      .eq('school_role', 'student')
+      .eq('is_school_visible', true)
+      .eq('is_disabled', false);
 
     // Apply time frame filter
     if (timeFrame === 'daily') {
@@ -65,15 +75,10 @@ export async function fetchLeaderboard(
 
     if (error) {
       throw error;
-    } // For each profile, get basic information
+    } // Map profiles to User type
     const data = (profileData || []).map((profile) => {
-      // For display purposes, create a placeholder email if display_name is not available
-      // In a real app, you would handle this differently
       return {
         id: profile.id,
-        email: profile.display_name
-          ? `${profile.display_name}@example.com`
-          : `user-${profile.id.substring(0, 8)}@example.com`,
         display_name:
           profile.display_name || `User ${profile.id.substring(0, 6)}`,
         avatar_url: profile.avatar_url,
@@ -81,6 +86,8 @@ export async function fetchLeaderboard(
         level: profile.level,
         streak: profile.streak,
         lastQuizDate: profile.last_quiz_date,
+        is_school_visible: profile.is_school_visible,
+        school_role: profile.school_role,
       } as User;
     });
 

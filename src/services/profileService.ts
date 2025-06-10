@@ -24,18 +24,19 @@ export async function fetchUserProfile(): Promise<{
     const { data, error } = await supabase
       .from('user_profiles')
       .select(
-        `
-        id,
+        `        id,
         display_name,
         avatar_url,
         xp,
         level,
         streak,
         daily_xp,
-        weekly_xp,        last_quiz_date,
+        weekly_xp,
+        last_quiz_date,
         created_at,
         updated_at,
-        school_id
+        school_id,
+        is_school_visible
       `
       )
       .eq('id', currentUserId)
@@ -114,6 +115,7 @@ export async function fetchUserProfile(): Promise<{
         lastQuizDate: profileData.last_quiz_date,
         created_at: profileData.created_at,
         school_id: profileData.school_id,
+        is_school_visible: profileData.is_school_visible,
       };
 
       return { data: userData, error: null };
@@ -146,6 +148,7 @@ export async function updateUserProfile(profileData: {
   display_name?: string;
   avatar_url?: string;
   school_id?: string;
+  is_school_visible?: boolean;
 }): Promise<{ success: boolean; error: Error | null }> {
   try {
     // Get current user
@@ -166,6 +169,7 @@ export async function updateUserProfile(profileData: {
         display_name: profileData.display_name,
         avatar_url: profileData.avatar_url,
         school_id: profileData.school_id,
+        is_school_visible: profileData.is_school_visible,
         updated_at: new Date().toISOString(),
       })
       .eq('id', currentUserId);

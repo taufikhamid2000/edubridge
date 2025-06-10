@@ -36,6 +36,9 @@ export default function ProfileSettings({ user }: ProfileSettingsProps) {
   const [schoolSearch, setSchoolSearch] = useState<string>('');
   const [selectedState, setSelectedState] = useState<string>('all');
   const [selectedType, setSelectedType] = useState<string>('all');
+  const [isSchoolVisible, setIsSchoolVisible] = useState<boolean>(
+    user.is_school_visible || false
+  );
 
   // Get unique states and types for filters
   const states = [
@@ -109,15 +112,25 @@ export default function ProfileSettings({ user }: ProfileSettingsProps) {
           return;
         }
 
-        const { data } = supabase.storage
+        const { data: urlData } = supabase.storage
           .from('user-avatars')
           .getPublicUrl(filePath);
-        updatedAvatarUrl = data.publicUrl;
-      } // Update profile
+
+        if (urlData?.publicUrl) {
+          updatedAvatarUrl = urlData.publicUrl;
+        } else {
+          setErrorMessage('Error getting avatar URL');
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
+      // Update profile      // Only include school_id in the update if a school is selected
       const { success, error } = await updateUserProfile({
         display_name: displayName,
         avatar_url: updatedAvatarUrl,
-        school_id: selectedSchoolId,
+        ...(selectedSchoolId ? { school_id: selectedSchoolId } : {}),
+        is_school_visible: isSchoolVisible,
       });
 
       if (error) {
@@ -295,7 +308,7 @@ export default function ProfileSettings({ user }: ProfileSettingsProps) {
                     {school.state}
                   </option>
                 ))}
-              </select>
+              </select>{' '}
               {isLoadingSchools ? (
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                   Loading schools...
@@ -305,6 +318,25 @@ export default function ProfileSettings({ user }: ProfileSettingsProps) {
                   {filteredSchools.length} schools found
                 </p>
               )}
+              {/* School Visibility Toggle */}
+              <div className="mt-4 flex items-center">
+                <input
+                  type="checkbox"
+                  id="schoolVisibility"
+                  checked={isSchoolVisible}
+                  onChange={(e) => setIsSchoolVisible(e.target.checked)}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <label
+                  htmlFor="schoolVisibility"
+                  className="ml-2 block text-sm text-gray-600 dark:text-gray-400"
+                >
+                  Show my school on my public profile{' '}
+                  <span className="text-xs text-gray-500">
+                    (other students will be able to see which school you attend)
+                  </span>
+                </label>
+              </div>
             </div>
           </div>
           {/* Avatar Upload */}

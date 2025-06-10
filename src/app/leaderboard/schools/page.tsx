@@ -1,123 +1,62 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import SchoolLeaderboardTable from '@/components/leaderboard/SchoolLeaderboardTable';
 import LeaderboardNav from '@/components/leaderboard/LeaderboardNav';
-
-// Placeholder data - would be fetched from your database
-const mockSchoolData = [
-  {
-    id: '1',
-    name: 'MRSM Tawau',
-    type: 'MRSM',
-    district: 'Tawau',
-    state: 'Sabah',
-    totalStudents: 850,
-    averageScore: 92.5,
-    participationRate: 95,
-    rank: 1,
-  },
-  {
-    id: '2',
-    name: 'SMK Batu Unjur',
-    type: 'SMK',
-    district: 'Klang',
-    state: 'Selangor',
-    totalStudents: 1200,
-    averageScore: 88.7,
-    participationRate: 82,
-    rank: 2,
-  },
-  {
-    id: '3',
-    name: 'SMKA Sheikh Haji Mohd Said',
-    type: 'SMKA',
-    district: 'Seremban',
-    state: 'N. Sembilan',
-    totalStudents: 950,
-    averageScore: 87.2,
-    participationRate: 88,
-    rank: 3,
-  },
-  {
-    id: '4',
-    name: 'SMK Sultan Abdul Samad',
-    type: 'SMK',
-    district: 'Petaling',
-    state: 'Selangor',
-    totalStudents: 1500,
-    averageScore: 86.5,
-    participationRate: 75,
-    rank: 4,
-  },
-  {
-    id: '5',
-    name: 'Sekolah Sains Tuanku Jaafar',
-    type: 'Sekolah Sains',
-    district: 'Kuala Pilah',
-    state: 'N. Sembilan',
-    totalStudents: 600,
-    averageScore: 85.9,
-    participationRate: 92,
-    rank: 5,
-  },
-  {
-    id: '6',
-    name: 'MRSM Pengkalan Chepa',
-    type: 'MRSM',
-    district: 'Kota Bharu',
-    state: 'Kelantan',
-    totalStudents: 720,
-    averageScore: 85.1,
-    participationRate: 89,
-    rank: 6,
-  },
-  {
-    id: '7',
-    name: 'SMK Damansara Jaya',
-    type: 'SMK',
-    district: 'Petaling',
-    state: 'Selangor',
-    totalStudents: 1800,
-    averageScore: 84.8,
-    participationRate: 71,
-    rank: 7,
-  },
-  {
-    id: '8',
-    name: 'Kolej Vokasional Shah Alam',
-    type: 'KV',
-    district: 'Petaling',
-    state: 'Selangor',
-    totalStudents: 950,
-    averageScore: 84.3,
-    participationRate: 85,
-    rank: 8,
-  },
-  {
-    id: '9',
-    name: 'SMJK Chung Ling',
-    type: 'SMJK',
-    district: 'Timur Laut',
-    state: 'Pulau Pinang',
-    totalStudents: 2200,
-    averageScore: 83.9,
-    participationRate: 78,
-    rank: 9,
-  },
-  {
-    id: '10',
-    name: 'Sekolah Seni Malaysia Kuching',
-    type: 'Sekolah Seni',
-    district: 'Kuching',
-    state: 'Sarawak',
-    totalStudents: 480,
-    averageScore: 83.5,
-    participationRate: 94,
-    rank: 10,
-  },
-];
+import {
+  fetchSchoolLeaderboard,
+  fetchSchoolStats,
+} from '@/services/schoolLeaderboardService';
+import { School } from '@/types/leaderboard';
+import { logger } from '@/lib/logger';
 
 export default function SchoolLeaderboardPage() {
+  const [schoolData, setSchoolData] = useState<School[]>([]);
+  const [stats, setStats] = useState<{
+    totalSchools: number;
+    averageParticipation: number;
+    totalStudents: number;
+    growthRates: {
+      schools: number;
+      participation: number;
+      students: number;
+    };
+  } | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadSchoolData() {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        // Fetch both school rankings and stats in parallel
+        const [leaderboardResult, statsResult] = await Promise.all([
+          fetchSchoolLeaderboard(),
+          fetchSchoolStats(),
+        ]);
+
+        if (leaderboardResult.error) {
+          throw new Error('Failed to fetch school rankings');
+        }
+
+        // Set the school data
+        setSchoolData(leaderboardResult.data || []);
+
+        // Set the stats
+        setStats(statsResult);
+      } catch (err) {
+        logger.error('Error loading school leaderboard:', err);
+        setError('Failed to load school data. Please try again later.');
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    loadSchoolData();
+  }, []);
+
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
       <LeaderboardNav activeTab="schools" />
@@ -132,55 +71,100 @@ export default function SchoolLeaderboardPage() {
         </p>
       </div>
 
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-            Total Active Schools
-          </h3>
-          <p className="text-2xl font-semibold text-gray-900 dark:text-white mt-2">
-            2,145
+      {isLoading ? (
+        <div className="text-center py-12">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">
+            Loading school rankings...
           </p>
-          <div className="mt-2 flex items-center text-sm">
-            <span className="text-green-500 mr-2">↑ 12%</span>
-            <span className="text-gray-500">from last month</span>
-          </div>
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-            Average Participation
-          </h3>
-          <p className="text-2xl font-semibold text-gray-900 dark:text-white mt-2">
-            76.3%
+      ) : error ? (
+        <div className="text-center py-12">
+          <div className="inline-flex h-20 w-20 rounded-full bg-red-100 dark:bg-red-900/20 items-center justify-center mb-4">
+            <svg
+              className="h-10 w-10 text-red-500 dark:text-red-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+              />
+            </svg>
+          </div>
+          <p className="text-xl font-medium text-gray-800 dark:text-gray-200 mb-2">
+            {error}
           </p>
-          <div className="mt-2 flex items-center text-sm">
-            <span className="text-green-500 mr-2">↑ 5%</span>
-            <span className="text-gray-500">from last month</span>
-          </div>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+          >
+            Try Again
+          </button>
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-            Total Student Users
-          </h3>
-          <p className="text-2xl font-semibold text-gray-900 dark:text-white mt-2">
-            45,678
-          </p>
-          <div className="mt-2 flex items-center text-sm">
-            <span className="text-green-500 mr-2">↑ 8%</span>
-            <span className="text-gray-500">from last month</span>
+      ) : (
+        <>
+          {/* Stats Overview */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                Total Active Schools
+              </h3>
+              <p className="text-2xl font-semibold text-gray-900 dark:text-white mt-2">
+                {stats?.totalSchools.toLocaleString()}
+              </p>
+              <div className="mt-2 flex items-center text-sm">
+                <span className="text-green-500 mr-2">
+                  ↑ {stats?.growthRates.schools}%
+                </span>
+                <span className="text-gray-500">from last month</span>
+              </div>
+            </div>
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                Average Participation
+              </h3>
+              <p className="text-2xl font-semibold text-gray-900 dark:text-white mt-2">
+                {stats?.averageParticipation.toFixed(1)}%
+              </p>
+              <div className="mt-2 flex items-center text-sm">
+                <span className="text-green-500 mr-2">
+                  ↑ {stats?.growthRates.participation}%
+                </span>
+                <span className="text-gray-500">from last month</span>
+              </div>
+            </div>
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                Total Student Users
+              </h3>
+              <p className="text-2xl font-semibold text-gray-900 dark:text-white mt-2">
+                {stats?.totalStudents.toLocaleString()}
+              </p>
+              <div className="mt-2 flex items-center text-sm">
+                <span className="text-green-500 mr-2">
+                  ↑ {stats?.growthRates.students}%
+                </span>
+                <span className="text-gray-500">from last month</span>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
 
-      {/* Main Content */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
-        <SchoolLeaderboardTable data={mockSchoolData} />
-      </div>
+          {/* Main Content */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
+            <SchoolLeaderboardTable data={schoolData} />
+          </div>
 
-      {/* Bottom Info */}
-      <div className="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
-        Last updated: {new Date().toLocaleString()} • Rankings are updated daily
-      </div>
+          {/* Bottom Info */}
+          <div className="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
+            Last updated: {new Date().toLocaleString()} • Rankings are updated
+            daily
+          </div>
+        </>
+      )}
     </div>
   );
 }

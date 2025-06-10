@@ -13,7 +13,7 @@ export default function LeaderboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [timeFrame, setTimeFrame] = useState<'daily' | 'weekly' | 'allTime'>(
-    'weekly'
+    'allTime'
   );
   const [subjectFilter, setSubjectFilter] = useState<string | null>(null);
   const [currentUserRank, setCurrentUserRank] = useState<number | null>(null);

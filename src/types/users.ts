@@ -13,6 +13,7 @@ export interface User {
   created_at?: string;
   school_id?: string;
   school_role?: SchoolRole;
+  is_school_visible?: boolean;
 }
 
 // User achievements

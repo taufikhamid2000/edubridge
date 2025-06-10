@@ -10,11 +10,14 @@ interface LeaderboardTableProps {
 }
 
 // Helper function to validate image URLs
-const isValidImageUrl = (url: string): boolean => {
+const isValidImageUrl = (url: string | undefined): boolean => {
   if (!url) return false;
 
   // Check if it's a data URL
   if (url.startsWith('data:image/')) return true;
+
+  // Check if it's a URL from ui-avatars.com (default avatar)
+  if (url.includes('ui-avatars.com')) return true;
 
   // Simple check for http/https URLs
   return url.startsWith('http://') || url.startsWith('https://');
@@ -29,11 +32,6 @@ interface School {
 // Helper function to get a placeholder school
 const getPlaceholderSchool = (index: number): School => {
   const schools: School[] = [
-    {
-      id: 'd2a4b5c6-e7f8-4a3b-9c2d-1e0f3a4b5c6d',
-      name: 'SMK Batu Unjur',
-      type: 'SMK',
-    },
     {
       id: 'f8e7d6c5-b4a3-2f1e-9d8c-7b6a5f4e3d2c',
       name: 'MRSM Tawau',
@@ -58,36 +56,6 @@ const getPlaceholderSchool = (index: number): School => {
       id: 'd4e5f6a7-b8c9-0d1e-2f3a-4b5c6d7e8f9a',
       name: 'Sekolah Seni Malaysia Kuching',
       type: 'Sekolah Seni',
-    },
-    {
-      id: 'e5f6a7b8-c9d0-1e2f-3a4b-5c6d7e8f9a0b',
-      name: 'SMJK Chung Ling',
-      type: 'SMJK',
-    },
-    {
-      id: 'f6a7b8c9-d0e1-2f3a-4b5c-6d7e8f9a0b1c',
-      name: 'Sekolah Sukan Bukit Jalil',
-      type: 'Sekolah Sukan',
-    },
-    {
-      id: 'a7b8c9d0-e1f2-3a4b-5c6d-7e8f9a0b1c2d',
-      name: 'SMK Sultan Abdul Samad',
-      type: 'SMK',
-    },
-    {
-      id: 'b8c9d0e1-f2a3-4b5c-6d7e-8f9a0b1c2d3e',
-      name: 'MRSM Pengkalan Chepa',
-      type: 'MRSM',
-    },
-    {
-      id: 'c9d0e1f2-a3b4-5c6d-7e8f-9a0b1c2d3e4f',
-      name: 'Sekolah Menengah Sains Tuanku Jaafar',
-      type: 'Sekolah Sains',
-    },
-    {
-      id: 'd0e1f2a3-b4c5-6d7e-8f9a-0b1c2d3e4f5a',
-      name: 'SMKA Maahad Hamidiah',
-      type: 'SMKA',
     },
   ];
   return schools[index % schools.length];
@@ -300,38 +268,32 @@ export default function LeaderboardTable({
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center mr-3 overflow-hidden">
-                        {user.avatar_url && isValidImageUrl(user.avatar_url) ? (
+                        {isValidImageUrl(user.avatar_url) ? (
                           <Image
-                            src={user.avatar_url}
-                            alt={`${user.display_name || 'User'}'s avatar`}
+                            src={user.avatar_url!}
+                            alt={`${user.display_name}'s avatar`}
                             width={40}
                             height={40}
                             className="object-cover"
                             priority={index < 5}
-                            unoptimized={user.avatar_url.startsWith('data:')}
-                            onError={() => {
-                              console.log(
-                                `Failed to load avatar for user: ${user.id}`
-                              );
-                            }}
+                            unoptimized={
+                              user.avatar_url?.startsWith('data:') ||
+                              user.avatar_url?.includes('ui-avatars.com')
+                            }
                           />
                         ) : (
                           <span className="text-lg font-bold text-blue-500 dark:text-blue-400">
-                            {user.display_name?.[0]?.toUpperCase() ||
-                              user.email[0].toUpperCase()}
+                            {user.display_name?.[0]?.toUpperCase() || 'U'}
                           </span>
                         )}
                       </div>
                       <div>
                         <Link
-                          href={`/profile?userId=${user.id}`}
+                          href={`/profile/${user.id}`}
                           className="text-sm font-medium text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                         >
-                          {user.display_name || user.email.split('@')[0]}
+                          {user.display_name}
                         </Link>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                          {user.email}
-                        </p>
                       </div>
                     </div>
                   </td>

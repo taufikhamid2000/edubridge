@@ -1,49 +1,32 @@
 import React, { useState } from 'react';
-
-interface SchoolData {
-  id: string;
-  name: string;
-  type: string;
-  district: string;
-  state: string;
-  totalStudents: number;
-  averageScore: number;
-  participationRate: number;
-  rank: number;
-}
+import { School, SchoolType } from '@/types/leaderboard';
 
 interface SchoolLeaderboardTableProps {
-  data: SchoolData[];
+  data: School[];
 }
 
 export default function SchoolLeaderboardTable({
   data,
 }: SchoolLeaderboardTableProps) {
-  const [selectedType, setSelectedType] = useState<string>('all');
+  const [selectedType, setSelectedType] = useState<SchoolType | 'all'>('all');
   const [selectedState, setSelectedState] = useState<string>('all');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
 
-  // Placeholder data for filters
-  const states = [
-    'all',
-    'Selangor',
-    'Johor',
-    'Perak',
-    'Kedah',
-    'Sabah',
-    'Sarawak',
-  ];
-  const schoolTypes = [
+  // Get unique states from data
+  const states = ['all', ...new Set(data.map((school) => school.state))];
+
+  // School types from the SchoolType enum
+  const schoolTypes: Array<SchoolType | 'all'> = [
     'all',
     'SMK',
     'SMKA',
-    'SBP',
     'MRSM',
-    'SMT',
-    'Sekolah Seni',
-    'Sekolah Sukan',
-    'SMJK',
     'Sekolah Sains',
+    'Sekolah Sukan',
+    'Sekolah Seni',
+    'SBP',
+    'SMJK',
+    'KV',
   ];
 
   // Filter data based on selections
@@ -72,10 +55,13 @@ export default function SchoolLeaderboardTable({
             Average Score
           </h3>
           <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-            {(
-              data.reduce((acc, school) => acc + school.averageScore, 0) /
-              data.length
-            ).toFixed(1)}
+            {' '}
+            {data.length > 0
+              ? (
+                  data.reduce((acc, school) => acc + school.averageScore, 0) /
+                  data.length
+                ).toFixed(1)
+              : 'N/A'}
           </p>
         </div>
         <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
@@ -83,11 +69,16 @@ export default function SchoolLeaderboardTable({
             Participation Rate
           </h3>
           <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-            {(
-              data.reduce((acc, school) => acc + school.participationRate, 0) /
-              data.length
-            ).toFixed(1)}
-            %
+            {' '}
+            {data.length > 0
+              ? (
+                  data.reduce(
+                    (acc, school) => acc + school.participationRate,
+                    0
+                  ) / data.length
+                ).toFixed(1)
+              : 'N/A'}
+            {data.length > 0 ? '%' : ''}
           </p>
         </div>
       </div>
@@ -104,7 +95,9 @@ export default function SchoolLeaderboardTable({
             </label>
             <select
               value={selectedType}
-              onChange={(e) => setSelectedType(e.target.value)}
+              onChange={(e) =>
+                setSelectedType(e.target.value as SchoolType | 'all')
+              }
               className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 text-sm"
             >
               {schoolTypes.map((type) => (
@@ -141,7 +134,18 @@ export default function SchoolLeaderboardTable({
               disabled={selectedState === 'all'}
             >
               <option value="all">All Districts</option>
-              {/* Districts would be populated based on selected state */}
+              {selectedState !== 'all' &&
+                Array.from(
+                  new Set(
+                    data
+                      .filter((school) => school.state === selectedState)
+                      .map((school) => school.district)
+                  )
+                ).map((district) => (
+                  <option key={district} value={district}>
+                    {district}
+                  </option>
+                ))}
             </select>
           </div>
         </div>
