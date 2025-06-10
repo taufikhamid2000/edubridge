@@ -17,11 +17,11 @@ export async function verifyAdminAccess(): Promise<{
     const userId = session?.user?.id;
 
     // Log session state for debugging
-    console.log('Session check:', {
-      hasSession: !!session,
-      hasUserId: !!userId,
-      timestamp: new Date().toISOString(),
-    });
+    // console.log('Session check:', {
+    //   hasSession: !!session,
+    //   hasUserId: !!userId,
+    //   timestamp: new Date().toISOString(),
+    // });
 
     if (!userId) {
       logger.error('Admin access denied - no authenticated user');
@@ -39,12 +39,12 @@ export async function verifyAdminAccess(): Promise<{
       .single();
 
     // Debug role check
-    console.log('User role check:', {
-      userId,
-      hasRoleData: !!userRoles,
-      role: userRoles?.role,
-      hasError: !!roleError,
-    });
+    // console.log('User role check:', {
+    //   userId,
+    //   hasRoleData: !!userRoles,
+    //   role: userRoles?.role,
+    //   hasError: !!roleError,
+    // });
 
     if (roleError) {
       logger.error('Error checking admin role:', roleError);

@@ -12,23 +12,27 @@ interface UserProfilePageProps {
 }
 
 async function getUserData(userId: string) {
-  // Use server-side Supabase client
   const cookieStore = await cookies();
+
+  // Create server-side Supabase client with proper auth settings
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
         get: (name) => cookieStore.get(name)?.value,
-        set: () => {}, // We don't need to set cookies for this read operation
+        set: () => {}, // No need to set cookies in a server component
         remove: () => {},
+      },
+      auth: {
+        persistSession: false, // Don't persist session in server component
+        autoRefreshToken: false, // Disable auto refresh on server side
+        detectSessionInUrl: false, // Disable session detection in URL on server side
       },
     }
   );
 
-  console.log('Fetching user data for userId:', userId);
   try {
-    // Try user_profiles first
     const { data: user, error } = await supabase
       .from('user_profiles')
       .select(
@@ -39,8 +43,6 @@ async function getUserData(userId: string) {
       )
       .eq('id', userId)
       .single();
-
-    console.log('Supabase response:', { user, error });
 
     if (error) {
       logger.error('Error fetching user:', error);
@@ -57,14 +59,10 @@ async function getUserData(userId: string) {
 export default async function UserProfilePage({
   params,
 }: UserProfilePageProps) {
-  console.log('Profile page params:', params);
   const { userId } = params;
-  console.log('Extracted userId:', userId);
   const user = await getUserData(userId);
-  console.log('Retrieved user:', user);
 
   if (!user) {
-    console.log('No user found, redirecting to 404');
     redirect('/404');
   }
 

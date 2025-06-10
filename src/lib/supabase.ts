@@ -9,16 +9,16 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 // Debug environment information without exposing the actual keys
-const envDebug = {
-  hasUrl: !!supabaseUrl,
-  hasAnonKey: !!supabaseAnonKey,
-  hasServiceKey: !!supabaseServiceKey,
-  keyLength: supabaseServiceKey?.length || 0,
-  nodeEnv: process.env.NODE_ENV,
-  isServer: typeof window === 'undefined',
-};
+// const envDebug = {
+//   hasUrl: !!supabaseUrl,
+//   hasAnonKey: !!supabaseAnonKey,
+//   hasServiceKey: !!supabaseServiceKey,
+//   keyLength: supabaseServiceKey?.length || 0,
+//   nodeEnv: process.env.NODE_ENV,
+//   isServer: typeof window === 'undefined',
+// };
 
-logger.info('📊 Environment variables debug info:', envDebug);
+// logger.info('📊 Environment variables debug info:', envDebug);
 
 if (!supabaseUrl || !supabaseAnonKey) {
   logger.error('🚨 Missing Supabase credentials!', {
@@ -35,10 +35,9 @@ export const supabase = createClient(supabaseUrl || '', supabaseAnonKey || '', {
     persistSession: true,
     autoRefreshToken: true,
     storageKey: 'edubridge-auth-storage-key',
-    detectSessionInUrl: true,
-    // Optimize OAuth flow settings
+    detectSessionInUrl: true, // Optimize OAuth flow settings
     flowType: 'pkce', // Use PKCE flow for better security
-    debug: process.env.NODE_ENV === 'development',
+    debug: false, // Disable debug logs
   },
   global: {
     // Add request headers for tracking the source environment
@@ -101,9 +100,9 @@ export const supabaseAdmin =
     : supabase; // Fall back to regular client if no service key
 
 // Log if admin client successfully created (without exposing sensitive data)
-logger.info(
-  `🔐 Supabase admin client status: ${supabaseServiceKey ? 'configured' : 'using fallback'}`
-);
+// logger.info(
+//   `🔐 Supabase admin client status: ${supabaseServiceKey ? 'configured' : 'using fallback'}`
+// );
 
 /**
  * Handle auth session recovery when there's a token issue

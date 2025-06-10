@@ -72,7 +72,7 @@ function DashboardClient() {
       }
 
       try {
-        logger.log('Fetching subjects from Supabase...');
+        // logger.log('Fetching subjects from Supabase...');
         // Fetch subjects from Supabase
         const { data: subjectsData, error: subjectsError } = await supabase
           .from('subjects')
@@ -100,7 +100,7 @@ function DashboardClient() {
           // Then sort by the existing order_index within the same category
           return (a.order_index || 0) - (b.order_index || 0);
         });
-        logger.log('Subjects data sorted:', sortedSubjects);
+        // logger.log('Subjects data sorted:', sortedSubjects);
         setSubjects(sortedSubjects);
 
         // Extract unique categories

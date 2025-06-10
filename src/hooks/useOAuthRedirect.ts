@@ -78,7 +78,7 @@ export const useOAuthRedirect = (redirectPath: string = '/dashboard') => {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session) {
-        logger.info('🔐 User signed in via OAuth');
+        // logger.info('🔐 User signed in via OAuth');
 
         // Clean URL and redirect
         setTimeout(() => {
