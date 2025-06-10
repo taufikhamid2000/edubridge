@@ -17,12 +17,24 @@ export default function ProfileHeader({ user }: ProfileHeaderProps) {
     // Simple check for http/https URLs
     return url.startsWith('http://') || url.startsWith('https://');
   };
+
   // Default avatar if user doesn't have one
-  // Make sure avatarUrl is always a string
-  const defaultAvatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.display_name || 'User')}&background=random`;
+  const defaultAvatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+    user.display_name || 'User'
+  )}&background=random`;
   const avatarUrl: string = isValidImageUrl(user.avatar_url)
     ? user.avatar_url!
     : defaultAvatarUrl;
+
+  // Format the date in a consistent way for both server and client
+  const formatDate = (date: Date) => {
+    return new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric',
+    }).format(date);
+  };
+
   return (
     <div className="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
       <div className="h-24 bg-gradient-to-r from-blue-600 to-indigo-700"></div>
@@ -47,8 +59,7 @@ export default function ProfileHeader({ user }: ProfileHeaderProps) {
               {user.display_name || 'Anonymous User'}
             </h1>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Member since{' '}
-              {new Date(user.created_at || Date.now()).toLocaleDateString()}
+              Member since {formatDate(new Date(user.created_at || Date.now()))}
             </p>
           </div>
           <div className="mt-4 sm:mt-0 sm:ml-auto flex space-x-3">
