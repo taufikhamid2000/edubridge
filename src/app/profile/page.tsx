@@ -37,7 +37,6 @@ function ProfileContent() {
         const { data } = await supabase.auth.getSession();
         if (!data.session) {
           setError('You need to be logged in to view profiles.');
-          setLoading(false);
           return;
         }
 
@@ -56,22 +55,34 @@ function ProfileContent() {
           userData = data;
           userError = error;
         } else {
-          // Fetch current user profile
-          const result = await fetchUserProfile();
-          userData = result.data;
-          userError = result.error;
+          // Fetch current user profile with session recovery
+          try {
+            const result = await fetchUserProfile();
+            userData = result.data;
+            userError = result.error;
+            if (userError?.message?.includes('token')) {
+              // Try to recover the session
+              const { recoverSession } = await import('@/lib/supabase');
+              await recoverSession();
+              // Retry the fetch after recovery
+              const retryResult = await fetchUserProfile();
+              userData = retryResult.data;
+              userError = retryResult.error;
+            }
+          } catch (e) {
+            userError =
+              e instanceof Error ? e : new Error('Failed to fetch profile');
+          }
         }
 
         if (userError) {
           setError(`Failed to load profile data: ${userError.message}`);
           logger.error('Profile data fetch error:', userError);
-          setLoading(false);
           return;
         }
 
         if (!userData) {
           setError('No profile data returned. Please try again.');
-          setLoading(false);
           return;
         }
 

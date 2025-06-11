@@ -10,21 +10,43 @@ export async function fetchUserProfile(): Promise<{
   error: Error | null;
 }> {
   try {
-    // Get current user
-    const { data: sessionData } = await supabase.auth.getSession();
-    const currentUserId = sessionData?.session?.user?.id;
+    // Get current user with a retry for session issues
+    const { data: sessionData, error: sessionError } =
+      await supabase.auth.getSession();
+    if (sessionError) {
+      logger.warn(
+        'Session error in fetchUserProfile, attempting recovery:',
+        sessionError
+      );
+      const { recoverSession } = await import('@/lib/supabase');
+      await recoverSession();
+      // Get session again after recovery
+      const { data: recoveredSession } = await supabase.auth.getSession();
+      if (!recoveredSession.session) {
+        return {
+          data: null,
+          error: new Error(
+            'No authenticated user found after session recovery'
+          ),
+        };
+      }
+    }
 
+    const currentUserId = sessionData?.session?.user?.id;
     if (!currentUserId) {
       return {
         data: null,
         error: new Error('No authenticated user found'),
       };
-    } // Query user profile
+    }
+
+    // Query user profile
     let profileData;
     const { data, error } = await supabase
       .from('user_profiles')
       .select(
-        `        id,
+        `
+        id,
         display_name,
         avatar_url,
         xp,
@@ -102,18 +124,22 @@ export async function fetchUserProfile(): Promise<{
         data: null,
         error: new Error('User profile not found'),
       };
-    } // Format data according to User type
+    }
+
+    // Format data according to User type with safe date handling
     try {
       const userData: User = {
         id: profileData.id,
-        email: sessionData.session?.user?.email || '',
+        email: sessionData?.session?.user?.email || '',
         display_name: profileData.display_name || '',
         avatar_url: profileData.avatar_url || '',
         streak: profileData.streak || 0,
         xp: profileData.xp || 0,
         level: profileData.level || 1,
-        lastQuizDate: profileData.last_quiz_date,
-        created_at: profileData.created_at,
+        lastQuizDate: profileData.last_quiz_date
+          ? profileData.last_quiz_date
+          : undefined,
+        created_at: profileData.created_at || new Date().toISOString(),
         school_id: profileData.school_id,
         is_school_visible: profileData.is_school_visible,
       };
@@ -130,10 +156,7 @@ export async function fetchUserProfile(): Promise<{
       };
     }
   } catch (error) {
-    logger.error(
-      'Unexpected error in fetchUserProfile:',
-      JSON.stringify(error)
-    );
+    logger.error('Unexpected error in fetchUserProfile:', error);
     return {
       data: null,
       error: error instanceof Error ? error : new Error(JSON.stringify(error)),
