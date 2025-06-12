@@ -1,8 +1,6 @@
 'use client';
 
-import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { logger } from '@/lib/logger';
 import SchoolLeaderboardTable from '@/components/leaderboard/SchoolLeaderboardTable';
 import LeaderboardNav from '@/components/leaderboard/LeaderboardNav';
 import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
@@ -33,13 +31,7 @@ async function fetchSchoolLeaderboard(): Promise<SchoolLeaderboardResponse> {
 }
 
 export default function SchoolLeaderboardPage() {
-  const { 
-    data,
-    isLoading,
-    error,
-    dataUpdatedAt,
-    refetch
-  } = useQuery({
+  const { data, isLoading, error, dataUpdatedAt, refetch } = useQuery({
     queryKey: ['schoolLeaderboard'],
     queryFn: fetchSchoolLeaderboard,
     staleTime: 60000, // Consider data fresh for 1 minute
@@ -47,7 +39,8 @@ export default function SchoolLeaderboardPage() {
     refetchInterval: 60000, // Auto-refresh every minute
   });
 
-  const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
+  const errorMessage =
+    error instanceof Error ? error.message : 'An unexpected error occurred';
   const lastUpdated = dataUpdatedAt ? new Date(dataUpdatedAt) : new Date();
 
   return (
@@ -59,7 +52,8 @@ export default function SchoolLeaderboardPage() {
           🏫 School Rankings
         </h1>
         <p className="mt-2 text-gray-600 dark:text-gray-400">
-          Compare and track performance across different schools, districts, and states
+          Compare and track performance across different schools, districts, and
+          states
         </p>
       </div>
 
@@ -153,7 +147,8 @@ export default function SchoolLeaderboardPage() {
 
           {/* Bottom Info */}
           <div className="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
-            Last updated: {lastUpdated.toLocaleString()} • Rankings are updated daily
+            Last updated: {lastUpdated.toLocaleString()} • Rankings are updated
+            daily
           </div>
         </>
       )}

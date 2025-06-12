@@ -1,54 +1,61 @@
 'use client';
 
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { logger } from '@/lib/logger';
+import { useState, useEffect } from 'react';
 import SchoolLeaderboardTable from '@/components/leaderboard/SchoolLeaderboardTable';
 import LeaderboardNav from '@/components/leaderboard/LeaderboardNav';
-import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
+import {
+  fetchSchoolLeaderboard,
+  fetchSchoolStats,
+} from '@/services/schoolLeaderboardService';
 import { School } from '@/types/leaderboard';
-
-interface SchoolStatsResponse {
-  totalSchools: number;
-  averageParticipation: number;
-  totalStudents: number;
-  growthRates: {
-    schools: number;
-    participation: number;
-    students: number;
-  };
-}
-
-interface SchoolLeaderboardResponse {
-  data: School[];
-  stats: SchoolStatsResponse;
-}
-
-async function fetchSchoolLeaderboard(): Promise<SchoolLeaderboardResponse> {
-  const response = await fetch('/api/leaderboard/schools');
-  if (!response.ok) {
-    throw new Error('Failed to fetch school leaderboard data');
-  }
-  return response.json();
-}
+import { logger } from '@/lib/logger';
 
 export default function SchoolLeaderboardPage() {
-  const { 
-    data,
-    isLoading,
-    error,
-    dataUpdatedAt,
-    refetch
-  } = useQuery({
-    queryKey: ['schoolLeaderboard'],
-    queryFn: fetchSchoolLeaderboard,
-    staleTime: 60000, // Consider data fresh for 1 minute
-    gcTime: 300000, // Keep data in cache for 5 minutes
-    refetchInterval: 60000, // Auto-refresh every minute
-  });
+  const [schoolData, setSchoolData] = useState<School[]>([]);
+  const [stats, setStats] = useState<{
+    totalSchools: number;
+    averageParticipation: number;
+    totalStudents: number;
+    growthRates: {
+      schools: number;
+      participation: number;
+      students: number;
+    };
+  } | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
-  const lastUpdated = dataUpdatedAt ? new Date(dataUpdatedAt) : new Date();
+  useEffect(() => {
+    async function loadSchoolData() {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        // Fetch both school rankings and stats in parallel
+        const [leaderboardResult, statsResult] = await Promise.all([
+          fetchSchoolLeaderboard(),
+          fetchSchoolStats(),
+        ]);
+
+        if (leaderboardResult.error) {
+          throw new Error('Failed to fetch school rankings');
+        }
+
+        // Set the school data
+        setSchoolData(leaderboardResult.data || []);
+
+        // Set the stats
+        setStats(statsResult);
+      } catch (err) {
+        logger.error('Error loading school leaderboard:', err);
+        setError('Failed to load school data. Please try again later.');
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    loadSchoolData();
+  }, []);
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
@@ -59,18 +66,18 @@ export default function SchoolLeaderboardPage() {
           🏫 School Rankings
         </h1>
         <p className="mt-2 text-gray-600 dark:text-gray-400">
-          Compare and track performance across different schools, districts, and states
+          Compare and track performance across different schools, districts, and
+          states
         </p>
       </div>
 
       {isLoading ? (
-        <SkeletonLoader
-          variant="full"
-          rows={10}
-          cols={5}
-          message="Loading school rankings..."
-          showStopwatch={true}
-        />
+        <div className="text-center py-12">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">
+            Loading school rankings...
+          </p>
+        </div>
       ) : error ? (
         <div className="text-center py-12">
           <div className="inline-flex h-20 w-20 rounded-full bg-red-100 dark:bg-red-900/20 items-center justify-center mb-4">
@@ -89,10 +96,10 @@ export default function SchoolLeaderboardPage() {
             </svg>
           </div>
           <p className="text-xl font-medium text-gray-800 dark:text-gray-200 mb-2">
-            {errorMessage}
+            {error}
           </p>
           <button
-            onClick={() => refetch()}
+            onClick={() => window.location.reload()}
             className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
           >
             Try Again
@@ -107,11 +114,11 @@ export default function SchoolLeaderboardPage() {
                 Total Active Schools
               </h3>
               <p className="text-2xl font-semibold text-gray-900 dark:text-white mt-2">
-                {data?.stats.totalSchools.toLocaleString()}
+                {stats?.totalSchools.toLocaleString()}
               </p>
               <div className="mt-2 flex items-center text-sm">
                 <span className="text-green-500 mr-2">
-                  ↑ {data?.stats.growthRates.schools}%
+                  ↑ {stats?.growthRates.schools}%
                 </span>
                 <span className="text-gray-500">from last month</span>
               </div>
@@ -121,11 +128,11 @@ export default function SchoolLeaderboardPage() {
                 Average Participation
               </h3>
               <p className="text-2xl font-semibold text-gray-900 dark:text-white mt-2">
-                {data?.stats.averageParticipation.toFixed(1)}%
+                {stats?.averageParticipation.toFixed(1)}%
               </p>
               <div className="mt-2 flex items-center text-sm">
                 <span className="text-green-500 mr-2">
-                  ↑ {data?.stats.growthRates.participation}%
+                  ↑ {stats?.growthRates.participation}%
                 </span>
                 <span className="text-gray-500">from last month</span>
               </div>
@@ -135,11 +142,11 @@ export default function SchoolLeaderboardPage() {
                 Total Student Users
               </h3>
               <p className="text-2xl font-semibold text-gray-900 dark:text-white mt-2">
-                {data?.stats.totalStudents.toLocaleString()}
+                {stats?.totalStudents.toLocaleString()}
               </p>
               <div className="mt-2 flex items-center text-sm">
                 <span className="text-green-500 mr-2">
-                  ↑ {data?.stats.growthRates.students}%
+                  ↑ {stats?.growthRates.students}%
                 </span>
                 <span className="text-gray-500">from last month</span>
               </div>
@@ -148,12 +155,13 @@ export default function SchoolLeaderboardPage() {
 
           {/* Main Content */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
-            <SchoolLeaderboardTable data={data?.data || []} />
+            <SchoolLeaderboardTable data={schoolData} />
           </div>
 
           {/* Bottom Info */}
           <div className="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
-            Last updated: {lastUpdated.toLocaleString()} • Rankings are updated daily
+            Last updated: {new Date().toLocaleString()} • Rankings are updated
+            daily
           </div>
         </>
       )}

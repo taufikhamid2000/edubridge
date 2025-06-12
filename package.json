@@ -5,9 +5,10 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:analyze": "set ANALYZE=true && next build",
     "build:optimize": "bash scripts/add-dynamic-config.sh && next build",
     "build:segment-config": "bash scripts/setup-segment-configs.sh && next build",
-    "build:optimized": "bash scripts/improved-segment-configs.sh && next build",
+    "build:optimized": "NODE_ENV=production bash scripts/improved-segment-configs.sh && next build",
     "start": "next start",
     "lint": "next lint --fix",
     "prebuild": "echo 'Skipping TypeScript check for faster build'",
@@ -37,6 +38,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@jest/globals": "^29.7.0",
+    "@next/bundle-analyzer": "^15.3.3",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "@types/jest": "^29.5.14",

@@ -1,5 +1,11 @@
+import bundleAnalyzer from '@next/bundle-analyzer';
+
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+});
+
 /** @type {import('next').NextConfig} */
-const nextConfig = {
+const config = {
   reactStrictMode: true,
   // Enable standalone output for production
   output: 'standalone',
@@ -8,6 +14,23 @@ const nextConfig = {
     // Improve build performance
     serverMinification: true,
     optimizeServerReact: true,
+    // Enable server components by default
+    serverComponents: true,
+    // Enable concurrent features
+    concurrentFeatures: true,
+    // Optimize images
+    optimizeImages: true,
+    // Enable streaming
+    serverActions: {
+      bodySizeLimit: '2mb',
+    },
+  },
+  // Improve page loading performance
+  compiler: {
+    // Remove console.log in production
+    removeConsole: process.env.NODE_ENV === 'production',
+    // Enable React optimizations
+    styledComponents: true,
   },
   // Skip pre-rendering admin and API routes
   skipMiddlewareUrlNormalize: true,
@@ -50,4 +73,4 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+export default withBundleAnalyzer(config);
