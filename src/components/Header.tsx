@@ -15,6 +15,8 @@ export default function Header(): JSX.Element {
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
   useEffect(() => {
     async function init() {
       const {
@@ -69,37 +71,38 @@ export default function Header(): JSX.Element {
   }, []);
 
   useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const menuElement = document.querySelector('.header-menu');
       if (menuElement && !menuElement.contains(event.target as Node)) {
         setMenuOpen(false);
       }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const toggleTheme = () => {
     const next = theme === 'dark' ? 'light' : 'dark';
     setTheme(next);
     localStorage.setItem('theme', next);
-    document.documentElement.classList.remove('light', 'dark');
-    document.documentElement.classList.add(next);
+    document.documentElement.classList.toggle('dark', next === 'dark');
   };
 
-  const toggleMenu = () => {
-    setMenuOpen((prev) => !prev);
-  };
+  const toggleMenu = () => setMenuOpen((prev) => !prev);
 
   const openResearchPDF = () => {
     window.open('/docs/EduBridge%20Research.pdf', '_blank');
   };
 
   return (
-    <header className="sticky top-0 bg-[var(--color-bg)] bg-opacity-70 backdrop-blur-sm z-50">
+    <header className="sticky top-0 bg-[var(--color-bg)] bg-opacity-95 backdrop-blur-sm z-50 border-b border-gray-200 dark:border-gray-800">
       <div className="header-container">
         <Link href="/" className="header-link">
           <Image
@@ -108,100 +111,112 @@ export default function Header(): JSX.Element {
             width={32}
             height={32}
             className="w-8 h-8 mr-2"
+            priority
           />
-          EduBridge
-        </Link>{' '}
-        <nav className="header-nav space-x-2 md:space-x-4">
+          <span className="hidden sm:inline">EduBridge</span>
+        </Link>
+
+        <nav className="header-nav">
           {user ? (
             <div className={`header-menu ${menuOpen ? 'open' : ''}`}>
-              <button className="header-menu-button" onClick={toggleMenu}>
-                Menu
-              </button>{' '}
-              <div className="header-menu-dropdown">
-                {' '}
-                <Link href="/dashboard" className="header-menu-link">
-                  Dashboard
-                </Link>
-                <div className="py-1 border-b border-gray-200 dark:border-gray-700">
-                  <Link href="/leaderboard" className="header-menu-link">
-                    Student Rankings
+              <button
+                className={`header-menu-button flex items-center space-x-2 md:space-x-3 ${
+                  isMobile ? 'p-2' : 'px-4 py-2'
+                }`}
+                onClick={toggleMenu}
+                aria-label="Toggle menu"
+                aria-expanded={menuOpen}
+              >
+                <span className="hidden sm:inline">Menu</span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className={isMobile ? 'h-6 w-6' : 'h-5 w-5'}
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </button>
+
+              <div
+                className={`header-menu-dropdown ${
+                  menuOpen ? 'block' : 'hidden'
+                } ${isMobile ? 'w-screen left-0 right-0 fixed mt-0' : 'w-48'}`}
+              >
+                <div className={isMobile ? 'max-h-[80vh] overflow-y-auto' : ''}>
+                  <Link href="/dashboard" className="header-menu-link">
+                    Dashboard
                   </Link>
-                  <Link
-                    href="/leaderboard/schools"
-                    className="header-menu-link"
+
+                  <div className="py-1 border-b border-gray-200 dark:border-gray-700">
+                    <Link href="/leaderboard" className="header-menu-link">
+                      Student Rankings
+                    </Link>
+                    <Link
+                      href="/leaderboard/schools"
+                      className="header-menu-link"
+                    >
+                      School Rankings
+                    </Link>
+                  </div>
+
+                  <Link href="/profile" className="header-menu-link">
+                    Profile
+                  </Link>
+
+                  {isAdmin && (
+                    <Link href="/admin" className="header-menu-link">
+                      Admin
+                    </Link>
+                  )}
+
+                  <button
+                    type="button"
+                    className="header-menu-link w-full text-left"
+                    onClick={openResearchPDF}
                   >
-                    School Rankings
-                  </Link>
-                </div>
-                <Link href="/profile" className="header-menu-link">
-                  Profile
-                </Link>
-                {isAdmin && (
-                  <Link href="/admin" className="header-menu-link">
-                    Admin
-                  </Link>
-                )}
-                <button
-                  type="button"
-                  className="header-menu-link"
-                  onClick={openResearchPDF}
-                >
-                  Research
-                </button>{' '}
-                <button
-                  type="button"
-                  className="header-menu-link"
-                  onClick={async () => {
-                    console.log('Sign out button clicked');
-                    try {
-                      setUser(null); // Immediately update UI
+                    Research
+                  </button>
+
+                  <button
+                    type="button"
+                    className="header-menu-link w-full text-left text-red-600 dark:text-red-400"
+                    onClick={async () => {
+                      setUser(null);
                       setMenuOpen(false);
-
-                      // Initialize signout process
-                      signOut().catch((err) =>
-                        console.error('SignOut error:', err)
-                      );
-
-                      // Add a small delay to allow UI to update before redirect
-                      setTimeout(() => {
-                        console.log('Redirecting after UI update...');
-                        // Force a hard refresh/redirect to the home page
-                        document.location.href = '/';
-                      }, 150); // 150ms delay to allow React to render the UI change
-                    } catch (error) {
-                      console.error('Error during sign out:', error);
-                      document.location.href = '/auth';
-                    }
-                  }}
-                >
-                  {' '}
-                  Sign Out
-                </button>
+                      await signOut();
+                      document.location.href = '/';
+                    }}
+                  >
+                    Sign Out
+                  </button>
+                </div>
               </div>
             </div>
           ) : (
             <Link
               href="/auth"
-              className="btn text-sm md:text-base px-4 py-2 md:px-6 md:py-3"
+              className={`btn bg-[var(--color-accent)] text-white hover:bg-opacity-90 ${
+                isMobile ? 'px-4 py-2 text-sm' : ''
+              }`}
             >
               Get Started
             </Link>
-          )}{' '}
+          )}
+
           <button
             type="button"
-            className="header-theme-button text-sm md:text-base p-1 md:p-2"
+            className={`header-theme-button ${
+              isMobile ? 'p-2 ml-2' : 'p-2 ml-4'
+            }`}
             onClick={toggleTheme}
-            aria-label="Toggle theme"
+            aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
           >
-            {theme === 'dark' ? (
-              <span role="img" aria-label="Light Mode" className="text-xl">
-                🌞
-              </span>
-            ) : (
-              <span role="img" aria-label="Dark Mode" className="text-xl">
-                🌙
-              </span>
-            )}
+            {theme === 'dark' ? '🌞' : '🌙'}
           </button>
         </nav>
       </div>

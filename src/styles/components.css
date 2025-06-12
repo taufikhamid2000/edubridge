@@ -1,0 +1,32 @@
+/* Navigation links */
+.nav-link {
+  @apply flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 
+         hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors;
+}
+
+.nav-link svg {
+  @apply w-5 h-5;
+}
+
+/* Mobile optimizations */
+@media (max-width: 767px) {
+  .nav-link {
+    @apply px-3 py-2.5 text-sm;
+  }
+
+  .nav-link svg {
+    @apply w-4 h-4;
+  }
+}
+
+/* Touch target size optimization */
+@media (hover: none) and (pointer: coarse) {
+  .nav-link {
+    @apply min-h-[44px];
+  }
+}
+
+/* Active link styles */
+.nav-link.active {
+  @apply bg-[var(--color-accent)] text-white;
+}
