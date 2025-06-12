@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 
 interface Achievement {
   title: string;
@@ -6,24 +7,17 @@ interface Achievement {
   bgColor: string;
 }
 
-interface AchievementsProps {
+interface StaticAchievementsProps {
   achievements: Achievement[];
-  isStatic?: boolean;
 }
 
-const Achievements = ({
-  achievements,
-  isStatic = false,
-}: AchievementsProps) => {
-  const leaderboardPath = isStatic ? '/static/leaderboard' : '/leaderboard';
-
+const StaticAchievements = ({ achievements }: StaticAchievementsProps) => {
   return (
     <section className="dashboard-section achievements bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-md dark:bg-gray-800 dark:text-gray-200">
       <h2 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4">
         Recent Achievements
       </h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
-        {' '}
         {achievements.map((achievement, index) => (
           <div
             key={index}
@@ -36,18 +30,18 @@ const Achievements = ({
               {achievement.description}
             </p>
           </div>
-        ))}{' '}
-      </div>{' '}
+        ))}
+      </div>
       <div className="mt-4 text-center">
-        <a
-          href={leaderboardPath}
+        <Link
+          href="/static/leaderboard"
           className="inline-block px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full text-sm font-medium transition-colors dark:bg-blue-900 dark:text-blue-100 dark:hover:bg-blue-800"
         >
           🏆 View Leaderboard
-        </a>
+        </Link>
       </div>
     </section>
   );
 };
 
-export default Achievements;
+export default StaticAchievements;

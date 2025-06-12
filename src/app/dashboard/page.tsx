@@ -142,8 +142,8 @@ function DashboardClient() {
     fetchData();
   }, [router, cleanUrlTokens]);
 
-  const handleSubjectClick = (slug: string) => {
-    router.push(`/quiz/${slug}/chapters`);
+  const handleSubjectClick = (subject: Subject) => {
+    router.push(`/quiz/${subject.slug}/chapters`);
   };
 
   // Filter subjects based on search query and selected category

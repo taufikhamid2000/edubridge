@@ -17,12 +17,17 @@ export default function LoadingState() {
               </p>
               <p className="text-sm mt-2 text-blue-600 dark:text-blue-300">
                 🚀 Using Supabase Free Tier (~10 seconds)
-              </p>
+              </p>{' '}
               <p className="text-xs mt-2 text-blue-500 dark:text-blue-400">
                 Pro tip: If it takes too long, refreshing might help. If it
-                still didn't work after ~20 seconds, try clearing the cache. And
-                if it still didn't work after ~30 seconds, might as well go
-                touch some grass. jkjk
+                still didn't work after ~20 seconds, try clearing the cache.
+              </p>{' '}
+              <p className="text-xs mt-2 text-blue-600 dark:text-blue-300">
+                Having trouble on mobile? 📱{' '}
+                <Link href="/static/dashboard" className="underline">
+                  Try our static dashboard
+                </Link>{' '}
+                for instant access without backend connections.
               </p>
               <Stopwatch />
               <div className="mt-4">

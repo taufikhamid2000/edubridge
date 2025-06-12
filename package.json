@@ -23,6 +23,7 @@
     "test:coverage": "npx jest --config jest.config.mjs --coverage"
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "@supabase/auth-helpers-nextjs": "^0.10.0",
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.48.1",

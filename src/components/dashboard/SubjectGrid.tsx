@@ -16,7 +16,7 @@ interface SubjectGridProps {
   error: string | null;
   currentPage: number;
   totalPages: number;
-  handleSubjectClick: (slug: string) => void;
+  handleSubjectClick: (subject: Subject) => void;
   handlePageChange: (pageNumber: number) => void;
 }
 
@@ -52,7 +52,7 @@ const SubjectGrid = ({
           subjects.map((subject) => (
             <div
               key={subject.id}
-              onClick={() => handleSubjectClick(subject.slug)}
+              onClick={() => handleSubjectClick(subject)}
               className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow cursor-pointer"
             >
               <div className="flex items-center gap-3 mb-2">

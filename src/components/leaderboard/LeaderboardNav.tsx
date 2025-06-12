@@ -2,9 +2,13 @@ import Link from 'next/link';
 
 interface LeaderboardNavProps {
   activeTab: 'students' | 'schools';
+  isStatic?: boolean;
 }
 
-export default function LeaderboardNav({ activeTab }: LeaderboardNavProps) {
+export default function LeaderboardNav({
+  activeTab,
+  isStatic = false,
+}: LeaderboardNavProps) {
   return (
     <div className="mb-8">
       <div className="border-b border-gray-200 dark:border-gray-700">
@@ -13,7 +17,7 @@ export default function LeaderboardNav({ activeTab }: LeaderboardNavProps) {
           aria-label="Leaderboard navigation"
         >
           <Link
-            href="/leaderboard"
+            href={isStatic ? '/static/leaderboard' : '/leaderboard'}
             className={`py-4 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'students'
                 ? 'border-blue-500 text-blue-600 dark:text-blue-400'
@@ -21,9 +25,11 @@ export default function LeaderboardNav({ activeTab }: LeaderboardNavProps) {
             }`}
           >
             Student Rankings
-          </Link>
+          </Link>{' '}
           <Link
-            href="/leaderboard/schools"
+            href={
+              isStatic ? '/static/leaderboard/schools' : '/leaderboard/schools'
+            }
             className={`py-4 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'schools'
                 ? 'border-blue-500 text-blue-600 dark:text-blue-400'
