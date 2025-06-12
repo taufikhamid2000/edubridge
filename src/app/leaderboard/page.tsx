@@ -5,6 +5,7 @@ import { logger } from '@/lib/logger';
 import LeaderboardTable from '@/components/leaderboard/LeaderboardTable';
 import LeaderboardFilters from '@/components/leaderboard/LeaderboardFilters';
 import LeaderboardHeader from '@/components/leaderboard/LeaderboardHeader';
+import LeaderboardNav from '@/components/leaderboard/LeaderboardNav';
 import { User } from '@/types/users';
 import { fetchLeaderboard } from '@/services/leaderboardService';
 
@@ -27,7 +28,7 @@ export default function LeaderboardPage() {
           data,
           error,
           currentUserRank: userRank,
-        } = await fetchLeaderboard(timeFrame, subjectFilter);
+        } = await fetchLeaderboard(timeFrame);
 
         if (error) {
           logger.error('Error in leaderboard data:', error);
@@ -55,7 +56,7 @@ export default function LeaderboardPage() {
     }
 
     loadLeaderboardData();
-  }, [timeFrame, subjectFilter]);
+  }, [timeFrame]);
 
   const handleTimeFrameChange = (value: 'daily' | 'weekly' | 'allTime') => {
     setTimeFrame(value);
@@ -67,6 +68,7 @@ export default function LeaderboardPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <LeaderboardNav activeTab="students" />
       <LeaderboardHeader currentUserRank={currentUserRank} />
 
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6 border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-xl">
@@ -75,7 +77,7 @@ export default function LeaderboardPage() {
           onTimeFrameChange={handleTimeFrameChange}
           subjectFilter={subjectFilter}
           onSubjectFilterChange={handleSubjectFilterChange}
-        />{' '}
+        />
         {isLoading ? (
           <div className="text-center py-16">
             <div className="inline-block animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500 dark:border-blue-400"></div>
@@ -112,7 +114,7 @@ export default function LeaderboardPage() {
               {error.includes('No leaderboard data')
                 ? 'Complete quizzes to appear on the leaderboard and compete with other students!'
                 : 'There was a problem loading the leaderboard data. Please try again later.'}
-            </p>{' '}
+            </p>
             <button
               onClick={() => setTimeFrame(timeFrame)}
               className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors shadow-md hover:shadow-lg dark:bg-blue-700 dark:hover:bg-blue-600"

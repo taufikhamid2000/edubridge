@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
 import { useOAuthRedirect } from '@/hooks/useOAuthRedirect';
+import Stopwatch from '@/components/Stopwatch';
 
 // Import dashboard components
 import WelcomeBanner from '@/components/dashboard/WelcomeBanner';
@@ -207,11 +208,21 @@ function DashboardClient() {
   if (loading) {
     return (
       <main className="container mx-auto py-6 px-4 sm:px-6 md:px-8">
-        <div className="text-center mb-8 text-gray-600 dark:text-gray-400 text-sm">
-          <p>
-            Loading your dashboard... If this takes too long, you may need to
-            reload the page to refresh your Supabase session.
-          </p>
+        <div className="text-center mb-8">
+          <div className="inline-block px-6 py-3 rounded-lg bg-blue-100 dark:bg-blue-900/30">
+            <p className="text-lg text-blue-800 dark:text-blue-200">
+              Loading your dashboard...
+            </p>
+            <p className="text-sm mt-2 text-blue-600 dark:text-blue-300">
+              {' '}
+              🚀 Connecting to Supabase
+            </p>
+            <Stopwatch />
+            <p className="text-xs mt-2 text-blue-500 dark:text-blue-400">
+              Pro tip: If it takes too long, try refreshing to reset your
+              session.
+            </p>
+          </div>
         </div>
         <div className="animate-pulse space-y-8">
           {/* Welcome Banner Skeleton */}

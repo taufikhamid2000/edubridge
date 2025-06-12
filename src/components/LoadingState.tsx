@@ -2,6 +2,7 @@
 'use client';
 
 import Link from 'next/link';
+import Stopwatch from './Stopwatch';
 
 export default function LoadingState() {
   return (
@@ -23,6 +24,7 @@ export default function LoadingState() {
                 if it still didn't work after ~30 seconds, might as well go
                 touch some grass. jkjk
               </p>
+              <Stopwatch />
               <div className="mt-4">
                 <Link
                   href="/docs/EduBridge%20Research.pdf"
