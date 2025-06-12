@@ -12,6 +12,7 @@ import {
   MenuIcon,
   ChevronLeft,
 } from 'lucide-react';
+import { initializeTheme } from '@/lib/theme';
 
 interface AdminNavigationProps {
   onCloseMobile?: () => void;
@@ -23,16 +24,11 @@ export default function AdminNavigation({
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [theme] = useState<'light' | 'dark'>(() => {
-    if (typeof window !== 'undefined') {
-      return (localStorage.getItem('theme') as 'light' | 'dark') || 'dark';
-    }
-    return 'dark';
-  });
 
   // Apply theme changes and check for mobile view
   useEffect(() => {
-    document.documentElement.classList.toggle('dark', theme === 'dark');
+    // Initialize theme
+    initializeTheme();
 
     // Check if we're on mobile
     const checkMobile = () => {
@@ -53,7 +49,7 @@ export default function AdminNavigation({
     return () => {
       window.removeEventListener('resize', checkMobile);
     };
-  }, [theme]);
+  }, []);
 
   // Toggle sidebar function
   const toggleSidebar = () => {

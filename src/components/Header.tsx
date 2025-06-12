@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { signOut } from '@/lib/auth';
 import { verifyAdminAccess } from '@/services/adminAuthService';
+import { useTheme } from '@/hooks/useTheme';
 import type { User } from '@supabase/supabase-js';
 import { JSX } from 'react/jsx-dev-runtime';
 import Image from 'next/image';
@@ -13,8 +14,10 @@ import Image from 'next/image';
 export default function Header(): JSX.Element {
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
-  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [menuOpen, setMenuOpen] = useState(false);
+  const { theme, toggleTheme } = useTheme();
+
+  // Initialize auth state
   useEffect(() => {
     async function init() {
       const {
@@ -34,12 +37,6 @@ export default function Header(): JSX.Element {
       } else {
         setIsAdmin(false);
       }
-
-      const saved = localStorage.getItem('theme') as 'light' | 'dark' | null;
-      const initial = saved ?? 'dark';
-      setTheme(initial);
-      document.documentElement.classList.remove('light', 'dark');
-      document.documentElement.classList.add(initial);
     }
     init();
 
@@ -81,14 +78,6 @@ export default function Header(): JSX.Element {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
-
-  const toggleTheme = () => {
-    const next = theme === 'dark' ? 'light' : 'dark';
-    setTheme(next);
-    localStorage.setItem('theme', next);
-    document.documentElement.classList.remove('light', 'dark');
-    document.documentElement.classList.add(next);
-  };
 
   const toggleMenu = () => {
     setMenuOpen((prev) => !prev);
