@@ -6,8 +6,11 @@ import LeaderboardTable from '@/components/leaderboard/LeaderboardTable';
 import LeaderboardFilters from '@/components/leaderboard/LeaderboardFilters';
 import LeaderboardHeader from '@/components/leaderboard/LeaderboardHeader';
 import LeaderboardNav from '@/components/leaderboard/LeaderboardNav';
+import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
 import { User } from '@/types/users';
 import { fetchLeaderboard } from '@/services/leaderboardService';
+
+const AUTO_REFRESH_INTERVAL = 60000; // 1 minute in milliseconds
 
 export default function LeaderboardPage() {
   const [leaderboardData, setLeaderboardData] = useState<User[]>([]);
@@ -18,45 +21,60 @@ export default function LeaderboardPage() {
   );
   const [subjectFilter, setSubjectFilter] = useState<string | null>(null);
   const [currentUserRank, setCurrentUserRank] = useState<number | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
 
-  useEffect(() => {
-    async function loadLeaderboardData() {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const {
-          data,
-          error,
-          currentUserRank: userRank,
-        } = await fetchLeaderboard(timeFrame);
+  async function loadLeaderboardData() {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const {
+        data,
+        error,
+        currentUserRank: userRank,
+      } = await fetchLeaderboard(timeFrame);
 
-        if (error) {
-          logger.error('Error in leaderboard data:', error);
-          setError('Failed to load leaderboard data. Please try again later.');
-          return;
-        }
-
-        if (data && data.length > 0) {
-          setLeaderboardData(data);
-          setCurrentUserRank(userRank);
-        } else {
-          // Handle empty data case
-          setLeaderboardData([]);
-          setError(
-            'No leaderboard data available. Be the first to complete a quiz!'
-          );
-        }
-      } catch (error) {
-        console.error('Unhandled error in leaderboard:', error);
-        logger.error('Error fetching leaderboard data:', error);
-        setError('An unexpected error occurred. Please try again later.');
-      } finally {
-        setIsLoading(false);
+      if (error) {
+        logger.error('Error in leaderboard data:', error);
+        setError('Failed to load leaderboard data. Please try again later.');
+        return;
       }
-    }
 
+      if (data && data.length > 0) {
+        setLeaderboardData(data);
+        setCurrentUserRank(userRank);
+        setLastUpdated(new Date());
+      } else {
+        // Handle empty data case
+        setLeaderboardData([]);
+        setError(
+          'No leaderboard data available. Be the first to complete a quiz!'
+        );
+      }
+    } catch (error) {
+      console.error('Unhandled error in leaderboard:', error);
+      logger.error('Error fetching leaderboard data:', error);
+      setError('An unexpected error occurred. Please try again later.');
+    } finally {
+      setIsLoading(false);
+    }
+  }
+  // Initial load + reload on timeFrame change
+  useEffect(() => {
     loadLeaderboardData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timeFrame]);
+
+  // Auto-refresh timer
+  useEffect(() => {
+    const timer = setInterval(() => {
+      if (!isLoading && !error) {
+        loadLeaderboardData();
+      }
+    }, AUTO_REFRESH_INTERVAL);
+
+    return () => clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoading, error, timeFrame]);
 
   const handleTimeFrameChange = (value: 'daily' | 'weekly' | 'allTime') => {
     setTimeFrame(value);
@@ -77,19 +95,15 @@ export default function LeaderboardPage() {
           onTimeFrameChange={handleTimeFrameChange}
           subjectFilter={subjectFilter}
           onSubjectFilterChange={handleSubjectFilterChange}
-        />
+        />{' '}
         {isLoading ? (
-          <div className="text-center py-16">
-            <div className="inline-block animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500 dark:border-blue-400"></div>
-            <div className="mt-4">
-              <p className="text-lg font-medium text-gray-700 dark:text-gray-300">
-                Loading leaderboard...
-              </p>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                This may take a moment
-              </p>
-            </div>
-          </div>
+          <SkeletonLoader
+            variant="table"
+            rows={10}
+            cols={3}
+            message="Loading leaderboard... This may take a moment"
+            showStopwatch={true}
+          />
         ) : error ? (
           <div className="text-center py-16 px-4">
             <div className="inline-flex h-20 w-20 rounded-full bg-red-100 dark:bg-red-900/20 items-center justify-center mb-4">
@@ -116,7 +130,7 @@ export default function LeaderboardPage() {
                 : 'There was a problem loading the leaderboard data. Please try again later.'}
             </p>
             <button
-              onClick={() => setTimeFrame(timeFrame)}
+              onClick={loadLeaderboardData}
               className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors shadow-md hover:shadow-lg dark:bg-blue-700 dark:hover:bg-blue-600"
             >
               Try Again
@@ -127,7 +141,7 @@ export default function LeaderboardPage() {
             <LeaderboardTable data={leaderboardData} timeFrame={timeFrame} />
             <div className="text-center mt-6 text-sm text-gray-500 dark:text-gray-400">
               Showing top {leaderboardData.length} students • Last updated:{' '}
-              {new Date().toLocaleTimeString()}
+              {lastUpdated.toLocaleTimeString()} • Auto-refreshing every minute
             </div>
           </div>
         )}
