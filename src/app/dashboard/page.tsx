@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
 import { User } from '@/types/users';
 import DashboardClient from './DashboardClient';
+import LoadingState from '@/components/LoadingState';
 
 interface Subject {
   id: string;
@@ -135,14 +136,9 @@ export default function DashboardPage() {
 
     checkAuthAndFetchData();
   }, [router]);
-
   // Loading state
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg">Loading dashboard...</div>
-      </div>
-    );
+    return <LoadingState />;
   }
 
   // Error state

@@ -8,6 +8,7 @@ import { supabase } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
 import AdminClient from './AdminClient';
 import AccessDenied from '@/components/admin/AccessDenied';
+import LoadingState from '@/components/LoadingState';
 
 export default function AdminPage() {
   const router = useRouter();
@@ -82,14 +83,9 @@ export default function AdminPage() {
 
     checkAuthAndAdminStatus();
   }, [router]);
-
   // Loading state
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <div className="text-lg">Loading admin panel...</div>
-      </div>
-    );
+    return <LoadingState />;
   }
 
   // Error state

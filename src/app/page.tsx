@@ -126,7 +126,7 @@ export default function HomePage() {
               className="inline-block uppercase tracking-wide rounded-full shadow-lg transition-all duration-300 ease-in-out px-8 py-4 bg-white text-blue-600 font-medium hover:bg-gray-100 hover:scale-105 transform"
               onClick={() => router.push(isLoggedIn ? '/dashboard' : '/auth')}
             >
-              {isLoggedIn ? 'Access your dashboard' : 'Sign Up Now 🚀'}
+              Access your dashboard
             </button>{' '}
             <button
               className="inline-block uppercase tracking-wide rounded-full shadow-lg transition-all duration-300 ease-in-out px-8 py-4 bg-transparent border-2 border-white text-white font-medium hover:bg-white/10 hover:scale-105 transform"
