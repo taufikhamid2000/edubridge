@@ -14,6 +14,28 @@ export interface Subject {
 }
 
 /**
+ * Interface for public subject data (simpler structure for public API)
+ */
+export interface PublicSubject {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  icon?: string;
+  category?: string;
+}
+
+/**
+ * Interface for chapter data
+ */
+export interface Chapter {
+  id: number;
+  name: string;
+  form: number;
+  order_index?: number;
+}
+
+/**
  * Interface for nested subject data from database
  */
 interface SubjectWithNested {
@@ -302,5 +324,141 @@ export async function deleteSubject(id: string): Promise<{
     const err = error as Error;
     logger.error('Error in deleteSubject:', err);
     return { success: false, error: err };
+  }
+}
+
+/**
+ * Fetches subjects for public API (no auth required)
+ * @returns A promise with public subjects data
+ */
+export async function fetchPublicSubjects(): Promise<{
+  data: PublicSubject[] | null;
+  error: Error | null;
+}> {
+  try {
+    const { data: subjects, error } = await supabase
+      .from('subjects')
+      .select('id, name, slug, description, icon');
+
+    if (error) {
+      logger.error('Error fetching public subjects:', error);
+      return { data: null, error };
+    }
+
+    return { data: subjects as PublicSubject[], error: null };
+  } catch (error) {
+    const err = error instanceof Error ? error : new Error('Unknown error');
+    logger.error('Error in fetchPublicSubjects:', err);
+    return { data: null, error: err };
+  }
+}
+
+/**
+ * Fetches a single subject by ID for public API (no auth required)
+ * @param id The ID of the subject to fetch
+ * @returns A promise with the subject data or error
+ */
+export async function fetchPublicSubjectById(id: string): Promise<{
+  data: PublicSubject | null;
+  error: Error | null;
+}> {
+  try {
+    const { data: subject, error } = await supabase
+      .from('subjects')
+      .select('id, name, slug, description, icon')
+      .eq('id', id)
+      .single();
+
+    if (error) {
+      logger.error('Error fetching public subject by ID:', error);
+      return { data: null, error };
+    }
+
+    return { data: subject as PublicSubject, error: null };
+  } catch (error) {
+    const err = error instanceof Error ? error : new Error('Unknown error');
+    logger.error('Error in fetchPublicSubjectById:', err);
+    return { data: null, error: err };
+  }
+}
+
+/**
+ * Fetches chapters for a subject by subject ID (no auth required)
+ * @param subjectId The ID of the subject
+ * @returns A promise with the chapters data or error
+ */
+export async function fetchChaptersBySubjectId(subjectId: string): Promise<{
+  data: Chapter[] | null;
+  error: Error | null;
+}> {
+  try {
+    const { data: chapters, error } = await supabase
+      .from('chapters')
+      .select('id, name, form, order_index')
+      .eq('subject_id', subjectId)
+      .order('order_index', { ascending: true });
+
+    if (error) {
+      logger.error('Error fetching chapters by subject ID:', error);
+      return { data: null, error };
+    }
+
+    return { data: chapters as Chapter[], error: null };
+  } catch (error) {
+    const err = error instanceof Error ? error : new Error('Unknown error');
+    logger.error('Error in fetchChaptersBySubjectId:', err);
+    return { data: null, error: err };
+  }
+}
+
+/**
+ * Fetch subject data by slug via API route (no authentication required)
+ */
+export async function fetchSubjectBySlug(slug: string): Promise<PublicSubject> {
+  try {
+    const response = await fetch(`/api/subjects/${slug}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || 'Failed to fetch subject data');
+    }
+
+    return await response.json();
+  } catch (error) {
+    logger.error('Error fetching subject:', error);
+    throw error;
+  }
+}
+
+/**
+ * Fetch chapters for a subject by subject slug via API route (no authentication required)
+ */
+export async function fetchChaptersBySubjectSlug(
+  slug: string
+): Promise<Chapter[]> {
+  try {
+    const response = await fetch(`/api/subjects/${slug}/chapters`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || 'Failed to fetch chapters');
+    }
+
+    return await response.json();
+  } catch (error) {
+    logger.error('Error fetching chapters:', error);
+    throw error;
   }
 }

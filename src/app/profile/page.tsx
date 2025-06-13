@@ -1,212 +1,86 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
+import { useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
 import { User, Achievement } from '@/types/users';
-import { Quiz } from '@/types/topics';
+
+// Extended User type to include guest user properties
+interface ExtendedUser extends User {
+  isGuest?: boolean;
+}
 import {
-  fetchUserProfile,
-  fetchUserAchievements,
+  fetchUserProfileAPI,
+  fetchUserProfileByIdAPI,
+  fetchUserAchievementsAPI,
+  fetchUserCreatedQuizzesAPI,
+  QuizWithSubject,
 } from '@/services/profileService';
 import ProfileHeader from '@/components/profile/ProfileHeader';
 import ProfileStats from '@/components/profile/ProfileStats';
 import ProfileAchievements from '@/components/profile/ProfileAchievements';
 import ProfileSettings from '@/components/profile/ProfileSettings';
 import QuizTable from '@/components/topic/QuizTable';
-import { supabase } from '@/lib/supabase';
-import { logger } from '@/lib/logger';
 
 function ProfileContent() {
   const searchParams = useSearchParams();
   const userId = searchParams.get('userId'); // Get userId from query params
-  const [user, setUser] = useState<User | null>(null);
-  const [achievements, setAchievements] = useState<Achievement[]>([]);
-  const [createdQuizzes, setCreatedQuizzes] = useState<Quiz[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [isOwnProfile, setIsOwnProfile] = useState(false);
   const [activeTab, setActiveTab] = useState<
     'stats' | 'achievements' | 'settings' | 'created-quizzes'
   >('stats');
 
-  useEffect(() => {
-    const loadProfileData = async () => {
-      try {
-        setLoading(true);
-        // Check if user is logged in
-        const { data } = await supabase.auth.getSession();
-        if (!data.session) {
-          setError('You need to be logged in to view profiles.');
-          return;
-        }
+  // Fetch user profile with React Query
+  const {
+    data: user,
+    isLoading: isUserLoading,
+    error: userError,
+  } = useQuery<User>({
+    queryKey: ['profile', userId || 'me'],
+    queryFn: () => 
+      userId 
+        ? fetchUserProfileByIdAPI(userId)
+        : fetchUserProfileAPI(),
+    staleTime: 300000, // 5 minutes
+    gcTime: 600000, // 10 minutes cache
+    retry: 2,
+  });
 
-        const targetUserId = userId || data.session.user.id;
-        setIsOwnProfile(targetUserId === data.session.user.id);
+  // Fetch user achievements with React Query
+  const {
+    data: achievements,
+    isLoading: isAchievementsLoading,
+    error: achievementsError,
+  } = useQuery<Achievement[]>({
+    queryKey: ['achievements', userId || 'me'],
+    queryFn: () => fetchUserAchievementsAPI(userId || 'me'),
+    staleTime: 300000, // 5 minutes
+    gcTime: 600000, // 10 minutes cache
+    retry: 2,
+  });
 
-        // Fetch user profile data
-        let userData, userError;
-        if (userId) {
-          // Fetch specific user profile
-          const { data, error } = await supabase
-            .from('user_profiles')
-            .select('*')
-            .eq('id', userId)
-            .single();
-          userData = data;
-          userError = error;
-        } else {
-          // Fetch current user profile with session recovery
-          try {
-            const result = await fetchUserProfile();
-            userData = result.data;
-            userError = result.error;
-            if (userError?.message?.includes('token')) {
-              // Try to recover the session
-              const { recoverSession } = await import('@/lib/supabase');
-              await recoverSession();
-              // Retry the fetch after recovery
-              const retryResult = await fetchUserProfile();
-              userData = retryResult.data;
-              userError = retryResult.error;
-            }
-          } catch (e) {
-            userError =
-              e instanceof Error ? e : new Error('Failed to fetch profile');
-          }
-        }
+  // Fetch user created quizzes with React Query
+  const {
+    data: createdQuizzes,
+    isLoading: isQuizzesLoading,
+    error: quizzesError,
+  } = useQuery<QuizWithSubject[]>({
+    queryKey: ['created-quizzes', userId || 'me'],
+    queryFn: () => fetchUserCreatedQuizzesAPI(userId || 'me'),
+    staleTime: 300000, // 5 minutes
+    gcTime: 600000, // 10 minutes cache    retry: 2,
+  });
 
-        if (userError) {
-          setError(`Failed to load profile data: ${userError.message}`);
-          logger.error('Profile data fetch error:', userError);
-          return;
-        }
+  // Determine if this is the user's own profile
+  const isOwnProfile = !userId || (user && !(user as ExtendedUser).isGuest);
 
-        if (!userData) {
-          setError('No profile data returned. Please try again.');
-          return;
-        }
+  // Check if any data is loading
+  const isLoading = isUserLoading || isAchievementsLoading || isQuizzesLoading;
 
-        // Format the data to match User type if we fetched directly from Supabase
-        if (userId) {
-          const formattedUser: User = {
-            id: userData.id,
-            email:
-              userData.email ||
-              `user-${userData.id.substring(0, 8)}@example.com`,
-            display_name: userData.display_name || '',
-            avatar_url: userData.avatar_url || '',
-            streak: userData.streak || 0,
-            xp: userData.xp || 0,
-            level: userData.level || 1,
-            lastQuizDate: userData.last_quiz_date,
-            created_at: userData.created_at,
-          };
-          setUser(formattedUser);
-        } else {
-          setUser(userData);
-        }
-
-        // Fetch user achievements
-        let achievementsData, achievementsError;
-        if (userId) {
-          // Fetch specific user achievements
-          const { data, error } = await supabase
-            .from('achievements')
-            .select('*')
-            .eq('user_id', userId)
-            .order('earned_at', { ascending: false });
-          achievementsData = data;
-          achievementsError = error;
-        } else {
-          // Fetch current user achievements
-          const result = await fetchUserAchievements();
-          achievementsData = result.data;
-          achievementsError = result.error;
-        }
-
-        if (achievementsError) {
-          logger.error('Achievements fetch error:', achievementsError);
-          // We'll continue even if achievements fail to load
-        }
-        setAchievements(achievementsData || []);
-
-        // Fetch user created quizzes with subject slug for proper URL generation
-        const targetUserIdForQuizzes = userId || data.session.user.id;
-        const { data: createdQuizzesData, error: createdQuizzesError } =
-          await supabase
-            .from('quizzes')
-            .select(
-              `
-              *,
-              topics!inner(
-                id,
-                name,
-                chapters!inner(
-                  id,
-                  subjects!inner(
-                    slug
-                  )
-                )
-              )
-            `
-            )
-            .eq('created_by', targetUserIdForQuizzes)
-            .order('created_at', { ascending: false });
-
-        if (createdQuizzesError) {
-          logger.error('Created quizzes fetch error:', createdQuizzesError);
-          // We'll continue even if created quizzes fail to load
-        }
-
-        // Transform the quiz data to include subject_slug for proper URL generation
-        interface QuizWithRelations {
-          id: string;
-          name: string;
-          created_by: string;
-          created_at: string;
-          verified: boolean;
-          topic_id: string;
-          topics?: {
-            id: string;
-            name: string;
-            chapters?: {
-              id: string;
-              subjects?: {
-                slug: string;
-              };
-            };
-          };
-        }
-
-        const transformedQuizzes = (
-          (createdQuizzesData as QuizWithRelations[]) || []
-        ).map((quiz) => ({
-          ...quiz,
-          subject_slug: quiz.topics?.chapters?.subjects?.slug,
-          topic_title: quiz.topics?.name,
-        }));
-
-        setCreatedQuizzes(transformedQuizzes);
-      } catch (err) {
-        setError('An unexpected error occurred. Please try again.');
-        logger.error('Unexpected error in profile page:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadProfileData();
-  }, [userId]);
-
-  // Reset tab to 'stats' if viewing someone else's profile and settings tab was active
-  useEffect(() => {
-    if (!isOwnProfile && activeTab === 'settings') {
-      setActiveTab('stats');
-    }
-  }, [isOwnProfile, activeTab]);
+  // Check for errors
+  const hasError = userError || achievementsError || quizzesError;
 
   // Render loading state
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -220,7 +94,7 @@ function ProfileContent() {
   }
 
   // Render error state
-  if (error || !user) {
+  if (hasError || !user) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -229,7 +103,7 @@ function ProfileContent() {
               Error
             </h2>
             <p className="text-gray-600 dark:text-gray-300">
-              {error || 'Failed to load profile. Please try again.'}
+              {(userError || achievementsError || quizzesError)?.message || 'Failed to load profile. Please try again.'}
             </p>
             <button
               onClick={() => window.location.reload()}
@@ -300,16 +174,15 @@ function ProfileContent() {
 
           {/* Tab Content */}
           <div className="p-6">
-            {activeTab === 'stats' && <ProfileStats user={user} />}
-            {activeTab === 'achievements' && (
+            {activeTab === 'stats' && <ProfileStats user={user} />}            {activeTab === 'achievements' && (
               <ProfileAchievements
-                achievements={achievements}
-                loading={loading}
+                achievements={achievements || []}
+                loading={isLoading}
               />
             )}
             {activeTab === 'created-quizzes' && (
               <QuizTable
-                quizzes={createdQuizzes}
+                quizzes={createdQuizzes || []}
                 showCreator={false}
                 showActions={true}
                 title={

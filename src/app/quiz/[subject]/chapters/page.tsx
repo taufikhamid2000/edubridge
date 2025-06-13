@@ -1,64 +1,87 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { getChaptersBySubjectSlug, getSubjectBySlug } from '@/lib/api';
+import { useQuery } from '@tanstack/react-query';
+import {
+  fetchSubjectBySlug,
+  fetchChaptersBySubjectSlug,
+  PublicSubject,
+  Chapter,
+} from '@/services/subjectService';
 import ChapterList from '@/components/ChapterList';
 
 export default function ChaptersPage() {
   const params = useParams();
   const subject = params?.subject;
-  const [chapters, setChapters] = useState<
-    { id: number; name: string; form: number }[]
-  >([]);
-  const [subjectData, setSubjectData] = useState<{
-    id: number;
-    name: string;
-    slug: string;
-  } | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
   const subjectString = Array.isArray(subject) ? subject[0] : subject || '';
 
-  useEffect(() => {
-    if (!subject) {
-      setChapters([]);
-      setError('No subject specified. Please provide a valid subject.');
-      return;
-    }
+  // Fetch subject data with React Query
+  const {
+    data: subjectData,
+    isLoading: isSubjectLoading,
+    error: subjectError,
+  } = useQuery<PublicSubject>({
+    queryKey: ['subject', subjectString],
+    queryFn: () => fetchSubjectBySlug(subjectString),
+    enabled: !!subjectString,
+    staleTime: 300000, // 5 minutes
+    gcTime: 600000, // 10 minutes cache
+    retry: 2,
+  });
 
-    // Fetch subject data
-    getSubjectBySlug(subjectString)
-      .then((data) => {
-        setSubjectData(data);
+  // Fetch chapters data with React Query
+  const {
+    data: chapters,
+    isLoading: isChaptersLoading,
+    error: chaptersError,
+  } = useQuery<Chapter[]>({
+    queryKey: ['chapters', subjectString],
+    queryFn: () => fetchChaptersBySubjectSlug(subjectString),
+    enabled: !!subjectString,
+    staleTime: 300000, // 5 minutes
+    gcTime: 600000, // 10 minutes cache
+    retry: 2,
+  });
 
-        // Fetch chapters after getting subject data
-        return getChaptersBySubjectSlug(subjectString);
-      })
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setChapters(
-            data.map((chapter) => ({
-              ...chapter,
-              form: chapter.form !== undefined ? chapter.form : 0,
-            }))
-          );
-          setError(null);
-        } else {
-          throw new Error('Invalid data format received from server');
-        }
-      })
-      .catch((err) => {
-        console.error('Error loading chapters:', err);
-        setError(err.message || 'Failed to load data. Please try again later.');
-      });
-  }, [subject, subjectString]);
+  // Loading state
+  if (isSubjectLoading || isChaptersLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading chapters...</p>
+        </div>
+      </div>
+    );
+  }
 
+  // Error state
+  const error = subjectError || chaptersError;
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center h-screen bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
         <h1 className="text-2xl font-bold mb-4">Error</h1>
-        <p>{error}</p>
+        <p>
+          {error instanceof Error
+            ? error.message
+            : 'Failed to load data. Please try again later.'}
+        </p>
+        <button
+          onClick={() => window.location.reload()}
+          className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
+
+  // No subject specified
+  if (!subjectString) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
+        <h1 className="text-2xl font-bold mb-4">Error</h1>
+        <p>No subject specified. Please provide a valid subject.</p>
       </div>
     );
   }
@@ -88,7 +111,7 @@ export default function ChaptersPage() {
           Practice quiz with ChatGPT
         </button>{' '}
       </header>{' '}
-      {chapters.length === 0 ? (
+      {(chapters?.length || 0) === 0 ? (
         <div className="text-center py-10 px-6 bg-gray-50 dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
           <svg
             className="mx-auto h-12 w-12 text-gray-400 mb-4"
@@ -109,7 +132,7 @@ export default function ChaptersPage() {
           </p>
         </div>
       ) : (
-        <ChapterList chapters={chapters} subject={subjectString} />
+        <ChapterList chapters={chapters || []} subject={subjectString} />
       )}
     </div>
   );

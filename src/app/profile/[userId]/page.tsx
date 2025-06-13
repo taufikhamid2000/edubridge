@@ -1,9 +1,10 @@
+'use client';
+
+import { useQuery } from '@tanstack/react-query';
 import { User } from '@/types/users';
-import { createServerClient } from '@supabase/ssr';
-import { logger } from '@/lib/logger';
+import { fetchUserProfileByIdAPI } from '@/services/profileService';
 import UserProfileClient from './UserProfileClient';
 import { redirect } from 'next/navigation';
-import { cookies } from 'next/headers';
 
 interface UserProfilePageProps {
   params: {
@@ -11,58 +12,38 @@ interface UserProfilePageProps {
   };
 }
 
-async function getUserData(userId: string) {
-  const cookieStore = await cookies();
-
-  // Create server-side Supabase client with proper auth settings
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get: (name) => cookieStore.get(name)?.value,
-        set: () => {}, // No need to set cookies in a server component
-        remove: () => {},
-      },
-      auth: {
-        persistSession: false, // Don't persist session in server component
-        autoRefreshToken: false, // Disable auto refresh on server side
-        detectSessionInUrl: false, // Disable session detection in URL on server side
-      },
-    }
-  );
-
-  try {
-    const { data: user, error } = await supabase
-      .from('user_profiles')
-      .select(
-        `
-        *,
-        school:schools(*)
-      `
-      )
-      .eq('id', userId)
-      .single();
-
-    if (error) {
-      logger.error('Error fetching user:', error);
-      return null;
-    }
-
-    return user as User;
-  } catch (error) {
-    logger.error('Error in getUserData:', error);
-    return null;
-  }
-}
-
-export default async function UserProfilePage({
+export default function UserProfilePage({
   params,
 }: UserProfilePageProps) {
   const { userId } = params;
-  const user = await getUserData(userId);
+  
+  // Fetch user profile using React Query and API route
+  const {
+    data: user,
+    isLoading,
+    error,
+  } = useQuery<User>({
+    queryKey: ['profile', userId],
+    queryFn: () => fetchUserProfileByIdAPI(userId),
+    staleTime: 300000, // 5 minutes
+    gcTime: 600000, // 10 minutes cache
+    retry: 2,
+  });
 
-  if (!user) {
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-300">Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error or no user found
+  if (error || !user) {
     redirect('/404');
   }
 

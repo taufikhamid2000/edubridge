@@ -252,3 +252,117 @@ export async function fetchUserAchievements(): Promise<{
     };
   }
 }
+
+/**
+ * Fetch current user profile via API route (no authentication required)
+ */
+export async function fetchUserProfileAPI(): Promise<User> {
+  try {
+    const response = await fetch('/api/profile', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || 'Failed to fetch profile data');
+    }
+
+    return await response.json();
+  } catch (error) {
+    logger.error('Error fetching profile via API:', error);
+    throw error;
+  }
+}
+
+/**
+ * Fetch user profile by ID via API route (no authentication required)
+ */
+export async function fetchUserProfileByIdAPI(userId: string): Promise<User> {
+  try {
+    const response = await fetch(`/api/profile/${userId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || 'Failed to fetch profile data');
+    }
+
+    return await response.json();
+  } catch (error) {
+    logger.error('Error fetching profile by ID via API:', error);
+    throw error;
+  }
+}
+
+/**
+ * Fetch user achievements via API route (no authentication required)
+ */
+export async function fetchUserAchievementsAPI(userId: string = 'me'): Promise<Achievement[]> {
+  try {
+    const response = await fetch(`/api/profile/${userId}/achievements`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || 'Failed to fetch achievements');
+    }
+
+    return await response.json();
+  } catch (error) {
+    logger.error('Error fetching achievements via API:', error);
+    throw error;
+  }
+}
+
+/**
+ * Interface for quiz with relations
+ */
+export interface QuizWithSubject {
+  id: string;
+  name: string;
+  created_by: string;
+  created_at: string;
+  verified: boolean;
+  topic_id: string;
+  subject_slug?: string;
+  topic_title?: string;
+}
+
+/**
+ * Fetch user created quizzes via API route (no authentication required)
+ */
+export async function fetchUserCreatedQuizzesAPI(userId: string = 'me'): Promise<QuizWithSubject[]> {
+  try {
+    const response = await fetch(`/api/profile/${userId}/quizzes`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || 'Failed to fetch created quizzes');
+    }
+
+    return await response.json();
+  } catch (error) {
+    logger.error('Error fetching created quizzes via API:', error);
+    throw error;
+  }
+}
