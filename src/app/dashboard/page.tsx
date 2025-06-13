@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
@@ -14,32 +14,41 @@ import LoadingState from '@/components/LoadingState';
 
 export default function DashboardPage() {
   const router = useRouter();
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
   // Check authentication status
   useEffect(() => {
     const checkAuth = async () => {
-      const {
-        data: { session },
-        error: sessionError,
-      } = await supabase.auth.getSession();
+      try {
+        const {
+          data: { session },
+          error: sessionError,
+        } = await supabase.auth.getSession();
 
-      if (sessionError) {
-        logger.error('Session error in dashboard:', sessionError);
-        router.push('/auth');
-        return;
-      }
+        if (sessionError) {
+          logger.error('Session error in dashboard:', sessionError);
+          router.push('/auth');
+          return;
+        }
 
-      if (!session) {
-        logger.info('No active session, redirecting to auth');
+        if (!session) {
+          logger.info('No active session, redirecting to auth');
+          router.push('/auth');
+          return;
+        }
+
+        // Session confirmed, enable data fetching
+        setIsAuthenticated(true);
+      } catch (error) {
+        logger.error('Authentication check failed:', error);
         router.push('/auth');
-        return;
       }
     };
 
     checkAuth();
   }, [router]);
 
-  // Fetch dashboard data with React Query
+  // Fetch dashboard data with React Query - only when authenticated
   const {
     data: dashboardData,
     isLoading: isDashboardLoading,
@@ -47,13 +56,14 @@ export default function DashboardPage() {
   } = useQuery({
     queryKey: ['dashboard'],
     queryFn: fetchDashboardData,
+    enabled: isAuthenticated === true, // Only run when authenticated
     staleTime: 300000, // 5 minutes
     gcTime: 600000, // 10 minutes cache
     retry: 2,
     refetchOnWindowFocus: false,
   });
 
-  // Fetch user stats with React Query
+  // Fetch user stats with React Query - only when authenticated
   const {
     data: userStats,
     isLoading: isStatsLoading,
@@ -61,13 +71,18 @@ export default function DashboardPage() {
   } = useQuery({
     queryKey: ['userStats'],
     queryFn: fetchUserStats,
+    enabled: isAuthenticated === true, // Only run when authenticated
     staleTime: 600000, // 10 minutes
     gcTime: 1200000, // 20 minutes cache
     retry: 1,
     refetchOnWindowFocus: false,
   });
+  // Show loading while checking authentication
+  if (isAuthenticated === null) {
+    return <LoadingState />;
+  }
 
-  // Loading state
+  // Loading state - show loading when queries are running
   if (isDashboardLoading) {
     return <LoadingState />;
   }
