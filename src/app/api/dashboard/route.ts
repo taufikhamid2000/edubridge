@@ -40,7 +40,7 @@ interface DashboardResponse {
 
 export async function GET() {
   try {
-    // Get authenticated user
+    // Get authenticated user (optional for dashboard)
     const cookieStore = await cookies();
     const supabaseServer = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -61,18 +61,11 @@ export async function GET() {
 
     if (sessionError) {
       logger.error('Session error in dashboard API:', sessionError);
-      return NextResponse.json(
-        { error: 'Authentication error' },
-        { status: 401 }
-      );
-    }
+      // Don't return error, continue without authentication
+    } // Continue without requiring authentication
+    const isAuthenticated = !!session?.user?.id;
 
-    if (!session) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
-    } // Fetch data in parallel for optimal performance using materialized views
+    // Fetch data in parallel for optimal performance using materialized views
     const [
       { data: subjectsData, error: subjectsError },
       { data: userData, error: userError },
@@ -87,21 +80,25 @@ export async function GET() {
         .order('category_priority', { ascending: true })
         .order('order_index', { ascending: true }),
 
-      // Fetch user profile
-      supabase
-        .from('user_profiles')
-        .select('display_name, streak, xp, level, last_quiz_date')
-        .eq('id', session.user.id)
-        .single(),
+      // Fetch user profile only if authenticated
+      isAuthenticated
+        ? supabase
+            .from('user_profiles')
+            .select('display_name, streak, xp, level, last_quiz_date')
+            .eq('id', session!.user.id)
+            .single()
+        : Promise.resolve({ data: null, error: null }),
 
-      // Fetch user statistics from materialized view if available, fallback to direct query
-      supabase
-        .from('mv_user_dashboard_stats')
-        .select(
-          'completed_quizzes, average_score, weekly_quizzes, weekly_average_score, active_days'
-        )
-        .eq('user_id', session.user.id)
-        .maybeSingle(),
+      // Fetch user statistics only if authenticated
+      isAuthenticated
+        ? supabase
+            .from('mv_user_dashboard_stats')
+            .select(
+              'completed_quizzes, average_score, weekly_quizzes, weekly_average_score, active_days'
+            )
+            .eq('user_id', session!.user.id)
+            .maybeSingle()
+        : Promise.resolve({ data: null, error: null }),
     ]);
 
     // Handle fetch errors
@@ -142,18 +139,25 @@ export async function GET() {
     const categories = [
       'all',
       ...new Set(processedSubjects.map((s) => s.category)),
-    ];
-
-    // Construct user data
-    const dashboardUser: DashboardUser = {
-      email: session.user.email || '',
-      display_name: userData?.display_name || undefined,
-      streak: userData?.streak || 0,
-      xp: userData?.xp || 0,
-      level: userData?.level || 1,
-      lastQuizDate:
-        userData?.last_quiz_date || new Date().toISOString().split('T')[0],
-    };
+    ]; // Construct user data
+    const dashboardUser: DashboardUser = isAuthenticated
+      ? {
+          email: session!.user.email || '',
+          display_name: userData?.display_name || undefined,
+          streak: userData?.streak || 0,
+          xp: userData?.xp || 0,
+          level: userData?.level || 1,
+          lastQuizDate:
+            userData?.last_quiz_date || new Date().toISOString().split('T')[0],
+        }
+      : {
+          email: '',
+          display_name: 'Guest User',
+          streak: 0,
+          xp: 0,
+          level: 1,
+          lastQuizDate: new Date().toISOString().split('T')[0],
+        };
 
     // Prepare response
     const response: DashboardResponse = {
