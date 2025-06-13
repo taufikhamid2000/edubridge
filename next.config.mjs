@@ -6,26 +6,18 @@ const withBundleAnalyzer = bundleAnalyzer({
 
 /** @type {import('next').NextConfig} */
 const config = {
-  reactStrictMode: true,
-  // Enable standalone output for production
+  reactStrictMode: false, // Temporarily disable to reduce doubles during log cleanup
   output: 'standalone',
-  // Optimize build performance
-  experimental: {
-    // Improve build performance
-    serverMinification: true,
-    optimizeServerReact: true,
-    // Enable server components by default
-    serverComponents: true,
-    // Enable concurrent features
-    concurrentFeatures: true,
-    // Optimize images
-    optimizeImages: true,
-    // Enable streaming
-    serverActions: {
-      bodySizeLimit: '2mb',
-    },
+  // Environment variables
+  env: {
+    DISABLE_SUPABASE_DEBUG: process.env.DISABLE_SUPABASE_DEBUG || 'true',
   },
-  // Improve page loading performance
+  experimental: {
+    serverActions: {
+      enabled: true,
+    },
+    optimizePackageImports: ['@heroicons/react', 'lucide-react', 'react-icons'],
+  },
   compiler: {
     // Remove console.log in production
     removeConsole: process.env.NODE_ENV === 'production',
@@ -70,6 +62,15 @@ const config = {
         permanent: true,
       },
     ];
+  },
+  webpack(config, { dev }) {
+    // Hard-nuke the trace plugin when an env flag is set
+    if (dev && process.env.NEXT_DISABLE_TRACE === 'true') {
+      config.plugins = config.plugins.filter(
+        (p) => p.constructor.name !== 'TraceNextServerPlugin'
+      );
+    }
+    return config;
   },
 };
 

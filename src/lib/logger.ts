@@ -84,3 +84,10 @@ export const logger = {
     return friendlyMessage;
   },
 };
+
+// Toggleable logger for debugging
+export const log = (...args: unknown[]) => {
+  if (process.env.NEXT_PUBLIC_LOG_LEVEL === 'debug') {
+    console.log('[DBG]', ...args);
+  }
+};

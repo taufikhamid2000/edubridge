@@ -16,31 +16,31 @@ export default function Header(): JSX.Element {
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
-
-  // Initialize auth state
+  // Initialize auth state from auth state changes only (avoid initial getSession call)
   useEffect(() => {
-    async function init() {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      setUser(session?.user ?? null);
+    // DISABLED: Initial getSession call that was causing repeated requests
+    // async function init() {
+    //   const {
+    //     data: { session },
+    //   } = await supabase.auth.getSession();
+    //   setUser(session?.user ?? null);
+    //
+    //   // Check admin status if user is logged in
+    //   if (session?.user) {
+    //     try {
+    //       const { isAdmin: adminStatus } = await verifyAdminAccess();
+    //       setIsAdmin(adminStatus);
+    //     } catch (error) {
+    //       console.error('Error checking admin status:', error);
+    //       setIsAdmin(false);
+    //     }
+    //   } else {
+    //     setIsAdmin(false);
+    //   }
+    // }
+    // init();
 
-      // Check admin status if user is logged in
-      if (session?.user) {
-        try {
-          const { isAdmin: adminStatus } = await verifyAdminAccess();
-          setIsAdmin(adminStatus);
-        } catch (error) {
-          console.error('Error checking admin status:', error);
-          setIsAdmin(false);
-        }
-      } else {
-        setIsAdmin(false);
-      }
-    }
-    init();
-
-    // Listen for auth state changes
+    // Listen for auth state changes only
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {

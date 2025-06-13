@@ -3,21 +3,34 @@ import { createClient, Session, AuthError } from '@supabase/supabase-js';
 import { logger } from './logger';
 import { validateSupabaseConfig } from './validateEnv';
 
-// Initialize Supabase client after environment validation
-let supabaseClient: ReturnType<typeof createClient>;
+// Initialize Supabase singleton client
+let _supabaseClient: ReturnType<typeof createClient> | null = null;
 
-validateSupabaseConfig().then((valid) => {
-  if (valid) {
-    supabaseClient = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
-  } else {
-    logger.error(
-      'Failed to initialize Supabase client due to invalid configuration'
-    );
+function initializeSupabaseClient() {
+  if (_supabaseClient) return _supabaseClient;
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    logger.error('Missing Supabase credentials!');
+    throw new Error('Missing Supabase credentials');
   }
-});
+  _supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      autoRefreshToken: true, // Re-enable but with controlled logging
+      persistSession: true,
+      detectSessionInUrl: false, // Keep this disabled to prevent URL-based auth loops
+      flowType: 'pkce',
+      debug: false, // Completely disable debug logging
+    },
+    global: {
+      headers: { 'X-Client-Info': 'edubridge-webapp' },
+    },
+  });
+
+  return _supabaseClient;
+}
 
 // Cache implementation
 const AUTH_CACHE_KEY = 'sb_auth_cache';
@@ -147,7 +160,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     persistSession: true,
     detectSessionInUrl: true, // Need this for OAuth to work
     flowType: 'pkce',
-    debug: process.env.NODE_ENV === 'development',
+    debug: false, // Disable verbose logging for cleaner console output
     storage: {
       getItem: (key) => {
         try {
@@ -237,36 +250,48 @@ export async function getCachedSession(): Promise<{
  * This helps recover from "Invalid Refresh Token" errors
  * Returns a boolean indicating if recovery was successful
  */
-export async function recoverSession() {
+export async function recoverSession(): Promise<boolean> {
   try {
     logger.info('Attempting to recover auth session...');
 
-    // Clear session promise to force a fresh request
+    // Clear all session state first
     sessionPromise = null;
+    if (typeof window !== 'undefined') {
+      safeStorage.removeItem(AUTH_CACHE_KEY);
+      safeStorage.removeItem('sb-access-token');
+      safeStorage.removeItem('sb-refresh-token');
+      safeStorage.removeItem('supabase.auth.token');
+    }
 
-    // Try to get current session first
+    // Try to refresh the session using refresh token
     const {
       data: { session },
-      error,
+      error: refreshError,
     } = await supabase.auth.getSession();
 
+    if (refreshError) {
+      logger.error('Error refreshing session:', refreshError);
+      // Perform a complete signout if refresh fails
+      await supabase.auth.signOut({ scope: 'global' });
+      return false;
+    }
+
     if (session) {
-      logger.info('Valid session found');
+      logger.info('Session successfully recovered');
       return true;
     }
 
-    // If there's an error or no session, clear auth state
-    if (typeof window !== 'undefined') {
-      safeStorage.removeItem(AUTH_CACHE_KEY);
-    }
-
-    // Do a local signout without redirecting
-    await supabase.auth.signOut({ scope: 'local' });
-    logger.info('Session recovery failed, user needs to sign in again');
-
+    // No session recovered
+    logger.info('No session could be recovered');
     return false;
   } catch (error) {
-    logger.error('Error during session recovery:', error);
+    logger.error('Critical error during session recovery:', error);
+    // Force a complete signout on critical errors
+    try {
+      await supabase.auth.signOut({ scope: 'global' });
+    } catch (signOutError) {
+      logger.error('Error during emergency signout:', signOutError);
+    }
     return false;
   }
 }

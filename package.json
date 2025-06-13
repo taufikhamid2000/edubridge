@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:fast": "next dev --turbo",
     "build": "next build",
     "build:analyze": "set ANALYZE=true && next build",
     "build:optimize": "bash scripts/add-dynamic-config.sh && next build",

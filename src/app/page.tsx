@@ -10,33 +10,34 @@ import LoadingState from '@/components/LoadingState';
 export default function HomePage() {
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  const [isLoading, setIsLoading] = useState(true);
-  const [isParallaxEnabled, setIsParallaxEnabled] = useState(false);
-  // Authentication effect
+  const [isLoading] = useState(false); // Set to false since we're not doing initial auth check
+  const [isParallaxEnabled, setIsParallaxEnabled] = useState(false); // Authentication effect - SIMPLIFIED to avoid repeated getSession calls
   useEffect(() => {
-    const checkAuthStatus = async () => {
-      try {
-        const {
-          data: { session },
-          error,
-        } = await supabase.auth.getSession();
+    // DISABLED: Initial auth check that was causing repeated requests
+    // const checkAuthStatus = async () => {
+    //   try {
+    //     const {
+    //       data: { session },
+    //       error,
+    //     } = await supabase.auth.getSession();
+    //
+    //     if (error) {
+    //       console.warn('Session check error:', error);
+    //       setIsLoggedIn(false);
+    //     } else {
+    //       setIsLoggedIn(!!session);
+    //     }
+    //   } catch (error) {
+    //     console.error('Error checking auth status:', error);
+    //     setIsLoggedIn(false);
+    //   } finally {
+    //     setIsLoading(false);
+    //   }
+    // };
+    //
+    // checkAuthStatus();
 
-        if (error) {
-          console.warn('Session check error:', error);
-          setIsLoggedIn(false);
-        } else {
-          setIsLoggedIn(!!session);
-        }
-      } catch (error) {
-        console.error('Error checking auth status:', error);
-        setIsLoggedIn(false);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    checkAuthStatus(); // Listen for auth changes
+    // Only listen for auth changes without initial session check
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {

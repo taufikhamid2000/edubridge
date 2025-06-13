@@ -50,42 +50,36 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     // Clean URL immediately on mount if tokens are present
     cleanOAuthTokensFromUrl();
 
-    // Add a periodic session check to prevent token issues
-    const checkInterval = setInterval(
-      async () => {
-        try {
-          const { error } = await supabase.auth.getSession();
-          if (error) {
-            logger.warn('Scheduled session check failed:', error);
-            const { recoverSession } = await import('@/lib/supabase');
-            await recoverSession();
-          }
-        } catch (err) {
-          logger.error('Error in scheduled session check:', err);
-        }
-      },
-      5 * 60 * 1000
-    ); // Check every 5 minutes
+    // DISABLED: Periodic session check that was causing repeated requests
+    // const checkInterval = setInterval(
+    //   async () => {
+    //     try {
+    //       const { error } = await supabase.auth.getSession();
+    //       if (error) {
+    //         logger.warn('Scheduled session check failed:', error);
+    //         const { recoverSession } = await import('@/lib/supabase');
+    //         await recoverSession();
+    //       }
+    //     } catch (err) {
+    //       logger.error('Error in scheduled session check:', err);
+    //     }
+    //   },
+    //   5 * 60 * 1000
+    // ); // Check every 5 minutes
 
-    // Set up Supabase auth refresh with enhanced error handling
+    // SIMPLIFIED: Set up minimal auth state listener without repeated session checks
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event) => {
       if (event === 'TOKEN_REFRESHED') {
         logger.info('Auth token refreshed successfully');
-
-        // Clean URL after token refresh
         cleanOAuthTokensFromUrl();
-
-        // Optional: Update query client to reflect newly authenticated state
         queryClient.invalidateQueries();
       } else if (event === 'SIGNED_IN') {
         logger.info('User signed in successfully');
-
-        // Clean URL after successful sign in
         setTimeout(() => {
           cleanOAuthTokensFromUrl();
-        }, 100); // Small delay to ensure Supabase has processed the tokens
+        }, 100);
       } else if (event === 'SIGNED_OUT') {
         logger.info('User signed out');
       } else if (event === 'USER_UPDATED') {
@@ -94,26 +88,22 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         logger.info('Password recovery initiated');
       }
 
-      // Handle potential auth errors by checking for any issues with the session
-      const { data, error } = await supabase.auth.getSession();
-      if (error || !data.session) {
-        logger.warn('Session issues detected, attempting recovery');
-
-        try {
-          // Import recoverSession function
-          const { recoverSession } = await import('@/lib/supabase');
-          await recoverSession();
-
-          // After recovery attempt, check if we need to redirect to auth
-          const { data } = await supabase.auth.getSession();
-          if (!data.session) {
-            logger.warn('Session recovery failed, redirecting to auth page');
-            window.location.href = '/auth';
-          }
-        } catch (err) {
-          logger.error('Error during token refresh recovery:', err);
-        }
-      }
+      // DISABLED: Repeated session checks that were causing request spam
+      // const { data, error } = await supabase.auth.getSession();
+      // if (error || !data.session) {
+      //   logger.warn('Session issues detected, attempting recovery');
+      //   try {
+      //     const { recoverSession } = await import('@/lib/supabase');
+      //     await recoverSession();
+      //     const { data } = await supabase.auth.getSession();
+      //     if (!data.session) {
+      //       logger.warn('Session recovery failed, redirecting to auth page');
+      //       window.location.href = '/auth';
+      //     }
+      //   } catch (err) {
+      //     logger.error('Error during token refresh recovery:', err);
+      //   }
+      // }
     });
 
     // Additional cleanup on page visibility change (when user returns to tab)
@@ -127,7 +117,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
 
     return () => {
       subscription.unsubscribe();
-      clearInterval(checkInterval);
+      // clearInterval(checkInterval); // Disabled since checkInterval is commented out
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, []);
