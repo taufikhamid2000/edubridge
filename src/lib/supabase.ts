@@ -1,6 +1,23 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { createClient, Session, AuthError } from '@supabase/supabase-js';
 import { logger } from './logger';
+import { validateSupabaseConfig } from './validateEnv';
+
+// Initialize Supabase client after environment validation
+let supabaseClient: ReturnType<typeof createClient>;
+
+validateSupabaseConfig().then((valid) => {
+  if (valid) {
+    supabaseClient = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+  } else {
+    logger.error(
+      'Failed to initialize Supabase client due to invalid configuration'
+    );
+  }
+});
 
 // Cache implementation
 const AUTH_CACHE_KEY = 'sb_auth_cache';

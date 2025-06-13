@@ -41,10 +41,10 @@ function DashboardClient() {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  // State for search, pagination, and filtering
+  // Search and filter state
   const [searchQuery, setSearchQuery] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [currentPage, setCurrentPage] = useState(1);
   const [categories, setCategories] = useState<string[]>([]);
   const subjectsPerPage = 6;
 
@@ -52,94 +52,110 @@ function DashboardClient() {
   const { cleanUrlTokens } = useOAuthRedirect('/dashboard');
 
   useEffect(() => {
-    // Clean URL tokens immediately if present
-    cleanUrlTokens();
+    // Set a 30 second timeout
+    const timeoutId = setTimeout(() => {
+      setError(
+        'Connection timeout. Please refresh the page or check your internet connection.'
+      );
+      setLoading(false);
+    }, 30000);
 
     const fetchData = async () => {
-      const {
-        data: { session },
-        error: sessionError,
-      } = await supabase.auth.getSession();
-
-      if (sessionError) {
-        logger.error('Session error:', sessionError);
-        router.replace('/auth');
-        return;
-      }
-
-      if (!session) {
-        router.replace('/auth');
-        return;
-      }
-
       try {
-        // logger.log('Fetching subjects from Supabase...');
-        // Fetch subjects from Supabase
-        const { data: subjectsData, error: subjectsError } = await supabase
-          .from('subjects')
-          .select('*')
-          .order('order_index', { ascending: true });
+        // Clean URL tokens immediately if present
+        cleanUrlTokens();
 
-        if (subjectsError) {
-          logger.error('Error fetching subjects:', subjectsError);
-          setError(subjectsError.message);
-          throw subjectsError;
-        } // Create a sorted copy of the subjects data
-        const sortedSubjects = [...(subjectsData || [])];
+        const {
+          data: { session },
+          error: sessionError,
+        } = await supabase.auth.getSession();
 
-        // Sort the subjects array using the category_priority field from the database
-        sortedSubjects.sort((a, b) => {
-          // First, try to sort by category_priority if present
-          const priorityA = a.category_priority ?? 999;
-          const priorityB = b.category_priority ?? 999;
-
-          // First sort by category priority
-          if (priorityA !== priorityB) {
-            return priorityA - priorityB;
-          }
-
-          // Then sort by the existing order_index within the same category
-          return (a.order_index || 0) - (b.order_index || 0);
-        });
-        // logger.log('Subjects data sorted:', sortedSubjects);
-        setSubjects(sortedSubjects);
-
-        // Extract unique categories
-        const uniqueCategories = Array.from(
-          new Set(
-            sortedSubjects.map((subject) => subject.category || 'Uncategorized')
-          )
-        ) as string[];
-        setCategories(['all', ...uniqueCategories]); // Fetch user profile data from Supabase
-        const { data: userData, error: userError } = await supabase
-          .from('user_profiles')
-          .select('display_name, streak, xp, level, last_quiz_date')
-          .eq('id', session.user.id)
-          .single();
-
-        if (userError && userError.code !== 'PGRST116') {
-          // PGRST116 means no profile found, which we'll handle by creating default data
-          logger.error('Error fetching user profile:', userError);
+        if (sessionError) {
+          logger.error('Session error:', sessionError);
+          setError('Authentication error. Please try logging in again.');
+          router.replace('/auth');
+          return;
         }
 
-        // Use profile data if available, or create default data
-        setUser({
-          email: session.user.email || '',
-          display_name: userData?.display_name,
-          streak: userData?.streak || 0,
-          xp: userData?.xp || 0,
-          level: userData?.level || 1,
-          lastQuizDate:
-            userData?.last_quiz_date || new Date().toISOString().split('T')[0],
-        });
+        if (!session) {
+          logger.info('No active session, redirecting to auth');
+          router.replace('/auth');
+          return;
+        }
+
+        // Clear timeout since we got past auth
+        clearTimeout(timeoutId);
+
+        try {
+          // Fetch subjects from Supabase
+          const { data: subjectsData, error: subjectsError } = await supabase
+            .from('subjects')
+            .select('*')
+            .order('order_index', { ascending: true });
+
+          if (subjectsError) {
+            throw subjectsError;
+          }
+
+          // Create a sorted copy of the subjects data
+          const sortedSubjects = [...(subjectsData || [])].sort((a, b) => {
+            const priorityA = a.category_priority ?? 999;
+            const priorityB = b.category_priority ?? 999;
+            return priorityA - priorityB;
+          });
+
+          setSubjects(sortedSubjects);
+
+          // Extract unique categories
+          const uniqueCategories = [
+            'all',
+            ...new Set(
+              sortedSubjects.map((s) => s.category || 'Uncategorized')
+            ),
+          ];
+          setCategories(uniqueCategories);
+
+          // Fetch user profile
+          const { data: userData, error: userError } = await supabase
+            .from('user_profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
+
+          if (userError && userError.code !== 'PGRST116') {
+            throw userError;
+          }
+
+          // Use profile data if available, or create default data
+          setUser({
+            email: session.user.email || '',
+            display_name: userData?.display_name,
+            streak: userData?.streak || 0,
+            xp: userData?.xp || 0,
+            level: userData?.level || 1,
+            lastQuizDate:
+              userData?.last_quiz_date ||
+              new Date().toISOString().split('T')[0],
+          });
+        } catch (error) {
+          logger.error('Error fetching data:', error);
+          setError(
+            error instanceof Error
+              ? error.message
+              : 'An error occurred loading your dashboard'
+          );
+        }
       } catch (error) {
-        logger.error('Error fetching data:', error);
-        setError(error instanceof Error ? error.message : 'An error occurred');
+        logger.error('Error in dashboard:', error);
+        setError('Unable to load dashboard. Please refresh the page.');
       } finally {
         setLoading(false);
       }
     };
+
     fetchData();
+
+    return () => clearTimeout(timeoutId);
   }, [router, cleanUrlTokens]);
 
   const handleSubjectClick = (subject: Subject) => {
@@ -214,89 +230,31 @@ function DashboardClient() {
               Loading your dashboard...
             </p>
             <p className="text-sm mt-2 text-blue-600 dark:text-blue-300">
-              {' '}
               🚀 Connecting to Supabase
             </p>
             <Stopwatch />
             <p className="text-xs mt-2 text-blue-500 dark:text-blue-400">
-              Pro tip: If it takes too long, try refreshing to reset your
-              session.
+              If this takes too long, try refreshing the page
             </p>
           </div>
         </div>
-        <div className="animate-pulse space-y-8">
-          {/* Welcome Banner Skeleton */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-48 mb-2"></div>
-                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-64"></div>
-              </div>
-              <div className="flex space-x-4">
-                <div className="h-10 w-10 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
-                <div className="h-10 w-24 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
-              </div>
-            </div>
+      </main>
+    );
+  }
+
+  if (error) {
+    return (
+      <main className="container mx-auto py-6 px-4 sm:px-6 md:px-8">
+        <div className="text-center mb-8">
+          <div className="inline-block px-6 py-3 rounded-lg bg-red-100 dark:bg-red-900/30">
+            <p className="text-lg text-red-800 dark:text-red-200">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+            >
+              Refresh Page
+            </button>
           </div>
-
-          {/* Subjects Section Skeleton */}
-          <section>
-            <div className="flex justify-between items-center mb-6">
-              <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-32"></div>
-              <div className="flex space-x-4">
-                <div className="h-10 w-48 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
-                <div className="h-10 w-32 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[...Array(6)].map((_, i) => (
-                <div
-                  key={i}
-                  className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm"
-                >
-                  <div className="flex items-center mb-4">
-                    <div className="h-12 w-12 bg-gray-200 dark:bg-gray-700 rounded-lg mr-4"></div>
-                    <div className="flex-1">
-                      <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
-                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
-                    </div>
-                  </div>
-                  <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full mt-4"></div>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {/* Weekly Progress Skeleton */}
-          <section className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
-            <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-40 mb-6"></div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-              <div className="h-20 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
-              <div className="h-20 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
-              <div className="h-20 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
-            </div>
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
-          </section>
-
-          {/* Achievements Skeleton */}
-          <section className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
-            <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-44 mb-6"></div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {[...Array(3)].map((_, i) => (
-                <div
-                  key={i}
-                  className="p-4 rounded-lg border border-gray-200 dark:border-gray-700"
-                >
-                  <div className="flex items-center mb-3">
-                    <div className="h-10 w-10 bg-gray-200 dark:bg-gray-700 rounded-full mr-3"></div>
-                    <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-24"></div>
-                  </div>
-                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full mb-2"></div>
-                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
-                </div>
-              ))}
-            </div>
-          </section>
         </div>
       </main>
     );
