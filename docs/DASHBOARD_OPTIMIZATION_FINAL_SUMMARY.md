@@ -77,7 +77,7 @@ We have successfully implemented a comprehensive dashboard performance optimizat
 - `supabase/migrations/20250614_dashboard_performance_optimization.sql` - Database migration
 - `scripts/apply-migration.mjs` - Automated migration script
 - `manual_migration_steps.sql` - Manual migration fallback
-- `jest.dashboard.config.json` - Custom Jest config for dashboard tests
+- `config/jest.dashboard.config.json` - Custom Jest config for dashboard tests
 - `scripts/test-dashboard-optimization.sh` - Test runner script
 - Complete test suite (12 test files)
 - Documentation files

@@ -65,7 +65,7 @@ I have successfully created a comprehensive test suite for the dashboard optimiz
 
 #### Test Configuration Files
 
-- `jest.dashboard.config.json` - Specialized Jest config for dashboard tests
+- `config/jest.dashboard.config.json` - Specialized Jest config for dashboard tests
 - `scripts/test-dashboard-optimization.sh` - Automated test runner script
 
 #### Mock Setup
@@ -149,7 +149,7 @@ npm test -- --coverage --testPathPattern="dashboard"
 
 ```bash
 # Run dashboard-specific tests
-jest --config jest.dashboard.config.json
+jest --config config/jest.dashboard.config.json
 ```
 
 ### 🎯 **Test Scenarios Covered**
