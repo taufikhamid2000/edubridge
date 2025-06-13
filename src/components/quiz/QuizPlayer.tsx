@@ -25,6 +25,7 @@ interface QuizPlayerProps {
   topic?: string; // Added for navigation
   onComplete?: () => void;
   topicContext?: TopicContext | null;
+  isVerified?: boolean; // Quiz verification status
 }
 
 export default function QuizPlayer({
@@ -37,6 +38,7 @@ export default function QuizPlayer({
   topic,
   onComplete,
   topicContext,
+  isVerified = true,
 }: QuizPlayerProps) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string[]>>({});
@@ -186,11 +188,45 @@ export default function QuizPlayer({
     const secs = seconds % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
-
   if (!quizStarted) {
     return (
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
         <h2 className="text-2xl font-bold mb-4">Quiz: {quizName}</h2>
+
+        {/* Unverified quiz warning */}
+        {!isVerified && (
+          <div className="mb-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <svg
+                  className="h-5 w-5 text-yellow-400"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+                  Unverified Quiz
+                </h3>
+                <div className="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
+                  <p>
+                    This quiz has not been verified by administrators.
+                    <strong> No points or XP will be awarded</strong> for
+                    completing this quiz. The content may not have been reviewed
+                    for accuracy.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {topicContext && (
           <div className="mb-4 text-gray-600 dark:text-gray-300">
             <p className="mb-1">
@@ -234,6 +270,7 @@ export default function QuizPlayer({
         totalQuestions={questions.length}
         answers={answers}
         questions={questions}
+        isVerified={isVerified}
         onRetake={resetQuiz}
         onViewAll={() => {
           if (subject && topic) {

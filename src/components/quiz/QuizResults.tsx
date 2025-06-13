@@ -9,6 +9,7 @@ interface QuizResultsProps {
   questions: Question[];
   onRetake: () => void;
   onViewAll: () => void;
+  isVerified?: boolean; // Quiz verification status
 }
 
 export default function QuizResults({
@@ -18,6 +19,7 @@ export default function QuizResults({
   questions,
   onRetake,
   onViewAll,
+  isVerified = true,
 }: QuizResultsProps) {
   const getStatusClass = (score: number) => {
     if (score >= 80) return 'text-green-600 dark:text-green-400';
@@ -59,7 +61,6 @@ export default function QuizResults({
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
       <div className="text-center mb-8">
         <h2 className="text-2xl font-bold mb-4">Quiz Completed!</h2>
-
         <div className="relative w-48 h-48 mx-auto mb-4">
           <svg viewBox="0 0 100 100" className="w-full h-full">
             {/* Background circle */}
@@ -97,8 +98,7 @@ export default function QuizResults({
               </span>
             </div>
           </div>
-        </div>
-
+        </div>{' '}
         <p className={`text-xl font-medium ${getStatusClass(score)} mb-2`}>
           {getStatusText(score)}
         </p>
@@ -106,6 +106,14 @@ export default function QuizResults({
           You scored {score}% ({Math.round((score / 100) * totalQuestions)}/
           {totalQuestions} correct)
         </p>
+        {/* Unverified quiz notice */}
+        {!isVerified && (
+          <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+            <p className="text-sm text-yellow-800 dark:text-yellow-200 text-center">
+              <strong>No points awarded:</strong> This was an unverified quiz
+            </p>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">

@@ -127,6 +127,19 @@ export async function submitQuizAttempt({
       );
     }
 
+    // Check if the quiz is verified before awarding points
+    const { data: quizData, error: quizError } = await supabase
+      .from('quizzes')
+      .select('verified')
+      .eq('id', quizId)
+      .single();
+
+    if (quizError) {
+      logger.error('Error checking quiz verification:', quizError);
+    }
+
+    const isQuizVerified = quizData?.verified || false;
+
     // For now, we'll create a more resilient approach that doesn't depend on a specific table
     // First, check if the quiz_attempts table exists
     const { error: checkError } = await supabase
@@ -154,16 +167,23 @@ export async function submitQuizAttempt({
       );
       existingAttempts.push(attemptData);
       localStorage.setItem('quiz_attempts', JSON.stringify(existingAttempts));
-
       return attemptData;
-    } // Import the leaderboardService to update user stats
-    const { updateUserStats } = await import('@/services/leaderboardService');
+    }
 
-    // Calculate XP based on score (simple formula - adjust as needed)
-    const earnedXp = Math.round(score * 10); // 10 XP per correct answer
+    // Only award XP and update stats for verified quizzes
+    if (isQuizVerified) {
+      // Import the leaderboardService to update user stats
+      const { updateUserStats } = await import('@/services/leaderboardService');
 
-    // Update user stats for leaderboard
-    await updateUserStats(userId, earnedXp, true); // If table exists, proceed with normal insert
+      // Calculate XP based on score (simple formula - adjust as needed)
+      const earnedXp = Math.round(score * 10); // 10 XP per correct answer
+
+      // Update user stats for leaderboard
+      await updateUserStats(userId, earnedXp, true);
+      logger.log(`Awarded ${earnedXp} XP for verified quiz completion`);
+    } else {
+      logger.log('No XP awarded - quiz is not verified');
+    } // If table exists, proceed with normal insert
     const { data: attemptData, error: attemptError } = await supabase
       .from('quiz_attempts')
       .insert([

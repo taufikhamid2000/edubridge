@@ -188,6 +188,7 @@ export default function PlayQuizPage() {
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="max-w-3xl mx-auto">
+        {' '}
         <QuizPlayer
           quizId={quizId}
           quizName={quiz.name}
@@ -197,6 +198,7 @@ export default function PlayQuizPage() {
           subject={subject}
           topic={topic}
           topicContext={topicContext}
+          isVerified={quiz.verified}
           onComplete={() => {
             // Handle quiz completion
             logger.log('Quiz completed');

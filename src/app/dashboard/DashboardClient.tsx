@@ -19,6 +19,19 @@ interface Subject {
   order_index?: number;
 }
 
+interface UserStats {
+  weeklyProgress: {
+    quizzesCompleted: number;
+    quizzesTotal: number;
+    averageScore: number;
+  };
+  achievements: Array<{
+    title: string;
+    description: string;
+    bgColor: string;
+  }>;
+}
+
 interface DashboardClientProps {
   initialUser: {
     email: string;
@@ -30,12 +43,18 @@ interface DashboardClientProps {
   };
   initialSubjects: Subject[];
   initialCategories: string[];
+  userStats?: UserStats;
+  statsLoading?: boolean;
+  statsError?: Error | null;
 }
 
 export default function DashboardClient({
   initialUser,
   initialSubjects,
   initialCategories,
+  userStats,
+  // statsLoading = false,
+  // statsError,
 }: DashboardClientProps) {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
@@ -86,9 +105,8 @@ export default function DashboardClient({
   const handleSubjectClick = (subject: Subject) => {
     router.push(`/quiz/${subject.slug}/chapters`);
   };
-
-  // Achievement data
-  const achievements = [
+  // Achievement data - use from userStats or fallback to static
+  const achievements = userStats?.achievements || [
     {
       title: 'Quiz Master',
       description: 'Completed 10 quizzes in a week',
@@ -106,12 +124,18 @@ export default function DashboardClient({
     },
   ];
 
+  // Weekly progress data - use from userStats or fallback
+  const weeklyProgress = userStats?.weeklyProgress || {
+    quizzesCompleted: 7,
+    quizzesTotal: 10,
+    averageScore: 85,
+  };
+
   return (
     <main className="container mx-auto py-6 px-4 sm:px-6 md:px-8">
       <div className="flex flex-col gap-8 sm:gap-10 md:gap-12">
         {/* Welcome Section */}
         <WelcomeBanner user={initialUser} />
-
         {/* Subjects Section */}
         <section id="subjects-section">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 sm:mb-6">
@@ -146,15 +170,13 @@ export default function DashboardClient({
             handleSubjectClick={handleSubjectClick}
             handlePageChange={handlePageChange}
           />
-        </section>
-
+        </section>{' '}
         {/* Weekly Progress Section */}
         <WeeklyProgress
-          quizzesCompleted={7}
-          quizzesTotal={10}
-          averageScore={85}
+          quizzesCompleted={weeklyProgress.quizzesCompleted}
+          quizzesTotal={weeklyProgress.quizzesTotal}
+          averageScore={weeklyProgress.averageScore}
         />
-
         {/* Recent Achievements Section */}
         <Achievements achievements={achievements} />
       </div>
