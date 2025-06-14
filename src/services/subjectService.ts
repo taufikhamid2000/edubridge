@@ -36,6 +36,37 @@ export interface Chapter {
 }
 
 /**
+ * Interface for topic data
+ */
+export interface Topic {
+  id: string;
+  name: string;
+  description: string;
+  difficulty_level: string;
+  time_estimate_minutes: number;
+  order_index: number;
+}
+
+/**
+ * Interface for chapter with topics data
+ */
+export interface ChapterWithTopics {
+  id: number;
+  name: string;
+  form: number;
+  order_index: number;
+  topics: Topic[];
+}
+
+/**
+ * Interface for subject with chapters and topics response
+ */
+export interface SubjectWithChaptersAndTopics {
+  subject: PublicSubject;
+  chapters: ChapterWithTopics[];
+}
+
+/**
  * Interface for nested subject data from database
  */
 interface SubjectWithNested {
@@ -460,5 +491,96 @@ export async function fetchChaptersBySubjectSlug(
   } catch (error) {
     logger.error('Error fetching chapters:', error);
     throw error;
+  }
+}
+
+/**
+ * Fetches subjects with chapters and topics for a subject by ID
+ * @param subjectId The ID of the subject
+ * @returns A promise with the subject, chapters, and topics data or error
+ */
+export async function fetchSubjectWithChaptersAndTopics(
+  subjectId: string
+): Promise<{
+  data: SubjectWithChaptersAndTopics | null;
+  error: Error | null;
+}> {
+  try {
+    // Fetch subject data
+    const { data: subject, error: subjectError } = await supabase
+      .from('subjects')
+      .select('id, name, slug, description, icon')
+      .eq('id', subjectId)
+      .single();
+
+    if (subjectError) {
+      logger.error('Error fetching subject:', subjectError);
+      return { data: null, error: subjectError };
+    }
+
+    // Fetch chapters with topics for the subject
+    const { data: chapters, error: chaptersError } = await supabase
+      .from('chapters')
+      .select(
+        'id, name, form, order_index, topics(id, name, description, difficulty_level, time_estimate_minutes, order_index)'
+      )
+      .eq('subject_id', subjectId)
+      .order('order_index', { ascending: true });
+
+    if (chaptersError) {
+      logger.error('Error fetching chapters with topics:', chaptersError);
+      return { data: null, error: chaptersError };
+    }
+
+    // Format the response
+    const responseData: SubjectWithChaptersAndTopics = {
+      subject: subject as PublicSubject,
+      chapters: (chapters || []).map((chapter) => ({
+        id: chapter.id,
+        name: chapter.name,
+        form: chapter.form,
+        order_index: chapter.order_index,
+        topics: chapter.topics || [],
+      })),
+    };
+
+    return { data: responseData, error: null };
+  } catch (error) {
+    const err = error instanceof Error ? error : new Error('Unknown error');
+    logger.error('Error in fetchSubjectWithChaptersAndTopics:', err);
+    return { data: null, error: err };
+  }
+}
+
+/**
+ * Fetches chapters with topics for a subject using API route (authentication-optional)
+ * @param slug - The subject slug
+ * @returns Promise with subject and chapters with topics data
+ */
+export async function fetchChaptersWithTopicsAPI(
+  slug: string
+): Promise<SubjectWithChaptersAndTopics> {
+  try {
+    const response = await fetch(`/api/subjects/${slug}/chapters-with-topics`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        errorData.error || 'Failed to fetch chapters with topics'
+      );
+    }
+
+    return await response.json();
+  } catch (error) {
+    logger.error('Error fetching chapters with topics:', error);
+    throw error instanceof Error
+      ? error
+      : new Error('Failed to fetch chapters with topics');
   }
 }
