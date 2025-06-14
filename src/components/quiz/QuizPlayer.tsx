@@ -8,6 +8,16 @@ import { useRouter } from 'next/navigation';
 import { submitQuizAttempt } from '@/lib/quiz';
 import { logger } from '@/lib/logger';
 
+// Fisher-Yates shuffle algorithm
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
 interface TopicContext {
   topicTitle: string;
   chapterTitle: string;
@@ -48,8 +58,20 @@ export default function QuizPlayer({
     timeLimit ? timeLimit * 60 : 0
   );
   const [quizStarted, setQuizStarted] = useState(false);
+  const [shuffledQuestions, setShuffledQuestions] = useState<Question[]>([]);
   const router = useRouter();
-
+  // Initialize shuffled questions when component mounts or questions change
+  useEffect(() => {
+    if (questions.length > 0) {
+      const shuffled = shuffleArray(questions);
+      setShuffledQuestions(shuffled);
+      // Log the randomization for verification
+      logger.log('Quiz questions shuffled:', {
+        originalOrder: questions.map((q) => q.id.slice(-8)),
+        shuffledOrder: shuffled.map((q) => q.id.slice(-8)),
+      });
+    }
+  }, [questions]);
   // Function to reset quiz state for retaking
   const resetQuiz = () => {
     setCurrentQuestionIndex(0);
@@ -58,6 +80,12 @@ export default function QuizPlayer({
     setScore(0);
     setTimeRemaining(timeLimit ? timeLimit * 60 : 0);
     setQuizStarted(false);
+    // Re-shuffle questions for a fresh experience on retake
+    const reshuffled = shuffleArray(questions);
+    setShuffledQuestions(reshuffled);
+    logger.log('Quiz questions re-shuffled on retake:', {
+      newOrder: reshuffled.map((q) => q.id.slice(-8)),
+    });
   };
 
   // Start quiz timer when quiz is started
@@ -91,9 +119,8 @@ export default function QuizPlayer({
       [questionId]: selectedAnswers,
     }));
   };
-
   const handleNextQuestion = () => {
-    if (currentQuestionIndex < questions.length - 1) {
+    if (currentQuestionIndex < shuffledQuestions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
   };
@@ -103,12 +130,11 @@ export default function QuizPlayer({
       setCurrentQuestionIndex(currentQuestionIndex - 1);
     }
   };
-
   const calculateScore = (): number => {
     let correctAnswers = 0;
-    const totalQuestions = questions.length;
+    const totalQuestions = shuffledQuestions.length;
 
-    questions.forEach((question) => {
+    shuffledQuestions.forEach((question) => {
       if (!question.answers) return;
 
       const userAnswers = answers[question.id] || [];
@@ -243,7 +269,7 @@ export default function QuizPlayer({
         )}
         <div className="mb-6">
           <p className="text-gray-600 dark:text-gray-300 mb-2">
-            This quiz contains {questions.length} questions.
+            This quiz contains {shuffledQuestions.length} questions.
           </p>
           {timeLimit && (
             <p className="text-gray-600 dark:text-gray-300 mb-2">
@@ -267,9 +293,9 @@ export default function QuizPlayer({
     return (
       <QuizResults
         score={score}
-        totalQuestions={questions.length}
+        totalQuestions={shuffledQuestions.length}
         answers={answers}
-        questions={questions}
+        questions={shuffledQuestions}
         isVerified={isVerified}
         onRetake={resetQuiz}
         onViewAll={() => {
@@ -283,7 +309,21 @@ export default function QuizPlayer({
     );
   }
 
-  const currentQuestion = questions[currentQuestionIndex];
+  // Don't render if shuffledQuestions is not ready
+  if (shuffledQuestions.length === 0) {
+    return (
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-t-blue-500 border-r-transparent border-b-blue-500 border-l-transparent"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">
+            Preparing quiz questions...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  const currentQuestion = shuffledQuestions[currentQuestionIndex];
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
@@ -300,14 +340,12 @@ export default function QuizPlayer({
             Time: {formatTime(timeRemaining)}
           </div>
         )}
-      </div>
-
+      </div>{' '}
       <QuizProgress
         currentQuestion={currentQuestionIndex + 1}
-        totalQuestions={questions.length}
+        totalQuestions={shuffledQuestions.length}
         answeredQuestions={Object.keys(answers).length}
       />
-
       {currentQuestion && (
         <QuizQuestion
           question={currentQuestion}
@@ -317,7 +355,6 @@ export default function QuizPlayer({
           }
         />
       )}
-
       <div className="flex justify-between mt-8">
         <button
           onClick={handlePrevQuestion}
@@ -331,7 +368,7 @@ export default function QuizPlayer({
           Previous
         </button>
 
-        {currentQuestionIndex < questions.length - 1 ? (
+        {currentQuestionIndex < shuffledQuestions.length - 1 ? (
           <button
             onClick={handleNextQuestion}
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
