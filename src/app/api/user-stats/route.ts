@@ -55,19 +55,34 @@ export async function GET() {
       data: { session },
       error: sessionError,
     } = await supabaseServer.auth.getSession();
-
     if (sessionError) {
       logger.error('Session error in user stats API:', sessionError);
-      return NextResponse.json(
-        { error: 'Authentication error' },
-        { status: 401 }
-      );
+      // Continue without authentication for guest user
     }
 
     if (!session) {
+      // Return guest user stats
       return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
+        {
+          weeklyProgress: {
+            quizzesCompleted: 0,
+            quizzesTotal: 0,
+            averageScore: 0,
+          },
+          achievements: [],
+          streakInfo: {
+            currentStreak: 0,
+            longestStreak: 0,
+            streakType: 'days' as const,
+          },
+          recentActivity: [],
+          isGuest: true,
+        },
+        {
+          headers: {
+            'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
+          },
+        }
       );
     }
 
@@ -192,7 +207,7 @@ export async function GET() {
       description: string;
       date: string;
       score?: number;
-    }> = []; // Add quiz completion activities    
+    }> = []; // Add quiz completion activities
     const quizActivities = (recentQuizzes || [])
       .slice(0, 5)
       .map((quiz: any) => ({

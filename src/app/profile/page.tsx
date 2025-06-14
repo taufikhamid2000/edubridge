@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, Suspense } from 'react';
+import { useState, Suspense, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { User, Achievement } from '@/types/users';
@@ -8,6 +8,9 @@ import { User, Achievement } from '@/types/users';
 // Extended User type to include guest user properties
 interface ExtendedUser extends User {
   isGuest?: boolean;
+  daily_xp?: number;
+  weekly_xp?: number;
+  last_quiz_date?: string;
 }
 import {
   fetchUserProfileAPI,
@@ -28,12 +31,30 @@ function ProfileContent() {
   const [activeTab, setActiveTab] = useState<
     'stats' | 'achievements' | 'settings' | 'created-quizzes'
   >('stats');
+  const [isUpgrading, setIsUpgrading] = useState(false);
 
-  // Fetch user profile with React Query
+  // Start with guest data immediately for fast loading
+  const [displayUser, setDisplayUser] = useState<ExtendedUser>({
+    id: 'guest',
+    email: '',
+    display_name: 'Guest User',
+    avatar_url: '',
+    streak: 0,
+    xp: 0,
+    level: 1,
+    daily_xp: 0,
+    weekly_xp: 0,
+    last_quiz_date: new Date().toISOString().split('T')[0],
+    created_at: new Date().toISOString(),
+    isGuest: true,
+  });
+
+  // Fetch real user profile with React Query (but don't block rendering)
   const {
-    data: user,
+    data: realUser,
     isLoading: isUserLoading,
     error: userError,
+    isFetched,
   } = useQuery<User>({
     queryKey: ['profile', userId || 'me'],
     queryFn: () =>
@@ -42,6 +63,28 @@ function ProfileContent() {
     gcTime: 600000, // 10 minutes cache
     retry: 2,
   });
+
+  // Progressive enhancement: upgrade from guest to real user data
+  useEffect(() => {
+    if (isFetched && realUser) {
+      if ((realUser as ExtendedUser).isGuest) {
+        // API returned guest user, keep guest display
+        setDisplayUser(realUser as ExtendedUser);
+        setIsUpgrading(false);
+      } else {
+        // API returned real user, upgrade the display
+        setIsUpgrading(true);
+
+        // Add a subtle delay to avoid jarring transitions
+        const timer = setTimeout(() => {
+          setDisplayUser(realUser as ExtendedUser);
+          setIsUpgrading(false);
+        }, 300);
+
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [isFetched, realUser]);
 
   // Fetch user achievements with React Query
   const {
@@ -67,9 +110,8 @@ function ProfileContent() {
     staleTime: 300000, // 5 minutes
     gcTime: 600000, // 10 minutes cache    retry: 2,
   });
-
   // Determine if this is the user's own profile
-  const isOwnProfile = !userId || (user && !(user as ExtendedUser).isGuest);
+  const isOwnProfile = !userId || (displayUser && !displayUser.isGuest);
 
   // Check if any data is loading
   const isLoading = isUserLoading || isAchievementsLoading || isQuizzesLoading;
@@ -77,22 +119,9 @@ function ProfileContent() {
   // Check for errors
   const hasError = userError || achievementsError || quizzesError;
 
-  // Render loading state
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="animate-pulse">
-            <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded-lg mb-6"></div>
-            <div className="h-64 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Render error state
-  if (hasError || !user) {
+  // Don't show loading spinner - we have guest data to show immediately
+  // Only show error if we can't get any data at all
+  if (hasError && !displayUser) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -115,12 +144,23 @@ function ProfileContent() {
       </div>
     );
   }
-
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Profile Header with Avatar and Basic Info */}
-        <ProfileHeader user={user} />
+        <div className="relative">
+          <ProfileHeader user={displayUser} />
+
+          {/* Upgrading indicator */}
+          {isUpgrading && (
+            <div className="absolute top-4 right-4">
+              <div className="flex items-center text-sm text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-3 py-1 rounded-full">
+                <div className="animate-spin rounded-full h-3 w-3 border border-blue-600 border-t-transparent mr-2"></div>
+                Loading your profile...
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* Tab Navigation */}
         <div className="bg-white dark:bg-gray-800 shadow rounded-lg mt-6 overflow-hidden">
@@ -173,7 +213,7 @@ function ProfileContent() {
 
           {/* Tab Content */}
           <div className="p-6">
-            {activeTab === 'stats' && <ProfileStats user={user} />}{' '}
+            {activeTab === 'stats' && <ProfileStats user={displayUser} />}
             {activeTab === 'achievements' && (
               <ProfileAchievements
                 achievements={achievements || []}
@@ -225,7 +265,7 @@ function ProfileContent() {
               />
             )}
             {activeTab === 'settings' && isOwnProfile && (
-              <ProfileSettings user={user} />
+              <ProfileSettings user={displayUser} />
             )}
           </div>
         </div>

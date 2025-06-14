@@ -1,20 +1,17 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
   fetchDashboardData,
   fetchUserStats,
 } from '@/services/dashboardService';
 import DashboardClient from './DashboardClient';
-import LoadingState from '@/components/LoadingState';
 
 export default function DashboardPage() {
+  const [isUpgrading, setIsUpgrading] = useState(false);
   // Fetch dashboard data with React Query - no authentication required
-  const {
-    data: dashboardData,
-    isLoading: isDashboardLoading,
-    error: dashboardError,
-  } = useQuery({
+  const { data: dashboardData, error: dashboardError } = useQuery({
     queryKey: ['dashboard'],
     queryFn: fetchDashboardData,
     staleTime: 300000, // 5 minutes
@@ -23,11 +20,12 @@ export default function DashboardPage() {
     refetchOnWindowFocus: false,
   });
 
-  // Fetch user stats with React Query - may not work for unauthenticated users
+  // Fetch user stats with React Query - progressive enhancement
   const {
     data: userStats,
     isLoading: isStatsLoading,
     error: statsError,
+    isFetched: isStatsFetched,
   } = useQuery({
     queryKey: ['userStats'],
     queryFn: fetchUserStats,
@@ -35,12 +33,19 @@ export default function DashboardPage() {
     gcTime: 1200000, // 20 minutes cache
     retry: 1,
     refetchOnWindowFocus: false,
-  }); // Loading state - show loading when queries are running
-  if (isDashboardLoading) {
-    return <LoadingState />;
-  }
+  });
 
-  // Error state
+  // Show upgrading indicator when real data is being fetched
+  useEffect(() => {
+    if (isStatsLoading) {
+      setIsUpgrading(true);
+    } else if (isStatsFetched) {
+      setIsUpgrading(false);
+    }
+  }, [isStatsLoading, isStatsFetched]);
+
+  // Never show loading spinner for dashboard data - show guest data immediately
+  // Only show error if critical dashboard data fails
   if (dashboardError) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -83,15 +88,26 @@ export default function DashboardPage() {
       </div>
     );
   }
-
   return (
-    <DashboardClient
-      initialUser={dashboardData.user}
-      initialSubjects={dashboardData.subjects}
-      initialCategories={dashboardData.categories}
-      userStats={userStats}
-      statsLoading={isStatsLoading}
-      statsError={statsError}
-    />
+    <div className="relative">
+      {/* Upgrading indicator */}
+      {isUpgrading && (
+        <div className="fixed top-4 right-4 z-50">
+          <div className="flex items-center text-sm text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-3 py-1 rounded-full shadow-lg">
+            <div className="animate-spin rounded-full h-3 w-3 border border-blue-600 border-t-transparent mr-2"></div>
+            Loading your data...
+          </div>
+        </div>
+      )}
+
+      <DashboardClient
+        initialUser={dashboardData.user}
+        initialSubjects={dashboardData.subjects}
+        initialCategories={dashboardData.categories}
+        userStats={userStats}
+        statsLoading={isStatsLoading}
+        statsError={statsError}
+      />
+    </div>
   );
 }
