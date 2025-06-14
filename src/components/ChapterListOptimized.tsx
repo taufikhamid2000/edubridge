@@ -87,8 +87,9 @@ export default function ChapterListOptimized({
                                 key={topic.id}
                                 className="bg-white dark:bg-gray-800 rounded-md p-3 border border-gray-200 dark:border-gray-600 hover:shadow-sm transition-shadow duration-200"
                               >
+                                {' '}
                                 <Link
-                                  href={`/quiz/${subject}/${topic.id}`}
+                                  href={`/quiz/${subject}/${topic.id}?chapterId=${chapter.id}&chapterName=${encodeURIComponent(chapter.name)}`}
                                   className="block group"
                                 >
                                   <div className="flex items-start justify-between">

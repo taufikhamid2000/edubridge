@@ -82,30 +82,52 @@ export default function CreateQuizPage() {
 
           if (subjectError) throw subjectError;
           if (subjectData) setSubjectData(subjectData);
-        }
-
-        // Fetch topic data
+        } // Fetch topic data
         if (topic) {
+          logger.log('Fetching topic data for topic ID:', topic);
           const { data: topicData, error: topicError } = await supabase
             .from('topics')
-            .select('id, title, chapter_id')
+            .select('id, name, chapter_id')
             .eq('id', topic)
             .single();
 
+          logger.log('Topic query result:', { topicData, topicError });
           if (topicError) throw topicError;
           if (topicData) {
-            setTopicData(topicData);
+            setTopicData({
+              id: topicData.id,
+              title: topicData.name, // Map name to title for compatibility
+              chapter_id: topicData.chapter_id,
+            });
 
             // Fetch chapter data if we have a chapter_id
             if (topicData.chapter_id) {
+              logger.log(
+                'Fetching chapter data for chapter ID:',
+                topicData.chapter_id
+              );
               const { data: chapterData, error: chapterError } = await supabase
                 .from('chapters')
-                .select('id, title, form')
+                .select('id, name, form')
                 .eq('id', topicData.chapter_id)
                 .single();
 
+              logger.log('Chapter query result:', {
+                chapterData,
+                chapterError,
+              });
               if (chapterError) throw chapterError;
-              if (chapterData) setChapterData(chapterData);
+              if (chapterData) {
+                setChapterData({
+                  id: chapterData.id,
+                  title: chapterData.name, // Map name to title for compatibility
+                  form: chapterData.form,
+                });
+              }
+            } else {
+              logger.log(
+                'No chapter_id found for topic, chapter data will be null'
+              );
             }
           }
         }

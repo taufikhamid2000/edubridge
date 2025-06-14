@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
 import { Subject, Topic, Chapter, Quiz } from '@/types/topics';
@@ -12,6 +12,7 @@ export function useTopicData(subject: string, topic: string) {
   const [chapterData, setChapterData] = useState<Chapter | null>(null);
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     if (!subject || !topic) {
@@ -32,39 +33,68 @@ export function useTopicData(subject: string, topic: string) {
         if (subjectError)
           throw new Error(`Failed to load subject: ${subjectError.message}`);
         if (!subjectData) throw new Error(`Subject not found: ${subject}`);
-        setSubjectData(subjectData);
-
-        // Fetch topic and chapter data
+        setSubjectData(subjectData); // Fetch topic and chapter data
+        logger.log('Fetching topic data for topic ID:', topic);
         const { data: topicData, error: topicError } = await supabase
           .from('topics')
-          .select('*, chapters(*)')
+          .select(
+            'id, name, chapter_id, description, difficulty_level, time_estimate_minutes, order_index'
+          )
           .eq('id', topic)
           .single();
+
+        logger.log('Topic query result:', { topicData, topicError });
         if (topicError)
           throw new Error(`Failed to load topic: ${topicError.message}`);
         if (!topicData) throw new Error(`Topic not found: ${topic}`);
-        if (!topicData.chapters) {
-          // Chapter data missing, but we'll handle it gracefully
-          // Continue without throwing, let the chapterData=null flow handle this
-        }
-        setTopicData(topicData);
 
-        // Handle different possible formats of the chapters data
+        setTopicData({
+          ...topicData,
+          chapters: [], // Empty array since we'll fetch chapter separately
+        });
+
+        // Fetch chapter data if we have a chapter_id
         let chapter = null;
-        if (topicData.chapters) {
-          if (
-            Array.isArray(topicData.chapters) &&
-            topicData.chapters.length > 0
-          ) {
-            chapter = topicData.chapters[0];
-          } else if (
-            typeof topicData.chapters === 'object' &&
-            'id' in topicData.chapters
-          ) {
-            // Handle case where chapters might be a single object and not an array
-            chapter = topicData.chapters;
+        if (topicData.chapter_id) {
+          logger.log(
+            'Fetching chapter data for chapter ID:',
+            topicData.chapter_id
+          );
+          const { data: chapterData, error: chapterError } = await supabase
+            .from('chapters')
+            .select('id, name, form, order_index')
+            .eq('id', topicData.chapter_id)
+            .single();
+
+          logger.log('Chapter query result:', { chapterData, chapterError });
+          if (chapterError) {
+            logger.error('Failed to fetch chapter data:', chapterError);
+          } else if (chapterData) {
+            chapter = chapterData;
           }
-        } // Set the chapter data, which might be null if no valid chapter was found
+        } else {
+          logger.log(
+            'No chapter_id found for topic, checking query parameters...'
+          );
+          // If no chapter_id from database, check query parameters as fallback
+          const chapterId = searchParams.get('chapterId');
+          const chapterName = searchParams.get('chapterName');
+
+          if (chapterId && chapterName) {
+            logger.log('Using chapter data from query parameters:', {
+              chapterId,
+              chapterName,
+            });
+            chapter = {
+              id: chapterId,
+              name: decodeURIComponent(chapterName),
+              form: 0, // Default form, could be enhanced
+              order_index: 0,
+            };
+          }
+        }
+
+        // Set the chapter data, which might be null if no valid chapter was found
         setChapterData(chapter);
         try {
           // Fetch basic quizzes first
@@ -131,7 +161,7 @@ export function useTopicData(subject: string, topic: string) {
         setLoading(false);
       }
     })();
-  }, [subject, topic, router]);
+  }, [subject, topic, router, searchParams]);
 
   return { loading, error, subjectData, topicData, chapterData, quizzes };
 }

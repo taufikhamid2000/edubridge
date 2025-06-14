@@ -22,7 +22,7 @@ export default function ActionButtons({
           className="px-5 py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white rounded-md transition-colors shadow-md font-medium text-lg flex items-center"
           onClick={() =>
             router.push(
-              `/quiz/${subject}/${topic}/create?chapter=${chapterData?.title}`
+              `/quiz/${subject}/${topic}/create?chapter=${encodeURIComponent(chapterData?.name || 'Unknown Chapter')}`
             )
           }
         >
