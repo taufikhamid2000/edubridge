@@ -47,12 +47,9 @@ export async function GET(
 
     if (profileError) {
       logger.error('Error fetching user profile:', profileError);
-      
+
       if (profileError.code === 'PGRST116') {
-        return NextResponse.json(
-          { error: 'User not found' },
-          { status: 404 }
-        );
+        return NextResponse.json({ error: 'User not found' }, { status: 404 });
       }
 
       return NextResponse.json(
@@ -62,10 +59,7 @@ export async function GET(
     }
 
     if (!profileData) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
     // Return profile without email for privacy (public profile)

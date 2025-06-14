@@ -36,10 +36,8 @@ function ProfileContent() {
     error: userError,
   } = useQuery<User>({
     queryKey: ['profile', userId || 'me'],
-    queryFn: () => 
-      userId 
-        ? fetchUserProfileByIdAPI(userId)
-        : fetchUserProfileAPI(),
+    queryFn: () =>
+      userId ? fetchUserProfileByIdAPI(userId) : fetchUserProfileAPI(),
     staleTime: 300000, // 5 minutes
     gcTime: 600000, // 10 minutes cache
     retry: 2,
@@ -103,7 +101,8 @@ function ProfileContent() {
               Error
             </h2>
             <p className="text-gray-600 dark:text-gray-300">
-              {(userError || achievementsError || quizzesError)?.message || 'Failed to load profile. Please try again.'}
+              {(userError || achievementsError || quizzesError)?.message ||
+                'Failed to load profile. Please try again.'}
             </p>
             <button
               onClick={() => window.location.reload()}
@@ -174,7 +173,8 @@ function ProfileContent() {
 
           {/* Tab Content */}
           <div className="p-6">
-            {activeTab === 'stats' && <ProfileStats user={user} />}            {activeTab === 'achievements' && (
+            {activeTab === 'stats' && <ProfileStats user={user} />}{' '}
+            {activeTab === 'achievements' && (
               <ProfileAchievements
                 achievements={achievements || []}
                 loading={isLoading}

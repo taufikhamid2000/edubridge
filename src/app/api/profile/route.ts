@@ -86,7 +86,7 @@ export async function GET() {
 
     if (profileError) {
       logger.error('Error fetching user profile:', profileError);
-      
+
       // If profile doesn't exist, create one
       if (profileError.code === 'PGRST116') {
         const { data: newProfile, error: createError } = await supabase

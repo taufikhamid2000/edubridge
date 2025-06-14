@@ -13,7 +13,7 @@ export async function GET(
 ) {
   try {
     const { userId } = await params;
-    
+
     // Handle guest user case
     if (userId === 'guest') {
       return NextResponse.json([], {
@@ -22,7 +22,7 @@ export async function GET(
         },
       });
     }
-    
+
     // If userId is 'me', get current user's created quizzes
     if (userId === 'me') {
       const cookieStore = await cookies();
@@ -51,7 +51,7 @@ export async function GET(
       }
 
       const targetUserId = session.user.id;
-      
+
       // Fetch created quizzes for authenticated user
       const { data: quizzes, error } = await supabase
         .from('quizzes')
@@ -101,13 +101,13 @@ export async function GET(
         };
       }
 
-      const transformedQuizzes = (
-        (quizzes as QuizWithRelations[]) || []
-      ).map((quiz) => ({
-        ...quiz,
-        subject_slug: quiz.topics?.chapters?.subjects?.slug,
-        topic_title: quiz.topics?.name,
-      }));
+      const transformedQuizzes = ((quizzes as QuizWithRelations[]) || []).map(
+        (quiz) => ({
+          ...quiz,
+          subject_slug: quiz.topics?.chapters?.subjects?.slug,
+          topic_title: quiz.topics?.name,
+        })
+      );
 
       return NextResponse.json(transformedQuizzes, {
         headers: {
@@ -166,13 +166,13 @@ export async function GET(
       };
     }
 
-    const transformedQuizzes = (
-      (quizzes as QuizWithRelations[]) || []
-    ).map((quiz) => ({
-      ...quiz,
-      subject_slug: quiz.topics?.chapters?.subjects?.slug,
-      topic_title: quiz.topics?.name,
-    }));
+    const transformedQuizzes = ((quizzes as QuizWithRelations[]) || []).map(
+      (quiz) => ({
+        ...quiz,
+        subject_slug: quiz.topics?.chapters?.subjects?.slug,
+        topic_title: quiz.topics?.name,
+      })
+    );
 
     return NextResponse.json(transformedQuizzes, {
       headers: {

@@ -13,7 +13,7 @@ export async function GET(
 ) {
   try {
     const { userId } = await params;
-    
+
     // Handle guest user case
     if (userId === 'guest') {
       return NextResponse.json([], {
@@ -22,7 +22,7 @@ export async function GET(
         },
       });
     }
-    
+
     // If userId is 'me', get current user's achievements
     if (userId === 'me') {
       const cookieStore = await cookies();
@@ -51,7 +51,7 @@ export async function GET(
       }
 
       const targetUserId = session.user.id;
-      
+
       // Fetch achievements for authenticated user
       const { data: achievements, error } = await supabase
         .from('achievements')

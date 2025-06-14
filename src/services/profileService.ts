@@ -306,7 +306,9 @@ export async function fetchUserProfileByIdAPI(userId: string): Promise<User> {
 /**
  * Fetch user achievements via API route (no authentication required)
  */
-export async function fetchUserAchievementsAPI(userId: string = 'me'): Promise<Achievement[]> {
+export async function fetchUserAchievementsAPI(
+  userId: string = 'me'
+): Promise<Achievement[]> {
   try {
     const response = await fetch(`/api/profile/${userId}/achievements`, {
       method: 'GET',
@@ -345,7 +347,9 @@ export interface QuizWithSubject {
 /**
  * Fetch user created quizzes via API route (no authentication required)
  */
-export async function fetchUserCreatedQuizzesAPI(userId: string = 'me'): Promise<QuizWithSubject[]> {
+export async function fetchUserCreatedQuizzesAPI(
+  userId: string = 'me'
+): Promise<QuizWithSubject[]> {
   try {
     const response = await fetch(`/api/profile/${userId}/quizzes`, {
       method: 'GET',

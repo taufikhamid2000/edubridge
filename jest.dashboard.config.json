@@ -1,0 +1,33 @@
+{
+  "displayName": "Dashboard Optimization Tests",
+  "testMatch": [
+    "**/__tests__/api/dashboard/**/*.test.ts",
+    "**/__tests__/api/user-stats/**/*.test.ts",
+    "**/__tests__/services/dashboardService.test.ts",
+    "**/__tests__/components/dashboard/**/*.test.tsx",
+    "**/__tests__/integration/dashboard-optimization.test.ts"
+  ],
+  "setupFilesAfterEnv": [
+    "<rootDir>/jest.setup.js",
+    "<rootDir>/src/setupTests.ts"
+  ],
+  "testEnvironment": "jest-environment-jsdom",
+  "moduleNameMapper": {
+    "^@/(.*)$": "<rootDir>/src/$1"
+  },
+  "collectCoverageFrom": [
+    "src/app/api/dashboard/**/*.ts",
+    "src/app/api/user-stats/**/*.ts",
+    "src/services/dashboardService.ts",
+    "src/app/dashboard/**/*.tsx",
+    "!**/*.d.ts",
+    "!**/node_modules/**"
+  ],
+  "coverageReporters": ["text", "text-summary", "html", "lcov"],
+  "coverageDirectory": "<rootDir>/coverage/dashboard-optimization",
+  "transform": {
+    "^.+\\.(js|jsx|ts|tsx)$": ["next/jest"]
+  },
+  "testTimeout": 10000,
+  "verbose": true
+}
