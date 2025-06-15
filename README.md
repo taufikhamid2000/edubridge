@@ -70,7 +70,7 @@ The optimized build script creates segment config files that mark admin and API 
 2. Ensures admin data is always fresh at runtime
 3. Improves CI/CD pipeline efficiency
 
-For more details, see the [Build Optimization Summary](./docs/development/build-optimization-summary.md) and [Admin Routes Optimization Guide](./docs/development/admin-routes-optimization.md).
+For more details, see the [Build Optimization Summary](./docs/development/build-optimization-summary.md), [Admin Routes Optimization Guide](./docs/development/admin-routes-optimization.md), and [Dashboard Optimization Summary](./docs/DASHBOARD_OPTIMIZATION_SUMMARY.md).
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
@@ -86,7 +86,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - [Authentication System](./docs/authentication-system.md) - Auth implementation details
 - [Testing Strategy](./docs/testing-strategy.md) - Testing approach and practices
 - [Performance Optimization](./docs/performance-optimization.md) - Performance best practices
-- [Database Schema Reference](./database-schema-reference.md) - Database structure
+- [Database Schema Reference](./docs/database/database-schema-reference.md) - Database structure
 
 ### Feature Documentation
 

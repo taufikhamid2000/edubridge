@@ -19,9 +19,9 @@
     "db:migrate:admin": "node scripts/apply-migration.mjs admin-migration.sql",
     "db:test": "node scripts/test_quiz_attempts_table.mjs",
     "migrate:app-router": "node scripts/migrate-to-app-router.mjs",
-    "test": "npx jest --config jest.config.mjs",
-    "test:watch": "npx jest --config jest.config.mjs --watch",
-    "test:coverage": "npx jest --config jest.config.mjs --coverage"
+    "test": "npx jest --config config/jest.config.mjs",
+    "test:watch": "npx jest --config config/jest.config.mjs --watch",
+    "test:coverage": "npx jest --config config/jest.config.mjs --coverage"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
