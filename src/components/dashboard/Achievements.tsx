@@ -18,7 +18,7 @@ const Achievements = ({
   const leaderboardPath = isStatic ? '/static/leaderboard' : '/leaderboard';
 
   return (
-    <section className="dashboard-section achievements bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-md dark:bg-gray-800 dark:text-gray-200">
+    <section className="dashboard-section achievements bg-gray-800 dark:bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-md text-gray-200 dark:text-gray-800">
       <h2 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4">
         Recent Achievements
       </h2>

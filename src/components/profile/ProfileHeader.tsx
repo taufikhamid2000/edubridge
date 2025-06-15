@@ -35,7 +35,7 @@ export default function ProfileHeader({ user }: ProfileHeaderProps) {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+    <div className="bg-gray-800 dark:bg-white shadow rounded-lg overflow-hidden">
       <div className="h-24 bg-gradient-to-r from-blue-600 to-indigo-700"></div>
       <div className="relative px-6 pb-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center -mt-12">
@@ -54,10 +54,10 @@ export default function ProfileHeader({ user }: ProfileHeaderProps) {
             <div className="absolute bottom-0 right-0 h-6 w-6 rounded-full bg-green-500 border-2 border-white dark:border-gray-700"></div>
           </div>
           <div className="mt-6 sm:mt-0 sm:ml-6">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            <h1 className="text-2xl font-bold text-white dark:text-gray-900">
               {user.display_name || 'Anonymous User'}
             </h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-gray-400 dark:text-gray-500">
               Member since {formatDate(new Date(user.created_at || Date.now()))}
             </p>
           </div>

@@ -154,7 +154,7 @@ export default function DashboardClient({
 
           {/* Subjects Grid with Results Count */}
           <div className="mb-4">
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-gray-400 dark:text-gray-500">
               Showing {currentSubjects.length} of {filteredSubjects.length}{' '}
               subjects
               {searchQuery && ` matching "${searchQuery}"`}

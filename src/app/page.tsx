@@ -176,9 +176,9 @@ export default function HomePage() {
           </h2>
           <div className="h-1 w-20 bg-yellow-400 mx-auto"></div>
         </div>{' '}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-8 mb-16 border border-gray-100 dark:border-gray-700 transform transition-all hover:shadow-2xl">
+        <div className="bg-gray-800 dark:bg-white rounded-xl shadow-xl p-8 mb-16 border border-gray-100 dark:border-gray-700 transform transition-all hover:shadow-2xl">
           <div className="max-w-4xl mx-auto">
-            <div className="prose prose-lg max-w-none text-gray-700 dark:text-gray-300">
+            <div className="prose prose-lg max-w-none text-gray-300 dark:text-gray-700">
               <h2 className="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-100">
                 Earn up to RM1000 when you join EduBridge – and make your school
                 proud!
@@ -272,7 +272,7 @@ export default function HomePage() {
           <div className="h-1 w-20 bg-yellow-400 mx-auto"></div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+          <div className="bg-gray-800 dark:bg-white rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
             <div className="flex items-center mb-4">
               <div className="bg-blue-100 dark:bg-blue-900/30 p-3 rounded-full mr-4">
                 <svg
@@ -308,7 +308,7 @@ export default function HomePage() {
                     d="M5 13l4 4L19 7"
                   />
                 </svg>
-                <span className="text-gray-700 dark:text-gray-300">
+                <span className="text-gray-300 dark:text-gray-700">
                   <strong>1.1 million</strong> students in Malaysian upper
                   secondary education (Form 4 and 5)
                 </span>
@@ -327,7 +327,7 @@ export default function HomePage() {
                     d="M5 13l4 4L19 7"
                   />
                 </svg>
-                <span className="text-gray-700 dark:text-gray-300">
+                <span className="text-gray-300 dark:text-gray-700">
                   Competitors focus on static notes or traditional AI tutors
                 </span>
               </li>
@@ -345,13 +345,13 @@ export default function HomePage() {
                     d="M5 13l4 4L19 7"
                   />
                 </svg>
-                <span className="text-gray-700 dark:text-gray-300">
+                <span className="text-gray-300 dark:text-gray-700">
                   Current options lack proper engagement loops
                 </span>
               </li>
             </ul>
           </div>
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+          <div className="bg-gray-800 dark:bg-white rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
             <div className="flex items-center mb-4">
               <div className="bg-purple-100 dark:bg-purple-900/30 p-3 rounded-full mr-4">
                 <svg
@@ -387,7 +387,7 @@ export default function HomePage() {
                     d="M5 13l4 4L19 7"
                   />
                 </svg>
-                <span className="text-gray-700 dark:text-gray-300">
+                <span className="text-gray-300 dark:text-gray-700">
                   Limited tools combining quick learning ⚡, habit formation,
                   and tangible rewards 🏅
                 </span>
@@ -406,7 +406,7 @@ export default function HomePage() {
                     d="M5 13l4 4L19 7"
                   />
                 </svg>
-                <span className="text-gray-700 dark:text-gray-300">
+                <span className="text-gray-300 dark:text-gray-700">
                   Traditional apps are not mobile-data friendly, disadvantaging
                   B40 groups
                 </span>
@@ -425,7 +425,7 @@ export default function HomePage() {
                     d="M5 13l4 4L19 7"
                   />
                 </svg>
-                <span className="text-gray-700 dark:text-gray-300">
+                <span className="text-gray-300 dark:text-gray-700">
                   No major platform currently gamifies daily subject mastery at
                   secondary school level
                 </span>
@@ -452,7 +452,7 @@ export default function HomePage() {
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+          <div className="bg-gray-800 dark:bg-white rounded-xl shadow-md p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
             <div className="bg-blue-100 dark:bg-blue-900/30 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg
                 className="h-8 w-8 text-blue-600 dark:text-blue-400"
@@ -477,7 +477,7 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+          <div className="bg-gray-800 dark:bg-white rounded-xl shadow-md p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
             <div className="bg-purple-100 dark:bg-purple-900/30 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg
                 className="h-8 w-8 text-purple-600 dark:text-purple-400"
@@ -501,7 +501,7 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+          <div className="bg-gray-800 dark:bg-white rounded-xl shadow-md p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
             <div className="bg-green-100 dark:bg-green-900/30 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg
                 className="h-8 w-8 text-green-600 dark:text-green-400"
@@ -544,7 +544,7 @@ export default function HomePage() {
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl">
+          <div className="bg-gray-800 dark:bg-white rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl">
             <h4 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-100 flex items-center">
               <span className="bg-indigo-100 dark:bg-indigo-900/30 p-2 rounded-full mr-3">
                 <svg
@@ -578,7 +578,7 @@ export default function HomePage() {
                     d="M5 13l4 4L19 7"
                   />
                 </svg>
-                <span className="text-gray-700 dark:text-gray-300">
+                <span className="text-gray-300 dark:text-gray-700">
                   Daily bite-sized quizzes covering key secondary school topics
                   ❓
                 </span>
@@ -597,7 +597,7 @@ export default function HomePage() {
                     d="M5 13l4 4L19 7"
                   />
                 </svg>
-                <span className="text-gray-700 dark:text-gray-300">
+                <span className="text-gray-300 dark:text-gray-700">
                   XP points earned for participation and mastery ✨
                 </span>
               </li>
@@ -615,7 +615,7 @@ export default function HomePage() {
                     d="M5 13l4 4L19 7"
                   />
                 </svg>
-                <span className="text-gray-700 dark:text-gray-300">
+                <span className="text-gray-300 dark:text-gray-700">
                   Streak rewards for consecutive daily engagement 🔥
                 </span>
               </li>
@@ -633,14 +633,14 @@ export default function HomePage() {
                     d="M5 13l4 4L19 7"
                   />
                 </svg>
-                <span className="text-gray-700 dark:text-gray-300">
+                <span className="text-gray-300 dark:text-gray-700">
                   Weekly and monthly cash prizes to drive motivation 💰
                 </span>
               </li>
             </ul>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl">
+          <div className="bg-gray-800 dark:bg-white rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl">
             <h4 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-100 flex items-center">
               <span className="bg-teal-100 dark:bg-teal-900/30 p-2 rounded-full mr-3">
                 <svg
@@ -674,7 +674,7 @@ export default function HomePage() {
                     d="M5 13l4 4L19 7"
                   />
                 </svg>
-                <span className="text-gray-700 dark:text-gray-300">
+                <span className="text-gray-300 dark:text-gray-700">
                   Mobile-first design 📱
                 </span>
               </li>
@@ -692,7 +692,7 @@ export default function HomePage() {
                     d="M5 13l4 4L19 7"
                   />
                 </svg>
-                <span className="text-gray-700 dark:text-gray-300">
+                <span className="text-gray-300 dark:text-gray-700">
                   Low-bandwidth usage 🌐
                 </span>
               </li>
@@ -710,7 +710,7 @@ export default function HomePage() {
                     d="M5 13l4 4L19 7"
                   />
                 </svg>
-                <span className="text-gray-700 dark:text-gray-300">
+                <span className="text-gray-300 dark:text-gray-700">
                   Gamification at the core 🎮
                 </span>
               </li>
@@ -728,7 +728,7 @@ export default function HomePage() {
                     d="M5 13l4 4L19 7"
                   />
                 </svg>
-                <span className="text-gray-700 dark:text-gray-300">
+                <span className="text-gray-300 dark:text-gray-700">
                   Independent and curriculum-neutral 🔍
                 </span>
               </li>
@@ -749,7 +749,7 @@ export default function HomePage() {
           <h3 className="text-3xl font-bold mb-6">📅 Phase-by-Phase Plan</h3>
           <div className="h-1 w-20 bg-yellow-400 mx-auto mb-8"></div>
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 border border-gray-100 dark:border-gray-700 mb-16">
+        <div className="bg-gray-800 dark:bg-white rounded-xl shadow-lg p-8 border border-gray-100 dark:border-gray-700 mb-16">
           <div className="relative">
             {' '}
             {/* Timeline line with parallax effect */}
@@ -769,7 +769,7 @@ export default function HomePage() {
                 </div>
                 <h4 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">
                   MVP Development{' '}
-                  <span className="text-sm text-gray-500 dark:text-gray-400 font-normal">
+                  <span className="text-sm text-gray-400 dark:text-gray-500 font-normal">
                     (0-4 months)
                   </span>
                 </h4>
@@ -789,7 +789,7 @@ export default function HomePage() {
                 </div>
                 <h4 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">
                   Pilot Testing{' '}
-                  <span className="text-sm text-gray-500 dark:text-gray-400 font-normal">
+                  <span className="text-sm text-gray-400 dark:text-gray-500 font-normal">
                     (4-6 months)
                   </span>
                 </h4>
@@ -808,7 +808,7 @@ export default function HomePage() {
                 </div>
                 <h4 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">
                   Expansion{' '}
-                  <span className="text-sm text-gray-500 dark:text-gray-400 font-normal">
+                  <span className="text-sm text-gray-400 dark:text-gray-500 font-normal">
                     (6-9 months)
                   </span>
                 </h4>
@@ -827,7 +827,7 @@ export default function HomePage() {
                 </div>
                 <h4 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">
                   Malaysia-Wide Launch{' '}
-                  <span className="text-sm text-gray-500 dark:text-gray-400 font-normal">
+                  <span className="text-sm text-gray-400 dark:text-gray-500 font-normal">
                     (9-15 months)
                   </span>
                 </h4>
@@ -846,7 +846,7 @@ export default function HomePage() {
                 </div>
                 <h4 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">
                   Optional Regional Expansion{' '}
-                  <span className="text-sm text-gray-500 dark:text-gray-400 font-normal">
+                  <span className="text-sm text-gray-400 dark:text-gray-500 font-normal">
                     (15+ months)
                   </span>
                 </h4>
@@ -868,7 +868,7 @@ export default function HomePage() {
           <div className="h-1 w-20 bg-yellow-400 mx-auto mb-8"></div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+          <div className="bg-gray-800 dark:bg-white rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
             <div className="flex items-center mb-5">
               <div className="bg-blue-100 dark:bg-blue-900/30 p-3 rounded-full">
                 <svg
@@ -908,10 +908,10 @@ export default function HomePage() {
                   </svg>
                 </div>
                 <div>
-                  <p className="font-medium text-gray-800 dark:text-gray-200">
+                  <p className="font-medium text-gray-200 dark:text-gray-800">
                     Freemium Access 🆓
                   </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-gray-400 dark:text-gray-600">
                     Free quizzes with optional upgrades (analytics, offline
                     packs)
                   </p>
@@ -935,10 +935,10 @@ export default function HomePage() {
                   </svg>
                 </div>
                 <div>
-                  <p className="font-medium text-gray-800 dark:text-gray-200">
+                  <p className="font-medium text-gray-200 dark:text-gray-800">
                     Sponsored Rewards 🏆
                   </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-gray-400 dark:text-gray-600">
                     Corporate sponsors for cash prizes and tournament events
                   </p>
                 </div>
@@ -946,7 +946,7 @@ export default function HomePage() {
             </ul>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+          <div className="bg-gray-800 dark:bg-white rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
             <div className="flex items-center mb-5">
               <div className="bg-purple-100 dark:bg-purple-900/30 p-3 rounded-full">
                 <svg
@@ -986,10 +986,10 @@ export default function HomePage() {
                   </svg>
                 </div>
                 <div>
-                  <p className="font-medium text-gray-800 dark:text-gray-200">
+                  <p className="font-medium text-gray-200 dark:text-gray-800">
                     B2B Licensing 🏢
                   </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-gray-400 dark:text-gray-600">
                     Packages for tuition centers, NGOs, and community programs
                   </p>
                 </div>
@@ -1012,10 +1012,10 @@ export default function HomePage() {
                   </svg>
                 </div>
                 <div>
-                  <p className="font-medium text-gray-800 dark:text-gray-200">
+                  <p className="font-medium text-gray-200 dark:text-gray-800">
                     Supporter Donations 🎗️
                   </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-gray-400 dark:text-gray-600">
                     Voluntary support from alumni, parents, or public backers
                   </p>
                 </div>
@@ -1030,7 +1030,7 @@ export default function HomePage() {
           <h3 className="text-3xl font-bold mb-6">⚠️ Risks and Mitigation</h3>
           <div className="h-1 w-20 bg-yellow-400 mx-auto mb-8"></div>
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 border border-gray-100 dark:border-gray-700 mb-16">
+        <div className="bg-gray-800 dark:bg-white rounded-xl shadow-lg p-8 border border-gray-100 dark:border-gray-700 mb-16">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-5 border border-gray-100 dark:border-gray-600">
               <div className="flex items-center mb-3">
@@ -1054,11 +1054,11 @@ export default function HomePage() {
                 </h4>
               </div>
               <div className="ml-10">
-                <p className="text-gray-700 dark:text-gray-300 mb-2">
+                <p className="text-gray-300 dark:text-gray-700 mb-2">
                   <strong>Risk:</strong> Competition from existing education
                   apps.
                 </p>
-                <p className="text-gray-600 dark:text-gray-400 text-sm bg-green-50 dark:bg-green-900/20 p-2 rounded-md border-l-4 border-green-500">
+                <p className="text-gray-400 dark:text-gray-600 text-sm bg-green-50 dark:bg-green-900/20 p-2 rounded-md border-l-4 border-green-500">
                   <strong>Mitigation:</strong> Focus on gamification and rewards
                   system, not static content. Unique selling proposition through
                   engagement loops.
@@ -1088,10 +1088,10 @@ export default function HomePage() {
                 </h4>
               </div>
               <div className="ml-10">
-                <p className="text-gray-700 dark:text-gray-300 mb-2">
+                <p className="text-gray-300 dark:text-gray-700 mb-2">
                   <strong>Risk:</strong> Low user retention rates.
                 </p>
-                <p className="text-gray-600 dark:text-gray-400 text-sm bg-green-50 dark:bg-green-900/20 p-2 rounded-md border-l-4 border-green-500">
+                <p className="text-gray-400 dark:text-gray-600 text-sm bg-green-50 dark:bg-green-900/20 p-2 rounded-md border-l-4 border-green-500">
                   <strong>Mitigation:</strong> Implement gamified loops, cash
                   incentives, and social recognition features to enhance user
                   engagement.
@@ -1121,10 +1121,10 @@ export default function HomePage() {
                 </h4>
               </div>
               <div className="ml-10">
-                <p className="text-gray-700 dark:text-gray-300 mb-2">
+                <p className="text-gray-300 dark:text-gray-700 mb-2">
                   <strong>Risk:</strong> Abuse of prize system.
                 </p>
-                <p className="text-gray-600 dark:text-gray-400 text-sm bg-green-50 dark:bg-green-900/20 p-2 rounded-md border-l-4 border-green-500">
+                <p className="text-gray-400 dark:text-gray-600 text-sm bg-green-50 dark:bg-green-900/20 p-2 rounded-md border-l-4 border-green-500">
                   <strong>Mitigation:</strong> Implement fraud prevention
                   through ID verification, randomized audits, and behavior
                   pattern analysis.
@@ -1154,10 +1154,10 @@ export default function HomePage() {
                 </h4>
               </div>
               <div className="ml-10">
-                <p className="text-gray-700 dark:text-gray-300 mb-2">
+                <p className="text-gray-300 dark:text-gray-700 mb-2">
                   <strong>Risk:</strong> Funding shortages.
                 </p>
-                <p className="text-gray-600 dark:text-gray-400 text-sm bg-green-50 dark:bg-green-900/20 p-2 rounded-md border-l-4 border-green-500">
+                <p className="text-gray-400 dark:text-gray-600 text-sm bg-green-50 dark:bg-green-900/20 p-2 rounded-md border-l-4 border-green-500">
                   <strong>Mitigation:</strong> Secure early sponsorship deals
                   and implement low-cost serverless hosting strategies to
                   minimize burn rate.
@@ -1190,7 +1190,7 @@ export default function HomePage() {
         </div>{' '}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16 relative">
           {/* Parallax effect for first card */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 sm:p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 text-center sm:translate-y-[calc(var(--scroll)*0.02px)]">
+          <div className="bg-gray-800 dark:bg-white rounded-xl shadow-md p-4 sm:p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 text-center sm:translate-y-[calc(var(--scroll)*0.02px)]">
             {' '}
             <div className="bg-indigo-100 dark:bg-indigo-900/30 w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-4 relative overflow-hidden">
               <div className="absolute w-10 sm:w-12 h-3 bg-indigo-200/50 dark:bg-indigo-700/30 rounded-full -rotate-45 transform sm:translate-y-[calc(var(--scroll)*-0.05px)]"></div>
@@ -1215,7 +1215,7 @@ export default function HomePage() {
               Day-2 retention among pilot users
             </p>
           </div>{' '}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 sm:p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 text-center">
+          <div className="bg-gray-800 dark:bg-white rounded-xl shadow-md p-4 sm:p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 text-center">
             <div className="bg-green-100 dark:bg-green-900/30 w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg
                 className="h-8 w-8 text-green-600 dark:text-green-400"
@@ -1238,7 +1238,7 @@ export default function HomePage() {
               Quizzes per user weekly
             </p>{' '}
           </div>{' '}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 sm:p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 text-center sm:translate-y-[calc(var(--scroll)*-0.015px)]">
+          <div className="bg-gray-800 dark:bg-white rounded-xl shadow-md p-4 sm:p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 text-center sm:translate-y-[calc(var(--scroll)*-0.015px)]">
             <div className="bg-purple-100 dark:bg-purple-900/30 w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-4 relative overflow-hidden">
               <div className="absolute w-10 h-10 bg-purple-200/40 dark:bg-purple-700/30 rounded-full transform sm:translate-y-[calc(var(--scroll)*0.04px)] rotate-45"></div>
               <svg
@@ -1262,7 +1262,7 @@ export default function HomePage() {
               Monthly active users by Month 4
             </p>{' '}
           </div>{' '}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 sm:p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 text-center sm:translate-y-[calc(var(--scroll)*0.025px)]">
+          <div className="bg-gray-800 dark:bg-white rounded-xl shadow-md p-4 sm:p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 text-center sm:translate-y-[calc(var(--scroll)*0.025px)]">
             <div className="bg-amber-100 dark:bg-amber-900/30 w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-4 relative overflow-hidden">
               <div className="absolute inset-0 bg-amber-200/30 dark:bg-amber-700/20 rounded-full clip-path-star transform sm:translate-y-[calc(var(--scroll)*-0.06px)] rotate-[25deg]"></div>
               <svg
@@ -1294,9 +1294,9 @@ export default function HomePage() {
           <h3 className="text-3xl font-bold mb-6">🔚 Conclusion</h3>
           <div className="h-1 w-20 bg-yellow-400 mx-auto mb-8"></div>
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 border border-gray-100 dark:border-gray-700 mb-16">
+        <div className="bg-gray-800 dark:bg-white rounded-xl shadow-lg p-8 border border-gray-100 dark:border-gray-700 mb-16">
           <div className="max-w-3xl mx-auto">
-            <p className="text-xl text-gray-700 dark:text-gray-300 leading-relaxed text-center">
+            <p className="text-xl text-gray-300 dark:text-gray-700 leading-relaxed text-center">
               EduBridge addresses a critical gap in Malaysia&rsquo;s education
               ecosystem: the need for daily, engaging, rewarding, and low-data
               independent learning. Its initial launch in Malaysia gives it a

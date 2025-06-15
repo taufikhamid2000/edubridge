@@ -34,8 +34,8 @@ export default function NotFound() {
   }, [pathname]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-50 dark:bg-gray-900">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 md:p-8 max-w-md w-full">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-900 dark:bg-gray-50">
+      <div className="bg-gray-800 dark:bg-white rounded-lg shadow-lg p-6 md:p-8 max-w-md w-full">
         <h1 className="text-3xl font-bold text-center mb-6 text-blue-600 dark:text-blue-400">
           {error && from === 'random-topic'
             ? 'No Topics Available'
@@ -43,7 +43,7 @@ export default function NotFound() {
         </h1>
 
         <div className="mb-6 text-center">
-          <p className="text-gray-700 dark:text-gray-300 mb-4">
+          <p className="text-gray-300 dark:text-gray-700 mb-4">
             {error && from === 'random-topic'
               ? 'Sorry, there are no topics available right now.'
               : "We couldn't find the page you're looking for."}
@@ -77,7 +77,7 @@ export default function NotFound() {
 
           <button
             onClick={() => window.history.back()}
-            className="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 py-2 px-4 rounded text-center transition-colors"
+            className="bg-gray-700 dark:bg-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-200 dark:text-gray-800 py-2 px-4 rounded text-center transition-colors"
           >
             Go Back
           </button>

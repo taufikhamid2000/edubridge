@@ -106,10 +106,10 @@ export default function PlayQuizPage() {
     return (
       <div className="container mx-auto py-8 px-4">
         <div className="max-w-3xl mx-auto">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 flex items-center justify-center">
+          <div className="bg-gray-800 dark:bg-white rounded-lg shadow-md p-8 flex items-center justify-center">
             <div className="text-center">
               <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-t-blue-500 border-r-transparent border-b-blue-500 border-l-transparent"></div>
-              <p className="mt-4 text-gray-600 dark:text-gray-400">
+              <p className="mt-4 text-gray-400 dark:text-gray-600">
                 {authLoading
                   ? 'Verifying authentication...'
                   : 'Loading quiz...'}
@@ -125,11 +125,11 @@ export default function PlayQuizPage() {
     return (
       <div className="container mx-auto py-8 px-4">
         <div className="max-w-3xl mx-auto">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
+          <div className="bg-gray-800 dark:bg-white rounded-lg shadow-md p-8">
             <h1 className="text-2xl font-bold text-red-600 dark:text-red-400 mb-4">
               Error Loading Quiz
             </h1>
-            <p className="text-gray-700 dark:text-gray-300">
+            <p className="text-gray-300 dark:text-gray-700">
               {error || 'Quiz not found or authentication required'}
             </p>
             <button

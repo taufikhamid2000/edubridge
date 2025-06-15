@@ -5,8 +5,8 @@ import Link from 'next/link';
 
 export default function StaticAboutPage() {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <header className="sticky top-0 bg-white dark:bg-gray-800 bg-opacity-70 backdrop-blur-sm z-50">
+    <div className="min-h-screen bg-gray-900 dark:bg-gray-50">
+      <header className="sticky top-0 bg-gray-800 dark:bg-white bg-opacity-70 backdrop-blur-sm z-50">
         <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
           <Link href="/static" className="flex items-center">
             <Image
@@ -22,7 +22,7 @@ export default function StaticAboutPage() {
       </header>
 
       <main className="max-w-4xl mx-auto px-4 py-12">
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-lg">
+        <div className="bg-gray-800 dark:bg-white rounded-xl p-8 shadow-lg">
           <h1 className="text-3xl font-bold mb-6">About EduBridge</h1>
 
           <div className="space-y-6 text-gray-600 dark:text-gray-300">

@@ -11,7 +11,7 @@ interface AdminClientProps {
 
 export default function AdminClient({ className = '' }: AdminClientProps) {
   return (
-    <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 ${className}`}>
+    <div className={`min-h-screen bg-gray-900 dark:bg-gray-50 ${className}`}>
       <div className="flex">
         <AdminNavigation />
         <div className="flex-1 p-8">

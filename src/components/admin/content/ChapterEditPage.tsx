@@ -290,7 +290,7 @@ export default function ChapterEditPage() {
   const renderTopicsTab = () => (
     <div>
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-medium text-gray-900 dark:text-white">
+        <h2 className="text-lg font-medium text-white dark:text-gray-900">
           Topics
         </h2>
         <Link
@@ -302,7 +302,7 @@ export default function ChapterEditPage() {
       </div>
 
       {topics.length === 0 ? (
-        <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+        <div className="text-center py-8 text-gray-400 dark:text-gray-500">
           <p className="mb-4">No topics found for this chapter.</p>
           <p>To begin building your chapter content:</p>
           <ol className="list-decimal list-inside text-left max-w-md mx-auto mt-4">
@@ -314,7 +314,7 @@ export default function ChapterEditPage() {
         </div>
       ) : (
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <table className="min-w-full divide-y divide-gray-700 dark:divide-gray-200">
             <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
@@ -331,23 +331,23 @@ export default function ChapterEditPage() {
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody className="bg-gray-800 dark:bg-white divide-y divide-gray-700 dark:divide-gray-200">
               {topics.map((topic) => (
                 <tr key={topic.id}>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900 dark:text-white">
+                    <div className="text-sm font-medium text-white dark:text-gray-900">
                       {topic.title}
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                    <div className="text-sm text-gray-400 dark:text-gray-500">
                       <span className="px-2 py-1 text-xs rounded bg-gray-100 dark:bg-gray-700">
                         {topic.quiz_count || 0} quizzes
                       </span>
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                    <div className="text-sm text-gray-400 dark:text-gray-500">
                       {topic.order_index}
                     </div>
                   </td>

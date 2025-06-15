@@ -43,16 +43,16 @@ export default function SchoolLeaderboardTable({
     <div className="space-y-6">
       {/* Statistics Cards */}
       <div className="grid gap-4 md:grid-cols-3">
-        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-          <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+        <div className="bg-gray-800 dark:bg-white p-4 rounded-lg shadow">
+          <h3 className="text-sm font-medium text-gray-400 dark:text-gray-500">
             Total Schools
           </h3>
           <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
             {data.length}
           </p>
         </div>
-        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-          <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+        <div className="bg-gray-800 dark:bg-white p-4 rounded-lg shadow">
+          <h3 className="text-sm font-medium text-gray-400 dark:text-gray-500">
             Average Score
           </h3>
           <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
@@ -65,8 +65,8 @@ export default function SchoolLeaderboardTable({
               : 'N/A'}
           </p>
         </div>
-        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-          <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+        <div className="bg-gray-800 dark:bg-white p-4 rounded-lg shadow">
+          <h3 className="text-sm font-medium text-gray-400 dark:text-gray-500">
             Participation Rate
           </h3>
           <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
@@ -85,13 +85,13 @@ export default function SchoolLeaderboardTable({
       </div>
 
       {/* Filters */}
-      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow space-y-4">
-        <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+      <div className="bg-gray-800 dark:bg-white p-4 rounded-lg shadow space-y-4">
+        <h3 className="text-sm font-medium text-gray-400 dark:text-gray-500">
           Filters
         </h3>
         <div className="grid gap-4 md:grid-cols-3">
           <div>
-            <label className="text-sm text-gray-500 dark:text-gray-400">
+            <label className="text-sm text-gray-400 dark:text-gray-500">
               School Type
             </label>
             <select
@@ -99,7 +99,7 @@ export default function SchoolLeaderboardTable({
               onChange={(e) =>
                 setSelectedType(e.target.value as SchoolType | 'all')
               }
-              className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 text-sm"
+              className="mt-1 block w-full rounded-md border-gray-600 dark:border-gray-300 dark:bg-gray-700 text-sm"
             >
               {schoolTypes.map((type) => (
                 <option key={type} value={type}>
@@ -109,13 +109,13 @@ export default function SchoolLeaderboardTable({
             </select>
           </div>
           <div>
-            <label className="text-sm text-gray-500 dark:text-gray-400">
+            <label className="text-sm text-gray-400 dark:text-gray-500">
               State
             </label>
             <select
               value={selectedState}
               onChange={(e) => setSelectedState(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 text-sm"
+              className="mt-1 block w-full rounded-md border-gray-600 dark:border-gray-300 dark:bg-gray-700 text-sm"
             >
               {states.map((state) => (
                 <option key={state} value={state}>
@@ -125,13 +125,13 @@ export default function SchoolLeaderboardTable({
             </select>
           </div>
           <div>
-            <label className="text-sm text-gray-500 dark:text-gray-400">
+            <label className="text-sm text-gray-400 dark:text-gray-500">
               District
             </label>{' '}
             <select
               value={selectedDistrict}
               onChange={(e) => setSelectedDistrict(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 text-sm"
+              className="mt-1 block w-full rounded-md border-gray-600 dark:border-gray-300 dark:bg-gray-700 text-sm"
             >
               <option value="all">All Districts</option>
               {selectedState !== 'all' &&
@@ -152,26 +152,26 @@ export default function SchoolLeaderboardTable({
       </div>
 
       {/* Leaderboard Table */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+      <div className="bg-gray-800 dark:bg-white rounded-lg shadow overflow-hidden">
+        <table className="min-w-full divide-y divide-gray-700 dark:divide-gray-200">
           <thead className="bg-gray-50 dark:bg-gray-800">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">
                 Rank
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">
                 School
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">
                 Type
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">
                 Location
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">
                 Average Score
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">
                 Participation
               </th>
             </tr>
@@ -204,7 +204,7 @@ export default function SchoolLeaderboardTable({
                           </span>
                         </div>
                       ) : (
-                        <span className="w-8 text-center mr-2 text-gray-600 dark:text-gray-400">
+                        <span className="w-8 text-center mr-2 text-gray-400 dark:text-gray-600">
                           {index + 1}
                         </span>
                       )}
@@ -229,7 +229,7 @@ export default function SchoolLeaderboardTable({
                     <div className="text-sm text-gray-900 dark:text-gray-100">
                       {school.district}
                     </div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                    <div className="text-xs text-gray-400 dark:text-gray-500">
                       {school.state}
                     </div>
                   </td>
@@ -251,7 +251,7 @@ export default function SchoolLeaderboardTable({
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="flex-grow">
-                        <div className="relative h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                        <div className="relative h-2 bg-gray-700 dark:bg-gray-200 rounded-full overflow-hidden">
                           <div
                             className={`absolute h-full rounded-full ${
                               school.participationRate >= 90
@@ -266,7 +266,7 @@ export default function SchoolLeaderboardTable({
                           />
                         </div>
                       </div>
-                      <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">
+                      <span className="ml-2 text-sm text-gray-400 dark:text-gray-600">
                         {school.participationRate}%
                       </span>
                     </div>

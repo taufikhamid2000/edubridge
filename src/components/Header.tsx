@@ -111,7 +111,7 @@ export default function Header(): JSX.Element {
                 <Link href="/dashboard" className="header-menu-link">
                   Dashboard
                 </Link>
-                <div className="py-1 border-b border-gray-200 dark:border-gray-700">
+                <div className="py-1 border-b border-gray-700 dark:border-gray-200">
                   <Link href="/leaderboard" className="header-menu-link">
                     Student Rankings
                   </Link>

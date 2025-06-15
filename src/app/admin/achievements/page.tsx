@@ -218,7 +218,7 @@ export default function AdminAchievementsPage() {
             <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
               {achievement.title}
             </div>
-            <div className="text-sm text-gray-500 dark:text-gray-400">
+            <div className="text-sm text-gray-400 dark:text-gray-500">
               {achievement.description}
             </div>
           </div>
@@ -229,7 +229,7 @@ export default function AdminAchievementsPage() {
       key: 'type',
       header: 'Type',
       render: (achievement) => (
-        <span className="text-sm text-gray-500 dark:text-gray-400">
+        <span className="text-sm text-gray-400 dark:text-gray-500">
           {achievement.achievement_type}
         </span>
       ),
@@ -247,7 +247,7 @@ export default function AdminAchievementsPage() {
       key: 'requirements',
       header: 'Requirements',
       render: (achievement) => (
-        <span className="text-sm text-gray-500 dark:text-gray-400">
+        <span className="text-sm text-gray-400 dark:text-gray-500">
           {achievement.requirements ? (
             <div className="max-w-xs truncate">
               {JSON.stringify(achievement.requirements)}
@@ -301,7 +301,7 @@ export default function AdminAchievementsPage() {
             <div className="text-base font-medium text-gray-900 dark:text-gray-100">
               {achievement.title}
             </div>
-            <div className="text-sm text-gray-500 dark:text-gray-400">
+            <div className="text-sm text-gray-400 dark:text-gray-500">
               {achievement.description}
             </div>
           </div>

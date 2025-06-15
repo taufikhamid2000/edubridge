@@ -134,9 +134,9 @@ export default function StaticHomePage() {
           <div className="h-1 w-20 bg-yellow-400 mx-auto"></div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-8 mb-16 border border-gray-100 dark:border-gray-700 transform transition-all hover:shadow-2xl">
+        <div className="bg-gray-800 dark:bg-white rounded-xl shadow-xl p-8 mb-16 border border-gray-100 dark:border-gray-700 transform transition-all hover:shadow-2xl">
           <div className="max-w-4xl mx-auto">
-            <div className="prose prose-lg max-w-none text-gray-700 dark:text-gray-300">
+            <div className="prose prose-lg max-w-none text-gray-300 dark:text-gray-700">
               <h2 className="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-100">
                 Earn up to RM1000 when you join EduBridge – and make your school
                 proud!
@@ -225,7 +225,7 @@ export default function StaticHomePage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+          <div className="bg-gray-800 dark:bg-white rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
             <div className="flex items-center mb-4">
               <div className="bg-blue-100 dark:bg-blue-900/30 p-3 rounded-full mr-4">
                 <svg
@@ -261,7 +261,7 @@ export default function StaticHomePage() {
                     d="M5 13l4 4L19 7"
                   />
                 </svg>
-                <span className="text-gray-700 dark:text-gray-300">
+                <span className="text-gray-300 dark:text-gray-700">
                   <strong>1.1 million</strong> students in Malaysian upper
                   secondary education (Form 4 and 5)
                 </span>
@@ -280,7 +280,7 @@ export default function StaticHomePage() {
                     d="M5 13l4 4L19 7"
                   />
                 </svg>
-                <span className="text-gray-700 dark:text-gray-300">
+                <span className="text-gray-300 dark:text-gray-700">
                   Competitors focus on static notes or traditional AI tutors
                 </span>
               </li>
@@ -298,14 +298,14 @@ export default function StaticHomePage() {
                     d="M5 13l4 4L19 7"
                   />
                 </svg>
-                <span className="text-gray-700 dark:text-gray-300">
+                <span className="text-gray-300 dark:text-gray-700">
                   Current options lack proper engagement loops
                 </span>
               </li>
             </ul>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+          <div className="bg-gray-800 dark:bg-white rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
             <div className="flex items-center mb-4">
               <div className="bg-purple-100 dark:bg-purple-900/30 p-3 rounded-full mr-4">
                 <svg
@@ -341,7 +341,7 @@ export default function StaticHomePage() {
                     d="M5 13l4 4L19 7"
                   />
                 </svg>
-                <span className="text-gray-700 dark:text-gray-300">
+                <span className="text-gray-300 dark:text-gray-700">
                   Limited tools combining quick learning ⚡, habit formation,
                   and tangible rewards 🏅
                 </span>
@@ -360,7 +360,7 @@ export default function StaticHomePage() {
                     d="M5 13l4 4L19 7"
                   />
                 </svg>
-                <span className="text-gray-700 dark:text-gray-300">
+                <span className="text-gray-300 dark:text-gray-700">
                   Traditional apps are not mobile-data friendly, disadvantaging
                   B40 groups
                 </span>
@@ -379,7 +379,7 @@ export default function StaticHomePage() {
                     d="M5 13l4 4L19 7"
                   />
                 </svg>
-                <span className="text-gray-700 dark:text-gray-300">
+                <span className="text-gray-300 dark:text-gray-700">
                   No major platform currently gamifies daily subject mastery at
                   secondary school level
                 </span>
@@ -408,7 +408,7 @@ export default function StaticHomePage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+          <div className="bg-gray-800 dark:bg-white rounded-xl shadow-md p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
             <div className="bg-blue-100 dark:bg-blue-900/30 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg
                 className="h-8 w-8 text-blue-600 dark:text-blue-400"
@@ -433,7 +433,7 @@ export default function StaticHomePage() {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+          <div className="bg-gray-800 dark:bg-white rounded-xl shadow-md p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
             <div className="bg-purple-100 dark:bg-purple-900/30 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg
                 className="h-8 w-8 text-purple-600 dark:text-purple-400"
@@ -457,7 +457,7 @@ export default function StaticHomePage() {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+          <div className="bg-gray-800 dark:bg-white rounded-xl shadow-md p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
             <div className="bg-green-100 dark:bg-green-900/30 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg
                 className="h-8 w-8 text-green-600 dark:text-green-400"

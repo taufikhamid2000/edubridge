@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 export default function AccessDenied() {
   const router = useRouter();
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen flex items-center justify-center bg-gray-900 dark:bg-gray-50">
       <div className="text-center p-8 max-w-md">
         <div className="bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 p-4 rounded-lg mb-4">
           <h2 className="text-2xl font-bold mb-2">Access Denied</h2>

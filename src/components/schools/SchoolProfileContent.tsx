@@ -35,10 +35,10 @@ export default function SchoolProfileContent({
               </Link>
             </li>
             <li>
-              <span className="text-gray-500 dark:text-gray-400 mx-2">/</span>
+              <span className="text-gray-400 dark:text-gray-500 mx-2">/</span>
             </li>
             <li>
-              <span className="text-gray-500 dark:text-gray-400">
+              <span className="text-gray-400 dark:text-gray-500">
                 {school.name}
               </span>
             </li>
@@ -52,7 +52,7 @@ export default function SchoolProfileContent({
             {school.type}
           </span>
           <span className="mx-2 text-gray-400">•</span>
-          <span className="text-gray-600 dark:text-gray-400">
+          <span className="text-gray-400 dark:text-gray-600">
             {school.district}, {school.state}
           </span>
         </div>
@@ -60,8 +60,8 @@ export default function SchoolProfileContent({
 
       {/* Stats Grid */}
       <div className="grid gap-6 mb-8 md:grid-cols-2 lg:grid-cols-4">
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
-          <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+        <div className="bg-gray-800 dark:bg-white p-6 rounded-lg shadow-sm">
+          <h3 className="text-sm font-medium text-gray-400 dark:text-gray-500">
             Average Score
           </h3>
           <p className="mt-2 text-3xl font-bold text-gray-900 dark:text-gray-100">
@@ -82,19 +82,19 @@ export default function SchoolProfileContent({
             />
           </div>
         </div>
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
-          <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+        <div className="bg-gray-800 dark:bg-white p-6 rounded-lg shadow-sm">
+          <h3 className="text-sm font-medium text-gray-400 dark:text-gray-500">
             Student Population
           </h3>
           <p className="mt-2 text-3xl font-bold text-gray-900 dark:text-gray-100">
             {school.studentCount?.toLocaleString() ?? 'N/A'}
           </p>
-          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+          <p className="mt-2 text-sm text-gray-400 dark:text-gray-600">
             {school.teacherCount} teachers
           </p>
         </div>
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
-          <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+        <div className="bg-gray-800 dark:bg-white p-6 rounded-lg shadow-sm">
+          <h3 className="text-sm font-medium text-gray-400 dark:text-gray-500">
             Participation Rate
           </h3>
           <p className="mt-2 text-3xl font-bold text-gray-900 dark:text-gray-100">
@@ -112,14 +112,14 @@ export default function SchoolProfileContent({
             </div>
           </div>
         </div>
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
-          <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+        <div className="bg-gray-800 dark:bg-white p-6 rounded-lg shadow-sm">
+          <h3 className="text-sm font-medium text-gray-400 dark:text-gray-500">
             Total Quizzes Taken
           </h3>
           <p className="mt-2 text-3xl font-bold text-gray-900 dark:text-gray-100">
             {school.stats?.total_quizzes_taken.toLocaleString()}
           </p>
-          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+          <p className="mt-2 text-sm text-gray-400 dark:text-gray-600">
             {(
               ((school.stats?.correct_answers || 0) /
                 (school.stats?.total_questions_answered || 1)) *
@@ -131,7 +131,7 @@ export default function SchoolProfileContent({
       </div>
 
       {/* Hall of Fame */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-8">
+      <div className="bg-gray-800 dark:bg-white rounded-lg shadow-sm p-6 mb-8">
         <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">
           Hall of Fame
         </h2>
@@ -151,7 +151,7 @@ export default function SchoolProfileContent({
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                     {student.full_name}
                   </h3>
-                  <div className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                  <div className="mt-1 text-sm text-gray-400 dark:text-gray-600">
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 mr-2">
                       {student.total_points.toLocaleString()} points
                     </span>
@@ -169,7 +169,7 @@ export default function SchoolProfileContent({
                     ).toFixed(1)}
                     %
                   </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                  <div className="text-xs text-gray-400 dark:text-gray-500">
                     accuracy
                   </div>
                 </div>
@@ -177,26 +177,26 @@ export default function SchoolProfileContent({
             ))}
           </div>
         ) : (
-          <p className="text-gray-500 dark:text-gray-400 text-center py-4">
+          <p className="text-gray-400 dark:text-gray-500 text-center py-4">
             No students have completed any quizzes yet.
           </p>
         )}
       </div>
 
       {/* School Details */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-8">
+      <div className="bg-gray-800 dark:bg-white rounded-lg shadow-sm p-6 mb-8">
         <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">
           School Information
         </h2>
         <div className="grid gap-6 md:grid-cols-2">
           <div>
-            <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
+            <h3 className="text-sm font-medium text-gray-400 dark:text-gray-500 mb-2">
               Contact Information
             </h3>
             <dl className="space-y-2">
               {school.phone && (
                 <div>
-                  <dt className="text-sm text-gray-500 dark:text-gray-400">
+                  <dt className="text-sm text-gray-400 dark:text-gray-500">
                     Phone
                   </dt>
                   <dd className="text-sm font-medium text-gray-900 dark:text-gray-100">
@@ -206,7 +206,7 @@ export default function SchoolProfileContent({
               )}
               {school.website && (
                 <div>
-                  <dt className="text-sm text-gray-500 dark:text-gray-400">
+                  <dt className="text-sm text-gray-400 dark:text-gray-500">
                     Website
                   </dt>
                   <dd className="text-sm font-medium text-gray-900 dark:text-gray-100">
@@ -223,7 +223,7 @@ export default function SchoolProfileContent({
               )}
               {school.address && (
                 <div>
-                  <dt className="text-sm text-gray-500 dark:text-gray-400">
+                  <dt className="text-sm text-gray-400 dark:text-gray-500">
                     Address
                   </dt>
                   <dd className="text-sm font-medium text-gray-900 dark:text-gray-100">
@@ -234,13 +234,13 @@ export default function SchoolProfileContent({
             </dl>
           </div>
           <div>
-            <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
+            <h3 className="text-sm font-medium text-gray-400 dark:text-gray-500 mb-2">
               Administration
             </h3>
             <dl className="space-y-2">
               {school.principal_name && (
                 <div>
-                  <dt className="text-sm text-gray-500 dark:text-gray-400">
+                  <dt className="text-sm text-gray-400 dark:text-gray-500">
                     Principal
                   </dt>
                   <dd className="text-sm font-medium text-gray-900 dark:text-gray-100">
@@ -249,7 +249,7 @@ export default function SchoolProfileContent({
                 </div>
               )}
               <div>
-                <dt className="text-sm text-gray-500 dark:text-gray-400">
+                <dt className="text-sm text-gray-400 dark:text-gray-500">
                   School Code
                 </dt>
                 <dd className="text-sm font-medium text-gray-900 dark:text-gray-100">

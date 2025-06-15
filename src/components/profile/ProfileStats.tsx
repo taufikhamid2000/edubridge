@@ -22,7 +22,7 @@ export default function ProfileStats({ user }: ProfileStatsProps) {
       {/* XP and Level Progress */}
       <div className="mb-8">
         <div className="flex justify-between items-center mb-2">
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          <span className="text-sm font-medium text-gray-300 dark:text-gray-700">
             Level Progress: {currentProgress}/{xpNeeded} XP to Level{' '}
             {user.level + 1}
           </span>
@@ -30,7 +30,7 @@ export default function ProfileStats({ user }: ProfileStatsProps) {
             {progressPercentage}%
           </span>
         </div>
-        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+        <div className="w-full bg-gray-700 dark:bg-gray-200 rounded-full h-2.5">
           <div
             className="bg-blue-600 dark:bg-blue-500 h-2.5 rounded-full transition-all duration-500 ease-out"
             style={{ width: `${progressPercentage}%` }}
@@ -39,27 +39,27 @@ export default function ProfileStats({ user }: ProfileStatsProps) {
       </div>
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+        <div className="bg-gray-800 dark:bg-white p-6 rounded-lg border border-gray-700 dark:border-gray-200 shadow-sm">
           <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">
             {user.xp.toLocaleString()}
           </div>
-          <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          <div className="text-sm text-gray-400 dark:text-gray-500 mt-1">
             Total XP Earned
           </div>
         </div>{' '}
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+        <div className="bg-gray-800 dark:bg-white p-6 rounded-lg border border-gray-700 dark:border-gray-200 shadow-sm">
           <div className="text-3xl font-bold text-orange-500 dark:text-orange-400">
             {user.streak}
           </div>
-          <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          <div className="text-sm text-gray-400 dark:text-gray-500 mt-1">
             Day Streak
           </div>
         </div>
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+        <div className="bg-gray-800 dark:bg-white p-6 rounded-lg border border-gray-700 dark:border-gray-200 shadow-sm">
           <div className="text-3xl font-bold text-green-600 dark:text-green-500">
             {user.level}
           </div>
-          <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          <div className="text-sm text-gray-400 dark:text-gray-500 mt-1">
             Current Level
           </div>
         </div>
@@ -75,7 +75,7 @@ export default function ProfileStats({ user }: ProfileStatsProps) {
             {new Date(user.lastQuizDate).toLocaleDateString()}
           </p>
         ) : (
-          <p className="text-gray-500 dark:text-gray-400 italic">
+          <p className="text-gray-400 dark:text-gray-500 italic">
             No recent activity
           </p>
         )}

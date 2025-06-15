@@ -54,7 +54,7 @@ export default function QuizManagement({
       key: 'topic',
       header: 'Topic',
       render: (quiz: Quiz) => (
-        <div className="text-sm text-gray-500 dark:text-gray-400">
+        <div className="text-sm text-gray-400 dark:text-gray-500">
           {getTopicTitle(quiz.topic_id)}
         </div>
       ),
@@ -80,7 +80,7 @@ export default function QuizManagement({
       key: 'questions',
       header: 'Questions',
       render: (quiz: Quiz) => (
-        <div className="text-sm text-gray-500 dark:text-gray-400">
+        <div className="text-sm text-gray-400 dark:text-gray-500">
           {quiz.question_count || 0}
         </div>
       ),
@@ -183,7 +183,7 @@ export default function QuizManagement({
       <div className="mb-3">
         <label
           htmlFor="quiz-name"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+          className="block text-sm font-medium text-gray-300 dark:text-gray-700 mb-1"
         >
           Quiz Name
         </label>
@@ -206,7 +206,7 @@ export default function QuizManagement({
       <div className="mb-3">
         <label
           htmlFor="quiz-topic"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+          className="block text-sm font-medium text-gray-300 dark:text-gray-700 mb-1"
         >
           Topic
         </label>
@@ -234,7 +234,7 @@ export default function QuizManagement({
       <div className="mb-3">
         <label
           htmlFor="quiz-difficulty"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+          className="block text-sm font-medium text-gray-300 dark:text-gray-700 mb-1"
         >
           Difficulty Level
         </label>
@@ -258,7 +258,7 @@ export default function QuizManagement({
       <div className="mb-3">
         <label
           htmlFor="quiz-time-limit"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+          className="block text-sm font-medium text-gray-300 dark:text-gray-700 mb-1"
         >
           Time Limit (seconds)
         </label>
@@ -281,7 +281,7 @@ export default function QuizManagement({
       <div className="mb-3">
         <label
           htmlFor="quiz-passing-score"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+          className="block text-sm font-medium text-gray-300 dark:text-gray-700 mb-1"
         >
           Passing Score (%)
         </label>

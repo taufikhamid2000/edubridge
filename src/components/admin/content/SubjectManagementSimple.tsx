@@ -36,7 +36,7 @@ export default function SubjectManagementSimple({
       key: 'description',
       header: 'Description',
       render: (subject: Subject) => (
-        <div className="text-sm text-gray-500 dark:text-gray-400 truncate max-w-xs">
+        <div className="text-sm text-gray-400 dark:text-gray-500 truncate max-w-xs">
           {subject.description}
         </div>
       ),
@@ -45,7 +45,7 @@ export default function SubjectManagementSimple({
       key: 'topic_count',
       header: 'Topics',
       render: (subject: Subject) => (
-        <div className="text-sm text-gray-500 dark:text-gray-400">
+        <div className="text-sm text-gray-400 dark:text-gray-500">
           {subject.topic_count}
         </div>
       ),
@@ -54,7 +54,7 @@ export default function SubjectManagementSimple({
       key: 'quiz_count',
       header: 'Quizzes',
       render: (subject: Subject) => (
-        <div className="text-sm text-gray-500 dark:text-gray-400">
+        <div className="text-sm text-gray-400 dark:text-gray-500">
           {subject.quiz_count}
         </div>
       ),
@@ -77,7 +77,7 @@ export default function SubjectManagementSimple({
       key: 'description',
       label: 'Description',
       render: (subject: Subject) => (
-        <div className="text-sm text-gray-500 dark:text-gray-400">
+        <div className="text-sm text-gray-400 dark:text-gray-500">
           {subject.description}
         </div>
       ),
@@ -112,7 +112,7 @@ export default function SubjectManagementSimple({
       <div className="mb-3">
         <label
           htmlFor="subject-name"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+          className="block text-sm font-medium text-gray-300 dark:text-gray-700 mb-1"
         >
           Subject Name
         </label>
@@ -134,7 +134,7 @@ export default function SubjectManagementSimple({
       <div className="mb-3">
         <label
           htmlFor="subject-desc"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+          className="block text-sm font-medium text-gray-300 dark:text-gray-700 mb-1"
         >
           Description
         </label>

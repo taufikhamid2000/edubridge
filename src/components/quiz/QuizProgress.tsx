@@ -16,7 +16,7 @@ export default function QuizProgress({
 
   return (
     <div className="mb-6">
-      <div className="flex justify-between mb-2 text-sm text-gray-600 dark:text-gray-400">
+      <div className="flex justify-between mb-2 text-sm text-gray-400 dark:text-gray-600">
         <span>
           Question {currentQuestion} of {totalQuestions}
         </span>
@@ -24,7 +24,7 @@ export default function QuizProgress({
           {answeredQuestions} answered ({Math.round(completionPercentage)}%)
         </span>
       </div>
-      <div className="h-2 w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+      <div className="h-2 w-full bg-gray-700 dark:bg-gray-200 rounded-full overflow-hidden">
         <div
           className="h-2 bg-blue-600 dark:bg-blue-500 rounded-full"
           style={{ width: `${progressPercentage}%` }}
@@ -34,7 +34,7 @@ export default function QuizProgress({
           aria-valuemax={100}
         ></div>
       </div>
-      <div className="h-2 w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden mt-1">
+      <div className="h-2 w-full bg-gray-700 dark:bg-gray-200 rounded-full overflow-hidden mt-1">
         <div
           className="h-2 bg-green-500 dark:bg-green-400 rounded-full"
           style={{ width: `${completionPercentage}%` }}

@@ -124,7 +124,7 @@ export default function AdminUserDetailPage() {
   }
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-gray-900 dark:bg-gray-50">
         <div className="flex">
           <AdminNavigation />
           <div className="flex-1 p-8 flex justify-center items-center">
@@ -137,7 +137,7 @@ export default function AdminUserDetailPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-gray-900 dark:bg-gray-50">
         <div className="flex">
           <AdminNavigation />
           <div className="flex-1 p-8">
@@ -162,7 +162,7 @@ export default function AdminUserDetailPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-gray-900 dark:bg-gray-50">
         <div className="flex">
           <AdminNavigation />
           <div className="flex-1 p-8">
@@ -184,7 +184,7 @@ export default function AdminUserDetailPage() {
     );
   }
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-900 dark:bg-gray-50">
       <div className="flex">
         <AdminNavigation />
         <div className="flex-1 p-8">
@@ -195,7 +195,7 @@ export default function AdminUserDetailPage() {
           <UserProfile user={user} />
 
           {/* Main content with tabs */}
-          <div className="bg-white dark:bg-gray-800 shadow rounded-lg">
+          <div className="bg-gray-800 dark:bg-white shadow rounded-lg">
             <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
 
             <div className="p-6">

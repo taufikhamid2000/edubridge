@@ -236,16 +236,16 @@ export default function AdminQuizStatsPage() {
     return matchesSearch && matchesDifficulty;
   });
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-900 dark:bg-gray-50">
       <div className="flex">
         <AdminNavigation />
         <div className="flex-1 p-8">
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              <h1 className="text-3xl font-bold text-white dark:text-gray-900">
                 Quiz Statistics
               </h1>
-              <p className="text-gray-500 dark:text-gray-400 mt-1">
+              <p className="text-gray-400 dark:text-gray-500 mt-1">
                 Performance metrics and completion rates for all quizzes
               </p>
             </div>

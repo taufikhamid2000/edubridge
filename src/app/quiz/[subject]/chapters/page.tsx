@@ -40,7 +40,7 @@ export default function ChaptersPage() {
   // Error state
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
+      <div className="flex flex-col items-center justify-center h-screen bg-gray-800 dark:bg-gray-100 text-gray-300 dark:text-gray-700">
         <h1 className="text-2xl font-bold mb-4">Error</h1>
         <p>
           {error instanceof Error
@@ -59,7 +59,7 @@ export default function ChaptersPage() {
   // Handle undefined subjectWithChapters (shouldn't happen if API works)
   if (!subjectWithChapters) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
+      <div className="flex flex-col items-center justify-center h-screen bg-gray-800 dark:bg-gray-100 text-gray-300 dark:text-gray-700">
         <h1 className="text-2xl font-bold mb-4">Error</h1>
         <p>Failed to load subject data. Please try again later.</p>
         <button
@@ -97,7 +97,7 @@ export default function ChaptersPage() {
       </header>
 
       {subjectWithChapters.chapters.length === 0 ? (
-        <div className="text-center py-10 px-6 bg-gray-50 dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <div className="text-center py-10 px-6 bg-gray-50 dark:bg-gray-800 rounded-lg shadow-sm border border-gray-700 dark:border-gray-200">
           <svg
             className="mx-auto h-12 w-12 text-gray-400 mb-4"
             fill="none"
@@ -112,7 +112,7 @@ export default function ChaptersPage() {
               d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
             />
           </svg>
-          <p className="text-gray-700 dark:text-gray-300">
+          <p className="text-gray-300 dark:text-gray-700">
             No chapters available for this subject. Please check back later.
           </p>
         </div>

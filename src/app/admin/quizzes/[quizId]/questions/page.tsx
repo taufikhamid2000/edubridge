@@ -258,7 +258,7 @@ export default function AdminQuizQuestionsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-gray-900 dark:bg-gray-50">
         <div className="flex">
           <AdminNavigation />
           <div className="flex-1 p-8 flex items-center justify-center">
@@ -270,7 +270,7 @@ export default function AdminQuizQuestionsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-900 dark:bg-gray-50">
       <div className="flex">
         <AdminNavigation />
         <div className="flex-1 p-8">
@@ -283,10 +283,10 @@ export default function AdminQuizQuestionsPage() {
                 >
                   ← Back to Quizzes
                 </Link>
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                <h1 className="text-3xl font-bold text-white dark:text-gray-900">
                   {quiz?.title || 'Quiz'}: Questions Audit
                 </h1>
-                <div className="text-gray-500 dark:text-gray-400 mt-1">
+                <div className="text-gray-400 dark:text-gray-500 mt-1">
                   {quiz?.subject_name} / {quiz?.topic_name}
                 </div>
                 <div className="mt-2">
@@ -360,10 +360,10 @@ export default function AdminQuizQuestionsPage() {
             </div>
           )}
 
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow mb-6 p-6">
+          <div className="bg-gray-800 dark:bg-white rounded-lg shadow mb-6 p-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                <p className="text-sm font-medium text-gray-300 dark:text-gray-700">
                   Difficulty
                 </p>
                 <p className="mt-1">
@@ -384,34 +384,34 @@ export default function AdminQuizQuestionsPage() {
                 </p>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                <p className="text-sm font-medium text-gray-300 dark:text-gray-700">
                   Time Limit
                 </p>
-                <p className="mt-1 text-gray-900 dark:text-white">
+                <p className="mt-1 text-white dark:text-gray-900">
                   {Math.floor((quiz?.time_limit || 0) / 60)} minutes{' '}
                   {(quiz?.time_limit || 0) % 60} seconds
                 </p>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                <p className="text-sm font-medium text-gray-300 dark:text-gray-700">
                   Passing Score
                 </p>
-                <p className="mt-1 text-gray-900 dark:text-white">
+                <p className="mt-1 text-white dark:text-gray-900">
                   {quiz?.passing_score || 0}%
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+          <div className="bg-gray-800 dark:bg-white rounded-lg shadow overflow-hidden">
             <div className="p-6">
-              <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+              <h2 className="text-xl font-semibold mb-4 text-white dark:text-gray-900">
                 Questions for Review
               </h2>
 
               {questions.length === 0 ? (
                 <div className="text-center py-6 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
-                  <p className="text-gray-500 dark:text-gray-400">
+                  <p className="text-gray-400 dark:text-gray-500">
                     No questions found for this quiz.
                   </p>
                 </div>
@@ -423,7 +423,7 @@ export default function AdminQuizQuestionsPage() {
                       className="border border-gray-200 dark:border-gray-600 rounded-lg p-5 bg-gray-50 dark:bg-gray-700"
                     >
                       <div className="flex justify-between items-start mb-4">
-                        <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                        <h3 className="text-lg font-medium text-white dark:text-gray-900">
                           Question {qIndex + 1}
                         </h3>
                         <button
@@ -440,10 +440,10 @@ export default function AdminQuizQuestionsPage() {
                       </div>
 
                       <div className="mb-4">
-                        <p className="text-gray-900 dark:text-white font-medium mb-2">
+                        <p className="text-white dark:text-gray-900 font-medium mb-2">
                           {question.text}
                         </p>
-                        <div className="text-sm text-gray-500 dark:text-gray-400">
+                        <div className="text-sm text-gray-400 dark:text-gray-500">
                           Type:{' '}
                           {question.type === 'radio'
                             ? 'Single Choice'
@@ -452,14 +452,14 @@ export default function AdminQuizQuestionsPage() {
                       </div>
 
                       <div className="mb-4">
-                        <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <h4 className="text-sm font-medium text-gray-300 dark:text-gray-700 mb-2">
                           Answers:
                         </h4>{' '}
                         <div className="space-y-2">
                           {question.answers.map((answer) => (
                             <div
                               key={answer.id}
-                              className="flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-600"
+                              className="flex items-center justify-between p-3 bg-gray-800 dark:bg-white rounded border border-gray-200 dark:border-gray-600"
                             >
                               <div className="flex items-center">
                                 <div className="flex-shrink-0 mr-3">
@@ -468,7 +468,7 @@ export default function AdminQuizQuestionsPage() {
                                       className={`w-4 h-4 rounded-full border-2 ${
                                         answer.isCorrect
                                           ? 'bg-green-500 border-green-500'
-                                          : 'border-gray-300 dark:border-gray-600'
+                                          : 'border-gray-600 dark:border-gray-300'
                                       }`}
                                     >
                                       {answer.isCorrect && (
@@ -480,7 +480,7 @@ export default function AdminQuizQuestionsPage() {
                                       className={`w-4 h-4 rounded border-2 ${
                                         answer.isCorrect
                                           ? 'bg-green-500 border-green-500'
-                                          : 'border-gray-300 dark:border-gray-600'
+                                          : 'border-gray-600 dark:border-gray-300'
                                       }`}
                                     >
                                       {answer.isCorrect && (
@@ -500,7 +500,7 @@ export default function AdminQuizQuestionsPage() {
                                   )}
                                 </div>
                                 <span
-                                  className={`${answer.isCorrect ? 'font-medium text-green-700 dark:text-green-300' : 'text-gray-700 dark:text-gray-300'}`}
+                                  className={`${answer.isCorrect ? 'font-medium text-green-700 dark:text-green-300' : 'text-gray-300 dark:text-gray-700'}`}
                                 >
                                   {answer.text}
                                 </span>
@@ -530,14 +530,14 @@ export default function AdminQuizQuestionsPage() {
                       {questionComments[question.id] &&
                         questionComments[question.id].length > 0 && (
                           <div className="mb-4">
-                            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            <h4 className="text-sm font-medium text-gray-300 dark:text-gray-700 mb-2">
                               Question Comments:
                             </h4>{' '}
                             <div className="space-y-2">
                               {questionComments[question.id].map((comment) => (
                                 <div
                                   key={comment.id}
-                                  className="bg-white dark:bg-gray-800 p-3 rounded border border-gray-200 dark:border-gray-600"
+                                  className="bg-gray-800 dark:bg-white p-3 rounded border border-gray-200 dark:border-gray-600"
                                 >
                                   <div className="flex justify-between items-start mb-1">
                                     <span
@@ -545,13 +545,13 @@ export default function AdminQuizQuestionsPage() {
                                     >
                                       {comment.comment_type}
                                     </span>
-                                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                                    <span className="text-xs text-gray-400 dark:text-gray-500">
                                       {new Date(
                                         comment.created_at
                                       ).toLocaleDateString()}
                                     </span>
                                   </div>
-                                  <p className="text-sm text-gray-700 dark:text-gray-300 mt-2">
+                                  <p className="text-sm text-gray-300 dark:text-gray-700 mt-2">
                                     {comment.comment_text}
                                   </p>
                                 </div>
@@ -567,7 +567,7 @@ export default function AdminQuizQuestionsPage() {
                           answerComments[answer.id].length > 0
                       ) && (
                         <div>
-                          <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          <h4 className="text-sm font-medium text-gray-300 dark:text-gray-700 mb-2">
                             Answer Comments:
                           </h4>{' '}
                           <div className="space-y-3">
@@ -577,7 +577,7 @@ export default function AdminQuizQuestionsPage() {
                                 answerComments[answer.id].length > 0 && (
                                   <div key={answer.id}>
                                     {' '}
-                                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
+                                    <p className="text-sm font-medium text-gray-400 dark:text-gray-600 mb-1">
                                       Answer {answerIndex + 1}: &ldquo;
                                       {answer.text}&rdquo;
                                     </p>
@@ -586,7 +586,7 @@ export default function AdminQuizQuestionsPage() {
                                         (comment) => (
                                           <div
                                             key={comment.id}
-                                            className="bg-white dark:bg-gray-800 p-3 rounded border border-gray-200 dark:border-gray-600"
+                                            className="bg-gray-800 dark:bg-white p-3 rounded border border-gray-200 dark:border-gray-600"
                                           >
                                             <div className="flex justify-between items-start mb-1">
                                               <span
@@ -594,13 +594,13 @@ export default function AdminQuizQuestionsPage() {
                                               >
                                                 {comment.comment_type}
                                               </span>
-                                              <span className="text-xs text-gray-500 dark:text-gray-400">
+                                              <span className="text-xs text-gray-400 dark:text-gray-500">
                                                 {new Date(
                                                   comment.created_at
                                                 ).toLocaleDateString()}
                                               </span>
                                             </div>
-                                            <p className="text-sm text-gray-700 dark:text-gray-300 mt-2">
+                                            <p className="text-sm text-gray-300 dark:text-gray-700 mt-2">
                                               {comment.comment_text}
                                             </p>
                                           </div>
@@ -623,9 +623,9 @@ export default function AdminQuizQuestionsPage() {
           {/* Comment Form Modal */}
           {showCommentForm && (
             <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-              <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800">
+              <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-gray-800 dark:bg-white">
                 <div className="mt-3">
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+                  <h3 className="text-lg font-medium text-white dark:text-gray-900 mb-4">
                     Add{' '}
                     {showCommentForm.type === 'question'
                       ? 'Question'
@@ -634,7 +634,7 @@ export default function AdminQuizQuestionsPage() {
                   </h3>
 
                   <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-300 dark:text-gray-700 mb-2">
                       Comment Type
                     </label>
                     <select
@@ -648,7 +648,7 @@ export default function AdminQuizQuestionsPage() {
                             | 'rejected'
                         )
                       }
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                      className="w-full px-3 py-2 border border-gray-600 dark:border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                     >
                       <option value="suggestion">Suggestion</option>
                       <option value="issue">Issue</option>
@@ -658,14 +658,14 @@ export default function AdminQuizQuestionsPage() {
                   </div>
 
                   <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-300 dark:text-gray-700 mb-2">
                       Comment
                     </label>
                     <textarea
                       value={commentText}
                       onChange={(e) => setCommentText(e.target.value)}
                       rows={4}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                      className="w-full px-3 py-2 border border-gray-600 dark:border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                       placeholder="Enter your comment..."
                     />
                   </div>

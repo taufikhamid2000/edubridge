@@ -43,9 +43,9 @@ export default function StaticQuizPage() {
         </button>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+      <div className="bg-gray-800 dark:bg-white rounded-lg shadow-sm border border-gray-700 dark:border-gray-200 p-6">
         <h1 className="text-3xl font-bold mb-4">{STATIC_QUIZ.title}</h1>
-        <p className="text-gray-600 dark:text-gray-400 mb-8">
+        <p className="text-gray-400 dark:text-gray-600 mb-8">
           {STATIC_QUIZ.description}
         </p>
 
@@ -53,7 +53,7 @@ export default function StaticQuizPage() {
           {STATIC_QUIZ.questions.map((question) => (
             <div
               key={question.id}
-              className="border-b border-gray-200 dark:border-gray-700 pb-6 last:border-0"
+              className="border-b border-gray-700 dark:border-gray-200 pb-6 last:border-0"
             >
               <p className="font-medium mb-4">
                 {question.id}. {question.text}
@@ -62,7 +62,7 @@ export default function StaticQuizPage() {
                 {question.options.map((option) => (
                   <div
                     key={option.id}
-                    className="p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
+                    className="p-3 rounded-lg border border-gray-700 dark:border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
                   >
                     <span className="font-medium mr-2">{option.id}.</span>
                     {option.text}

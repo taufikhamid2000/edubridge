@@ -53,10 +53,10 @@ export default function Pagination({
   const pageNumbers = getPageNumbers();
 
   return (
-    <div className="px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 sm:px-6">
+    <div className="px-4 py-3 flex items-center justify-between border-t border-gray-700 dark:border-gray-200 sm:px-6">
       <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
         <div>
-          <p className="text-sm text-gray-700 dark:text-gray-300">
+          <p className="text-sm text-gray-300 dark:text-gray-700">
             Showing{' '}
             <span className="font-medium">
               {totalItems === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1}
@@ -174,7 +174,7 @@ export default function Pagination({
         >
           Previous
         </button>
-        <div className="text-sm text-gray-700 dark:text-gray-300">
+        <div className="text-sm text-gray-300 dark:text-gray-700">
           {currentPage} of {totalPages}
         </div>
         <button

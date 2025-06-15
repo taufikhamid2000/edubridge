@@ -110,7 +110,7 @@ export default function StaticLeaderboardPage() {
       <LeaderboardNav activeTab="students" isStatic={true} />
       <LeaderboardHeader currentUserRank={1} />
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6 border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-xl">
+      <div className="bg-gray-800 dark:bg-white rounded-lg shadow-lg p-6 mb-6 border border-gray-700 dark:border-gray-200 transition-all duration-300 hover:shadow-xl">
         <LeaderboardFilters
           timeFrame="allTime"
           onTimeFrameChange={() => {}}
@@ -119,7 +119,7 @@ export default function StaticLeaderboardPage() {
         />
         <div className="fade-in animate-fadeIn">
           <LeaderboardTable data={STATIC_LEADERBOARD} timeFrame="allTime" />
-          <div className="text-center mt-6 text-sm text-gray-500 dark:text-gray-400">
+          <div className="text-center mt-6 text-sm text-gray-400 dark:text-gray-500">
             Showing demo data • This is a static preview of the leaderboard
           </div>
         </div>

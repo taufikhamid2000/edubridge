@@ -39,7 +39,7 @@ export default function StaticTopicPage() {
           ← Back to Subject
         </button>
         <h1 className="text-3xl font-bold mt-4">Demo Topics</h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-2">
+        <p className="text-gray-400 dark:text-gray-600 mt-2">
           Browse through available topics
         </p>
       </div>
@@ -49,17 +49,17 @@ export default function StaticTopicPage() {
           <div
             key={topic.id}
             onClick={() => router.push('/static/subjects/topic/quiz')}
-            className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow cursor-pointer"
+            className="bg-gray-800 dark:bg-white p-6 rounded-lg shadow-sm border border-gray-700 dark:border-gray-200 hover:shadow-md transition-shadow cursor-pointer"
           >
             <h3 className="text-xl font-semibold mb-2">{topic.name}</h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
+            <p className="text-gray-400 dark:text-gray-600 mb-4">
               {topic.description}
             </p>
-            <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
+            <div className="flex items-center justify-between text-sm text-gray-400 dark:text-gray-500">
               <span>{topic.quizCount} quizzes</span>
               <span>{topic.progress}% complete</span>
             </div>
-            <div className="mt-2 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+            <div className="mt-2 w-full bg-gray-700 dark:bg-gray-200 rounded-full h-2">
               <div
                 className="bg-blue-600 h-2 rounded-full"
                 style={{ width: `${topic.progress}%` }}

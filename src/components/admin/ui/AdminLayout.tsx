@@ -23,10 +23,10 @@ export default function AdminLayout({
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-900 dark:bg-gray-50">
       <div className="flex flex-col md:flex-row">
         {/* Mobile menu button */}
-        <div className="md:hidden p-4 bg-white dark:bg-gray-800 shadow sticky top-0 z-10 flex justify-between items-center">
+        <div className="md:hidden p-4 bg-gray-800 dark:bg-white shadow sticky top-0 z-10 flex justify-between items-center">
           <button
             onClick={toggleSidebar}
             className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white focus:outline-none"

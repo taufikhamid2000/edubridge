@@ -173,7 +173,7 @@ export default function ContentEntityEdit<T extends ContentEntity>({
           <div key={field.key} className="space-y-1">
             <label
               htmlFor={field.key}
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              className="block text-sm font-medium text-gray-300 dark:text-gray-700"
             >
               {field.label}{' '}
               {field.required && <span className="text-red-500">*</span>}
@@ -181,7 +181,7 @@ export default function ContentEntityEdit<T extends ContentEntity>({
             <textarea
               id={field.key}
               rows={4}
-              className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:text-white"
+              className="mt-1 block w-full border border-gray-600 dark:border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:text-white"
               placeholder={field.placeholder}
               value={String(value)}
               onChange={(e) => handleFieldChange(field.key, e.target.value)}
@@ -189,7 +189,7 @@ export default function ContentEntityEdit<T extends ContentEntity>({
               required={field.required}
             />
             {field.helpText && (
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
                 {field.helpText}
               </p>
             )}
@@ -201,14 +201,14 @@ export default function ContentEntityEdit<T extends ContentEntity>({
           <div key={field.key} className="space-y-1">
             <label
               htmlFor={field.key}
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              className="block text-sm font-medium text-gray-300 dark:text-gray-700"
             >
               {field.label}{' '}
               {field.required && <span className="text-red-500">*</span>}
             </label>
             <select
               id={field.key}
-              className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:text-white"
+              className="mt-1 block w-full border border-gray-600 dark:border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:text-white"
               value={String(value)}
               onChange={(e) => handleFieldChange(field.key, e.target.value)}
               disabled={disabled}
@@ -222,7 +222,7 @@ export default function ContentEntityEdit<T extends ContentEntity>({
               ))}
             </select>
             {field.helpText && (
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
                 {field.helpText}
               </p>
             )}
@@ -234,7 +234,7 @@ export default function ContentEntityEdit<T extends ContentEntity>({
           <div key={field.key} className="space-y-1">
             <label
               htmlFor={field.key}
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              className="block text-sm font-medium text-gray-300 dark:text-gray-700"
             >
               {field.label}{' '}
               {field.required && <span className="text-red-500">*</span>}
@@ -242,7 +242,7 @@ export default function ContentEntityEdit<T extends ContentEntity>({
             <input
               type="number"
               id={field.key}
-              className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:text-white"
+              className="mt-1 block w-full border border-gray-600 dark:border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:text-white"
               placeholder={field.placeholder}
               value={value !== undefined && value !== null ? String(value) : ''}
               onChange={(e) =>
@@ -252,7 +252,7 @@ export default function ContentEntityEdit<T extends ContentEntity>({
               required={field.required}
             />
             {field.helpText && (
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
                 {field.helpText}
               </p>
             )}
@@ -264,7 +264,7 @@ export default function ContentEntityEdit<T extends ContentEntity>({
           <div key={field.key} className="space-y-1">
             <label
               htmlFor={field.key}
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              className="block text-sm font-medium text-gray-300 dark:text-gray-700"
             >
               {field.label}{' '}
               {field.required && <span className="text-red-500">*</span>}
@@ -275,7 +275,7 @@ export default function ContentEntityEdit<T extends ContentEntity>({
               disabled
             )}
             {field.helpText && (
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
                 {field.helpText}
               </p>
             )}
@@ -288,7 +288,7 @@ export default function ContentEntityEdit<T extends ContentEntity>({
           <div key={field.key} className="space-y-1">
             <label
               htmlFor={field.key}
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              className="block text-sm font-medium text-gray-300 dark:text-gray-700"
             >
               {field.label}{' '}
               {field.required && <span className="text-red-500">*</span>}
@@ -296,7 +296,7 @@ export default function ContentEntityEdit<T extends ContentEntity>({
             <input
               type="text"
               id={field.key}
-              className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:text-white"
+              className="mt-1 block w-full border border-gray-600 dark:border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:text-white"
               placeholder={field.placeholder}
               value={String(value || '')}
               onChange={(e) => handleFieldChange(field.key, e.target.value)}
@@ -304,7 +304,7 @@ export default function ContentEntityEdit<T extends ContentEntity>({
               required={field.required}
             />
             {field.helpText && (
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
                 {field.helpText}
               </p>
             )}
@@ -319,10 +319,10 @@ export default function ContentEntityEdit<T extends ContentEntity>({
 
     return (
       <div className="pt-4">
-        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+        <h3 className="text-sm font-medium text-gray-300 dark:text-gray-700">
           Additional Information
         </h3>
-        <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-500 dark:text-gray-400">
+        <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-400 dark:text-gray-500">
           {metadataFields.map((field) => {
             const value = entity[field.key];
             const formattedValue = field.format
@@ -347,7 +347,7 @@ export default function ContentEntityEdit<T extends ContentEntity>({
   // Loading state render
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-gray-900 dark:bg-gray-50">
         <div className="flex">
           <AdminNavigation />
           <div className="flex-1 p-8 flex justify-center items-center">
@@ -361,7 +361,7 @@ export default function ContentEntityEdit<T extends ContentEntity>({
   // Entity not found state
   if (!entity) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-gray-900 dark:bg-gray-50">
         <div className="flex">
           <AdminNavigation />
           <div className="flex-1 p-8">
@@ -386,7 +386,7 @@ export default function ContentEntityEdit<T extends ContentEntity>({
 
   // Main render with tabs
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-900 dark:bg-gray-50">
       <div className="flex">
         <AdminNavigation />
         <div className="flex-1 p-8">
@@ -426,9 +426,9 @@ export default function ContentEntityEdit<T extends ContentEntity>({
             </div>
           )}
 
-          <div className="bg-white dark:bg-gray-800 shadow rounded-lg">
+          <div className="bg-gray-800 dark:bg-white shadow rounded-lg">
             {/* Tabs */}
-            <div className="border-b border-gray-200 dark:border-gray-700">
+            <div className="border-b border-gray-700 dark:border-gray-200">
               <nav className="-mb-px flex">
                 <button
                   onClick={() => setActiveTab('details')}

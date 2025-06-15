@@ -11,11 +11,11 @@ export default function AchievementsTab({
 }: AchievementsTabProps) {
   return (
     <div>
-      <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+      <h2 className="text-lg font-medium text-white dark:text-gray-900 mb-4">
         User Achievements
       </h2>
       {!achievements || achievements.length === 0 ? (
-        <p className="text-gray-500 dark:text-gray-400 py-4">
+        <p className="text-gray-400 dark:text-gray-500 py-4">
           This user has not earned any achievements yet.
         </p>
       ) : (
@@ -43,15 +43,15 @@ export default function AchievementsTab({
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-medium text-gray-900 dark:text-white">
+                  <h3 className="font-medium text-white dark:text-gray-900">
                     {achievement.title}
                   </h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-sm text-gray-400 dark:text-gray-500">
                     {achievement.description}
                   </p>
                 </div>
               </div>
-              <div className="text-xs text-gray-500 dark:text-gray-400">
+              <div className="text-xs text-gray-400 dark:text-gray-500">
                 Earned on{' '}
                 {new Date(achievement.created_at).toLocaleDateString()}
               </div>

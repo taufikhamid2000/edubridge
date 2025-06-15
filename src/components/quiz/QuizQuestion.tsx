@@ -52,7 +52,7 @@ export default function QuizQuestion({
                 value={answer.id}
                 checked={selectedAnswers.includes(answer.id)}
                 onChange={() => handleRadioChange(answer.id)}
-                className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600"
+                className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-600 dark:border-gray-300"
                 aria-labelledby={`label-${answer.id}`}
               />
             ) : (
@@ -63,7 +63,7 @@ export default function QuizQuestion({
                 value={answer.id}
                 checked={selectedAnswers.includes(answer.id)}
                 onChange={() => handleCheckboxChange(answer.id)}
-                className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 rounded border-gray-300 dark:border-gray-600"
+                className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 rounded border-gray-600 dark:border-gray-300"
                 aria-labelledby={`label-${answer.id}`}
               />
             )}
@@ -79,7 +79,7 @@ export default function QuizQuestion({
       </div>
 
       {question.type === 'checkbox' && (
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+        <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">
           Select all that apply
         </p>
       )}

@@ -189,7 +189,7 @@ export default function CreateQuizPage() {
         <div className="max-w-3xl mx-auto flex justify-center items-center min-h-[300px]">
           <div className="text-center">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-t-blue-500 border-r-transparent border-b-blue-500 border-l-transparent mb-4"></div>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-gray-400 dark:text-gray-600">
               Loading quiz information...
             </p>
           </div>
@@ -210,12 +210,12 @@ export default function CreateQuizPage() {
           </button>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 md:p-8">
+        <div className="bg-gray-800 dark:bg-white rounded-lg shadow-md p-6 md:p-8">
           <div className="mb-6">
             <h1 className="text-2xl md:text-3xl font-bold mb-2">
               Create New Quiz
             </h1>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-gray-400 dark:text-gray-600">
               Design a quiz for students to test their knowledge
             </p>
           </div>
@@ -240,11 +240,11 @@ export default function CreateQuizPage() {
           />
         </div>
 
-        <div className="mt-8 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg p-5">
+        <div className="mt-8 bg-gray-50 dark:bg-gray-800/50 border border-gray-700 dark:border-gray-200 rounded-lg p-5">
           <h2 className="text-lg font-medium mb-3">
             Tips for creating effective quizzes
           </h2>
-          <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+          <ul className="space-y-2 text-sm text-gray-400 dark:text-gray-600">
             <li className="flex items-start">
               <span className="text-green-500 mr-2">✓</span>
               <span>Use clear, concise language in your questions</span>

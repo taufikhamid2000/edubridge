@@ -30,10 +30,10 @@ export default function ErrorBoundary({
           <h2 className="text-2xl font-bold text-red-600 dark:text-red-400 mb-4">
             Something went wrong
           </h2>
-          <p className="mb-4 text-gray-800 dark:text-gray-200">
+          <p className="mb-4 text-gray-200 dark:text-gray-800">
             We&rsquo;ve encountered an error and our team has been notified.
           </p>
-          <div className="bg-gray-100 dark:bg-gray-800 p-3 rounded text-sm overflow-auto max-h-40">
+          <div className="bg-gray-800 dark:bg-gray-100 p-3 rounded text-sm overflow-auto max-h-40">
             <pre className="text-red-600 dark:text-red-400">
               {error?.message || 'Unknown error'}
             </pre>

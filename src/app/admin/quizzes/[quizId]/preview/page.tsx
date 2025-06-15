@@ -180,7 +180,7 @@ export default function AdminQuizPreviewPage() {
   }
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-gray-900 dark:bg-gray-50">
         <div className="flex">
           <AdminNavigation />
           <div className="flex-1 p-8 flex items-center justify-center">
@@ -192,7 +192,7 @@ export default function AdminQuizPreviewPage() {
   }
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-gray-900 dark:bg-gray-50">
         <div className="flex">
           <AdminNavigation />
           <div className="flex-1 p-8">
@@ -214,7 +214,7 @@ export default function AdminQuizPreviewPage() {
   }
   if (questions.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-gray-900 dark:bg-gray-50">
         <div className="flex">
           <AdminNavigation />
           <div className="flex-1 p-8">
@@ -226,13 +226,13 @@ export default function AdminQuizPreviewPage() {
                 >
                   ← Back to Questions
                 </Link>
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                <h1 className="text-3xl font-bold text-white dark:text-gray-900">
                   {quiz?.title || 'Quiz'}: Preview
                 </h1>
               </div>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <div className="bg-gray-800 dark:bg-white rounded-lg shadow p-6">
               <div className="text-center py-10">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -248,10 +248,10 @@ export default function AdminQuizPreviewPage() {
                     d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
                   />
                 </svg>
-                <h2 className="mt-2 text-lg font-medium text-gray-900 dark:text-white">
+                <h2 className="mt-2 text-lg font-medium text-white dark:text-gray-900">
                   No questions added yet
                 </h2>
-                <p className="mt-1 text-gray-500 dark:text-gray-400">
+                <p className="mt-1 text-gray-400 dark:text-gray-500">
                   {' '}
                   This quiz doesn&apos;t have any questions. Add some questions
                   before previewing.
@@ -274,7 +274,7 @@ export default function AdminQuizPreviewPage() {
 
   const currentQuestion = questions[currentQuestionIndex];
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-900 dark:bg-gray-50">
       <div className="flex">
         <AdminNavigation />
         <div className="flex-1 p-8">
@@ -287,10 +287,10 @@ export default function AdminQuizPreviewPage() {
               >
                 ← Back to Questions
               </Link>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              <h1 className="text-3xl font-bold text-white dark:text-gray-900">
                 {quiz?.title || 'Quiz'}: Preview
               </h1>
-              <div className="text-gray-500 dark:text-gray-400 mt-1">
+              <div className="text-gray-400 dark:text-gray-500 mt-1">
                 {quiz?.subject_name} / {quiz?.topic_name}
               </div>
             </div>
@@ -312,7 +312,7 @@ export default function AdminQuizPreviewPage() {
             </div>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden mb-6">
+          <div className="bg-gray-800 dark:bg-white rounded-lg shadow overflow-hidden mb-6">
             <div className="p-6">
               <div className="flex justify-between items-center mb-6">
                 <div>
@@ -330,18 +330,18 @@ export default function AdminQuizPreviewPage() {
                         quiz.difficulty.slice(1)
                       : 'Medium'}
                   </span>
-                  <span className="ml-2 text-gray-500 dark:text-gray-400 text-sm">
+                  <span className="ml-2 text-gray-400 dark:text-gray-500 text-sm">
                     {Math.floor((quiz?.time_limit || 0) / 60)} min{' '}
                     {(quiz?.time_limit || 0) % 60} sec
                   </span>
                 </div>{' '}
-                <div className="text-sm font-medium text-gray-900 dark:text-white">
+                <div className="text-sm font-medium text-white dark:text-gray-900">
                   Question {currentQuestionIndex + 1} of{' '}
                   {questions?.length || 0}
                 </div>
               </div>{' '}
               <div className="mb-8">
-                <h2 className="text-xl font-medium mb-4 text-gray-900 dark:text-white">
+                <h2 className="text-xl font-medium mb-4 text-white dark:text-gray-900">
                   {currentQuestion?.text}
                 </h2>
 
@@ -382,7 +382,7 @@ export default function AdminQuizPreviewPage() {
                       )}
                       <label
                         htmlFor={`answer-${answer.id}`}
-                        className="ml-3 text-gray-700 dark:text-gray-300"
+                        className="ml-3 text-gray-300 dark:text-gray-700"
                       >
                         {answer.text}
                       </label>
@@ -428,8 +428,8 @@ export default function AdminQuizPreviewPage() {
                   disabled={currentQuestionIndex === 0}
                   className={`px-4 py-2 rounded ${
                     currentQuestionIndex === 0
-                      ? 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
-                      : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'
+                      ? 'bg-gray-700 dark:bg-gray-200 text-gray-400 dark:text-gray-500 cursor-not-allowed'
+                      : 'bg-gray-700 dark:bg-gray-200 text-gray-200 dark:text-gray-800 hover:bg-gray-300 dark:hover:bg-gray-600'
                   }`}
                 >
                   Previous
@@ -439,7 +439,7 @@ export default function AdminQuizPreviewPage() {
                   disabled={currentQuestionIndex === questions.length - 1}
                   className={`px-4 py-2 rounded ${
                     currentQuestionIndex === questions.length - 1
-                      ? 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+                      ? 'bg-gray-700 dark:bg-gray-200 text-gray-400 dark:text-gray-500 cursor-not-allowed'
                       : 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white'
                   }`}
                 >

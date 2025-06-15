@@ -64,22 +64,22 @@ export default function AdminSettingsPage() {
     }
   }
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-900 dark:bg-gray-50">
       <div className="flex">
         <AdminNavigation />
         <div className="flex-1 p-8">
           <h1 className="text-3xl font-bold mb-6 dark:text-white">Settings</h1>
 
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
+          <div className="bg-gray-800 dark:bg-white rounded-lg shadow">
             {' '}
-            <div className="border-b border-gray-200 dark:border-gray-700">
+            <div className="border-b border-gray-700 dark:border-gray-200">
               <nav className="-mb-px flex">
                 <button
                   onClick={() => setActiveTab('general')}
                   className={`py-4 px-6 text-center border-b-2 font-medium text-sm ${
                     activeTab === 'general'
                       ? 'border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-300'
-                      : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
+                      : 'border-transparent text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
                   }`}
                 >
                   General
@@ -89,7 +89,7 @@ export default function AdminSettingsPage() {
                   className={`py-4 px-6 text-center border-b-2 font-medium text-sm ${
                     activeTab === 'gamification'
                       ? 'border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-300'
-                      : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
+                      : 'border-transparent text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
                   }`}
                 >
                   Gamification
@@ -99,7 +99,7 @@ export default function AdminSettingsPage() {
                   className={`py-4 px-6 text-center border-b-2 font-medium text-sm ${
                     activeTab === 'notifications'
                       ? 'border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-300'
-                      : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
+                      : 'border-transparent text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
                   }`}
                 >
                   Notifications
@@ -116,14 +116,14 @@ export default function AdminSettingsPage() {
                     <div>
                       <label
                         htmlFor="site-name"
-                        className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                        className="block text-sm font-medium text-gray-300 dark:text-gray-700"
                       >
                         Site Name
                       </label>
                       <input
                         type="text"
                         id="site-name"
-                        className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                        className="mt-1 block w-full border border-gray-600 dark:border-gray-300 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                         value={siteName}
                         onChange={(e) => setSiteName(e.target.value)}
                       />
@@ -132,14 +132,14 @@ export default function AdminSettingsPage() {
                       {' '}
                       <label
                         htmlFor="site-description"
-                        className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                        className="block text-sm font-medium text-gray-300 dark:text-gray-700"
                       >
                         Site Description
                       </label>
                       <textarea
                         id="site-description"
                         rows={3}
-                        className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                        className="mt-1 block w-full border border-gray-600 dark:border-gray-300 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                         value={siteDescription}
                         onChange={(e) => setSiteDescription(e.target.value)}
                       />
@@ -166,14 +166,14 @@ export default function AdminSettingsPage() {
                     <div>
                       <label
                         htmlFor="base-xp"
-                        className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                        className="block text-sm font-medium text-gray-300 dark:text-gray-700"
                       >
                         Base XP per Quiz Completion
                       </label>
                       <input
                         type="number"
                         id="base-xp"
-                        className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                        className="mt-1 block w-full border border-gray-600 dark:border-gray-300 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                         value={baseXpPerQuiz}
                         onChange={(e) =>
                           setBaseXpPerQuiz(Number(e.target.value))
@@ -184,14 +184,14 @@ export default function AdminSettingsPage() {
                       {' '}
                       <label
                         htmlFor="correct-answer-xp"
-                        className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                        className="block text-sm font-medium text-gray-300 dark:text-gray-700"
                       >
                         XP per Correct Answer
                       </label>
                       <input
                         type="number"
                         id="correct-answer-xp"
-                        className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                        className="mt-1 block w-full border border-gray-600 dark:border-gray-300 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                         value={xpPerCorrectAnswer}
                         onChange={(e) =>
                           setXpPerCorrectAnswer(Number(e.target.value))
@@ -202,14 +202,14 @@ export default function AdminSettingsPage() {
                       {' '}
                       <label
                         htmlFor="level-threshold"
-                        className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                        className="block text-sm font-medium text-gray-300 dark:text-gray-700"
                       >
                         XP Threshold per Level
                       </label>
                       <input
                         type="number"
                         id="level-threshold"
-                        className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                        className="mt-1 block w-full border border-gray-600 dark:border-gray-300 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                         value={levelThreshold}
                         onChange={(e) =>
                           setLevelThreshold(Number(e.target.value))

@@ -15,12 +15,12 @@ export default function ProfileAchievements({
     return (
       <div className="text-center py-8">
         <div className="animate-pulse space-y-4">
-          <div className="h-12 w-2/3 mx-auto bg-gray-200 dark:bg-gray-700 rounded"></div>
+          <div className="h-12 w-2/3 mx-auto bg-gray-700 dark:bg-gray-200 rounded"></div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="h-32 bg-gray-200 dark:bg-gray-700 rounded"
+                className="h-32 bg-gray-700 dark:bg-gray-200 rounded"
               ></div>
             ))}
           </div>
@@ -48,10 +48,10 @@ export default function ProfileAchievements({
             />
           </svg>
         </div>
-        <h3 className="mt-2 text-lg font-medium text-gray-900 dark:text-white">
+        <h3 className="mt-2 text-lg font-medium text-white dark:text-gray-900">
           No achievements yet
         </h3>
-        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+        <p className="mt-1 text-sm text-gray-400 dark:text-gray-500">
           Complete quizzes and challenges to earn your first achievement!
         </p>
       </div>
@@ -67,7 +67,7 @@ export default function ProfileAchievements({
         {achievements.map((achievement) => (
           <div
             key={achievement.id}
-            className="bg-white dark:bg-gray-800 p-4 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+            className="bg-gray-800 dark:bg-white p-4 border border-gray-700 dark:border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow"
           >
             <div className="flex items-center">
               <div className="flex-shrink-0 h-12 w-12">
@@ -86,10 +86,10 @@ export default function ProfileAchievements({
                 )}
               </div>{' '}
               <div className="ml-4">
-                <h3 className="font-medium text-gray-900 dark:text-white">
+                <h3 className="font-medium text-white dark:text-gray-900">
                   {achievement.title}
                 </h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+                <p className="text-sm text-gray-400 dark:text-gray-500">
                   {achievement.description}
                 </p>
                 {/* Show progress bar if applicable */}
@@ -97,11 +97,11 @@ export default function ProfileAchievements({
                   achievement.max_progress !== undefined && (
                     <div className="mt-1">
                       <div className="flex justify-between items-center mb-1">
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                        <span className="text-xs text-gray-400 dark:text-gray-500">
                           {achievement.progress}/{achievement.max_progress}
                         </span>
                       </div>
-                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
+                      <div className="w-full bg-gray-700 dark:bg-gray-200 rounded-full h-1.5">
                         <div
                           className="bg-blue-600 dark:bg-blue-500 h-1.5 rounded-full"
                           style={{

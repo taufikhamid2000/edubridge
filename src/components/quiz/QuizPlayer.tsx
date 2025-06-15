@@ -216,7 +216,7 @@ export default function QuizPlayer({
   };
   if (!quizStarted) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+      <div className="bg-gray-800 dark:bg-white rounded-lg shadow-md p-6">
         <h2 className="text-2xl font-bold mb-4">Quiz: {quizName}</h2>
 
         {/* Unverified quiz warning */}
@@ -312,10 +312,10 @@ export default function QuizPlayer({
   // Don't render if shuffledQuestions is not ready
   if (shuffledQuestions.length === 0) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+      <div className="bg-gray-800 dark:bg-white rounded-lg shadow-md p-6">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-t-blue-500 border-r-transparent border-b-blue-500 border-l-transparent"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">
+          <p className="mt-4 text-gray-400 dark:text-gray-600">
             Preparing quiz questions...
           </p>
         </div>
@@ -326,7 +326,7 @@ export default function QuizPlayer({
   const currentQuestion = shuffledQuestions[currentQuestionIndex];
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+    <div className="bg-gray-800 dark:bg-white rounded-lg shadow-md p-6">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-bold">{quizName}</h2>
         {timeLimit && (

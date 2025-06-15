@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { initializeTheme, setTheme as setGlobalTheme } from '@/lib/theme';
 
 export function useTheme() {
-  const [theme, setThemeState] = useState<'light' | 'dark'>('dark');
+  const [theme, setThemeState] = useState<'light' | 'dark'>('light');
 
   useEffect(() => {
     // Initialize theme on component mount

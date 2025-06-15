@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JavaScript Callbacks Practice</title>
+  </head>
+  <body>
+    <h1>JavaScript Callbacks Practice</h1>
+    <div id="output"></div>
+    <script>
+      // Helper function (assumed to exist)
+      function A(B) {
+        const C = document.getElementById('output');
+        const D = document.createElement('p');
+        D.textContent = B;
+        C.appendChild(D);
+      }
+
+      // MINUTES 0-15: PROMISE FUNDAMENTALS
+      // Creating a simple Promise
+      function janjiMudah() {
+        return new Promise((kalauSelesai, kalauDitolak) => {
+          setTimeout(() => {
+            const berjaya = true; // Change to false to see rejection
+            if (berjaya) {
+              kalauSelesai('Promise resolved successfully');
+            } else {
+              kalauDitolak(new Error('Promise was rejected'));
+            }
+          }, 1000);
+        });
+      }
+
+      // Using the Promise
+      displayOutput('Testing simple Promise...');
+      janjiMudah()
+        .then((keputusan) => displayOutput(keputusan))
+        .catch((ralat) => displayOutput(`Error: ${ralat.message}`));
+
+      // Converting callbacks to Promises
+      function readFilePromise(filename) {
+        return new Promise((kalauSelesai, kalauDitolak) => {
+          // Reusing our callback-based readFile function
+          readFile(filename, (sebuahVariableUntukError, data) => {
+            if (sebuahVariableUntukError) {
+              kalauDitolak(sebuahVariableUntukError);
+            } else {
+              kalauSelesai(data);
+            }
+          });
+        });
+      }
+
+      // Using Promise-based file reader
+      displayOutput('Testing Promise-based file reader...');
+      readFilePromise('config.txt')
+        .then((data) => displayOutput(`Promise keputusan: ${data}`))
+        .catch((sebuahVariableUntukError) => displayOutput(`Promise ralat: ${sebuahVariableUntukError.message}`));
+
+      readFilePromise('nonexistent.txt')
+        .then((data) => displayOutput(`Promise keputusan: ${data}`))
+        .catch((sebuahVariableUntukError) => displayOutput(`Promise ralat: ${sebuahVariableUntukError.message}`));
+    </script>
+  </body>
+</html>

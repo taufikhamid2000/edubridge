@@ -183,7 +183,7 @@ export default function QuizAuditPage() {
   ).length;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-900 dark:bg-gray-50">
       <div className="flex">
         <AdminNavigation />
         <div className="flex-1 p-8">
@@ -195,7 +195,7 @@ export default function QuizAuditPage() {
               >
                 ← Back to Quizzes
               </Link>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              <h1 className="text-3xl font-bold text-white dark:text-gray-900">
                 Quiz Audit & Review
               </h1>
             </div>
@@ -222,7 +222,7 @@ export default function QuizAuditPage() {
           )}
 
           {loading ? (
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden p-6">
+            <div className="bg-gray-800 dark:bg-white rounded-lg shadow overflow-hidden p-6">
               <div className="flex justify-center">
                 <div className="w-8 h-8 border-t-2 border-b-2 border-blue-500 rounded-full animate-spin"></div>
               </div>
@@ -230,9 +230,9 @@ export default function QuizAuditPage() {
           ) : quiz ? (
             <div className="space-y-6">
               {/* Quiz Information */}
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
-                <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+              <div className="bg-gray-800 dark:bg-white rounded-lg shadow overflow-hidden">
+                <div className="px-6 py-4 border-b border-gray-700 dark:border-gray-200 flex justify-between items-center">
+                  <h2 className="text-xl font-semibold text-white dark:text-gray-900">
                     Quiz Information
                   </h2>
                   <div className="flex items-center space-x-4">
@@ -255,31 +255,31 @@ export default function QuizAuditPage() {
                 <div className="p-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      <label className="block text-sm font-medium text-gray-300 dark:text-gray-700 mb-1">
                         Title
                       </label>
-                      <p className="text-gray-900 dark:text-white font-medium">
+                      <p className="text-white dark:text-gray-900 font-medium">
                         {quiz.title}
                       </p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      <label className="block text-sm font-medium text-gray-300 dark:text-gray-700 mb-1">
                         Subject
                       </label>
-                      <p className="text-gray-900 dark:text-white">
+                      <p className="text-white dark:text-gray-900">
                         {quiz.subject?.name}
                       </p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      <label className="block text-sm font-medium text-gray-300 dark:text-gray-700 mb-1">
                         Topic
                       </label>
-                      <p className="text-gray-900 dark:text-white">
+                      <p className="text-white dark:text-gray-900">
                         {quiz.topic?.name}
                       </p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      <label className="block text-sm font-medium text-gray-300 dark:text-gray-700 mb-1">
                         Difficulty
                       </label>
                       <span
@@ -295,28 +295,28 @@ export default function QuizAuditPage() {
                       </span>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      <label className="block text-sm font-medium text-gray-300 dark:text-gray-700 mb-1">
                         Time Limit
                       </label>
-                      <p className="text-gray-900 dark:text-white">
+                      <p className="text-white dark:text-gray-900">
                         {Math.floor(quiz.time_limit / 60)} minutes
                       </p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      <label className="block text-sm font-medium text-gray-300 dark:text-gray-700 mb-1">
                         Passing Score
                       </label>
-                      <p className="text-gray-900 dark:text-white">
+                      <p className="text-white dark:text-gray-900">
                         {quiz.passing_score}%
                       </p>
                     </div>
                   </div>
                   {quiz.description && (
                     <div className="mt-6">
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      <label className="block text-sm font-medium text-gray-300 dark:text-gray-700 mb-1">
                         Description
                       </label>
-                      <p className="text-gray-900 dark:text-white">
+                      <p className="text-white dark:text-gray-900">
                         {quiz.description}
                       </p>
                     </div>
@@ -325,9 +325,9 @@ export default function QuizAuditPage() {
               </div>
 
               {/* Verification Actions */}
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
-                <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+              <div className="bg-gray-800 dark:bg-white rounded-lg shadow overflow-hidden">
+                <div className="px-6 py-4 border-b border-gray-700 dark:border-gray-200">
+                  <h2 className="text-xl font-semibold text-white dark:text-gray-900">
                     Verification Actions
                   </h2>
                 </div>
@@ -359,9 +359,9 @@ export default function QuizAuditPage() {
               </div>
 
               {/* Add Comment */}
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
-                <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+              <div className="bg-gray-800 dark:bg-white rounded-lg shadow overflow-hidden">
+                <div className="px-6 py-4 border-b border-gray-700 dark:border-gray-200">
+                  <h2 className="text-xl font-semibold text-white dark:text-gray-900">
                     Add Audit Comment
                   </h2>
                 </div>
@@ -369,7 +369,7 @@ export default function QuizAuditPage() {
                   <div>
                     <label
                       htmlFor="comment-type"
-                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                      className="block text-sm font-medium text-gray-300 dark:text-gray-700 mb-2"
                     >
                       Comment Type
                     </label>
@@ -385,7 +385,7 @@ export default function QuizAuditPage() {
                             | 'rejected'
                         )
                       }
-                      className="block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      className="block w-full border border-gray-600 dark:border-gray-300 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-white dark:text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     >
                       <option value="suggestion">Suggestion</option>
                       <option value="issue">Issue</option>
@@ -396,7 +396,7 @@ export default function QuizAuditPage() {
                   <div>
                     <label
                       htmlFor="comment-text"
-                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                      className="block text-sm font-medium text-gray-300 dark:text-gray-700 mb-2"
                     >
                       Comment
                     </label>
@@ -405,7 +405,7 @@ export default function QuizAuditPage() {
                       value={newComment}
                       onChange={(e) => setNewComment(e.target.value)}
                       rows={4}
-                      className="block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      className="block w-full border border-gray-600 dark:border-gray-300 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-white dark:text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                       placeholder="Enter your feedback or comments..."
                       required
                     />
@@ -423,15 +423,15 @@ export default function QuizAuditPage() {
               </div>
 
               {/* Audit Comments */}
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
-                <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+              <div className="bg-gray-800 dark:bg-white rounded-lg shadow overflow-hidden">
+                <div className="px-6 py-4 border-b border-gray-700 dark:border-gray-200">
+                  <h2 className="text-xl font-semibold text-white dark:text-gray-900">
                     Audit Comments ({auditComments.length})
                   </h2>
                 </div>
                 <div className="p-6">
                   {auditComments.length === 0 ? (
-                    <p className="text-gray-500 dark:text-gray-400 text-center py-8">
+                    <p className="text-gray-400 dark:text-gray-500 text-center py-8">
                       No audit comments yet. Add the first comment above.
                     </p>
                   ) : (
@@ -454,14 +454,14 @@ export default function QuizAuditPage() {
                                 </span>
                               )}
                             </div>
-                            <span className="text-sm text-gray-500 dark:text-gray-400">
+                            <span className="text-sm text-gray-400 dark:text-gray-500">
                               {formatDate(comment.created_at)}
                             </span>
                           </div>
-                          <p className="text-gray-900 dark:text-white mb-2">
+                          <p className="text-white dark:text-gray-900 mb-2">
                             {comment.comment_text}
                           </p>{' '}
-                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                          <p className="text-sm text-gray-400 dark:text-gray-500">
                             By:{' '}
                             {comment.admin_user?.user_metadata?.full_name ||
                               comment.admin_user?.email ||
@@ -476,9 +476,9 @@ export default function QuizAuditPage() {
 
               {/* Verification Log */}
               {verificationLog.length > 0 && (
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
-                  <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                <div className="bg-gray-800 dark:bg-white rounded-lg shadow overflow-hidden">
+                  <div className="px-6 py-4 border-b border-gray-700 dark:border-gray-200">
+                    <h2 className="text-xl font-semibold text-white dark:text-gray-900">
                       Verification History
                     </h2>
                   </div>
@@ -507,7 +507,7 @@ export default function QuizAuditPage() {
                               </span>
                             )}
                           </div>
-                          <span className="text-sm text-gray-500 dark:text-gray-400">
+                          <span className="text-sm text-gray-400 dark:text-gray-500">
                             {formatDate(log.created_at)}
                           </span>
                         </div>
@@ -518,8 +518,8 @@ export default function QuizAuditPage() {
               )}
             </div>
           ) : (
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden p-6">
-              <p className="text-center text-gray-500 dark:text-gray-400">
+            <div className="bg-gray-800 dark:bg-white rounded-lg shadow overflow-hidden p-6">
+              <p className="text-center text-gray-400 dark:text-gray-500">
                 Quiz not found.
               </p>
             </div>
@@ -530,16 +530,16 @@ export default function QuizAuditPage() {
       {/* Verification Modal */}
       {showVerificationModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg max-w-md w-full">
-            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+          <div className="bg-gray-800 dark:bg-white rounded-lg shadow-lg max-w-md w-full">
+            <div className="px-6 py-4 border-b border-gray-700 dark:border-gray-200">
+              <h3 className="text-lg font-semibold text-white dark:text-gray-900">
                 {verificationAction === 'verify'
                   ? 'Verify Quiz'
                   : 'Unverify Quiz'}
               </h3>
             </div>
             <div className="p-6">
-              <p className="text-gray-700 dark:text-gray-300 mb-4">
+              <p className="text-gray-300 dark:text-gray-700 mb-4">
                 {verificationAction === 'verify'
                   ? 'Are you sure you want to verify this quiz? This will make it available to students.'
                   : 'Are you sure you want to unverify this quiz? This will make it unavailable to students.'}
@@ -547,7 +547,7 @@ export default function QuizAuditPage() {
               <div className="mb-4">
                 <label
                   htmlFor="verification-reason"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                  className="block text-sm font-medium text-gray-300 dark:text-gray-700 mb-2"
                 >
                   Reason (optional)
                 </label>
@@ -556,14 +556,14 @@ export default function QuizAuditPage() {
                   value={verificationReason}
                   onChange={(e) => setVerificationReason(e.target.value)}
                   rows={3}
-                  className="block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="block w-full border border-gray-600 dark:border-gray-300 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-white dark:text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Enter reason for verification change..."
                 />
               </div>
               <div className="flex justify-end space-x-3">
                 <button
                   onClick={() => setShowVerificationModal(false)}
-                  className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  className="px-4 py-2 border border-gray-600 dark:border-gray-300 rounded-md text-gray-300 dark:text-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                 >
                   Cancel
                 </button>

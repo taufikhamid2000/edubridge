@@ -211,7 +211,7 @@ export default function ProfileSettings({ user }: ProfileSettingsProps) {
           <div>
             <label
               htmlFor="displayName"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              className="block text-sm font-medium text-gray-300 dark:text-gray-700 mb-1"
             >
               Display Name
             </label>
@@ -229,7 +229,7 @@ export default function ProfileSettings({ user }: ProfileSettingsProps) {
           <div className="space-y-4">
             <label
               htmlFor="school"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              className="block text-sm font-medium text-gray-300 dark:text-gray-700"
             >
               School
             </label>
@@ -310,11 +310,11 @@ export default function ProfileSettings({ user }: ProfileSettingsProps) {
                 ))}
               </select>{' '}
               {isLoadingSchools ? (
-                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                <p className="mt-1 text-sm text-gray-400 dark:text-gray-500">
                   Loading schools...
                 </p>
               ) : (
-                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                <p className="mt-1 text-sm text-gray-400 dark:text-gray-500">
                   {filteredSchools.length} schools found
                 </p>
               )}
@@ -329,7 +329,7 @@ export default function ProfileSettings({ user }: ProfileSettingsProps) {
                 />
                 <label
                   htmlFor="schoolVisibility"
-                  className="ml-2 block text-sm text-gray-600 dark:text-gray-400"
+                  className="ml-2 block text-sm text-gray-400 dark:text-gray-600"
                 >
                   Show my school on my public profile{' '}
                   <span className="text-xs text-gray-500">
@@ -341,7 +341,7 @@ export default function ProfileSettings({ user }: ProfileSettingsProps) {
           </div>
           {/* Avatar Upload */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-gray-300 dark:text-gray-700 mb-1">
               Profile Picture
             </label>
             <div className="flex items-center space-x-6 mb-4">
@@ -376,7 +376,7 @@ export default function ProfileSettings({ user }: ProfileSettingsProps) {
                 />
               </div>
             </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
+            <p className="text-xs text-gray-400 dark:text-gray-500">
               Recommended: Square image, max 5MB (JPG, PNG, GIF)
             </p>
           </div>
@@ -394,7 +394,7 @@ export default function ProfileSettings({ user }: ProfileSettingsProps) {
       </form>
 
       {/* Divider */}
-      <div className="my-8 border-t border-gray-200 dark:border-gray-700"></div>
+      <div className="my-8 border-t border-gray-700 dark:border-gray-200"></div>
 
       {/* Account Actions */}
       <div>

@@ -25,7 +25,7 @@ export default function SearchBar({
       {searchTerm && (
         <button
           onClick={() => setSearchTerm('')}
-          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400"
+          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500"
           aria-label="Clear search"
         >
           <svg

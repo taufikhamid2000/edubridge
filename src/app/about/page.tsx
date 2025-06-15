@@ -36,29 +36,29 @@ export default function AboutPage() {
       <div className="container mx-auto px-4 py-12 max-w-4xl">
         <h1 className="text-4xl font-bold mb-8 text-center">About EduBridge</h1>
 
-        <section className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 mb-8">
+        <section className="bg-gray-800 dark:bg-white rounded-xl shadow-lg p-8 mb-8">
           <h2 className="text-2xl font-semibold mb-4">Our Mission</h2>
-          <p className="mb-4 text-gray-700 dark:text-gray-300">
+          <p className="mb-4 text-gray-300 dark:text-gray-700">
             EduBridge is a lightweight, gamified microlearning platform built to
             help Malaysian Form 4 and Form 5 students strengthen their academic
             skills through daily engagement. By offering fast, rewarding quiz
             experiences, EduBridge motivates students to build consistent study
             habits, earn recognition, and achieve measurable academic growth.
           </p>
-          <p className="text-gray-700 dark:text-gray-300">
+          <p className="text-gray-300 dark:text-gray-700">
             The platform operates independently, without claiming alignment with
             any official examination board or curriculum.
           </p>
         </section>
 
-        <section className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 mb-8">
+        <section className="bg-gray-800 dark:bg-white rounded-xl shadow-lg p-8 mb-8">
           <h2 className="text-2xl font-semibold mb-4">Our Approach</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <h3 className="text-xl font-medium mb-2 text-blue-600 dark:text-blue-400">
                 Learning Method
               </h3>
-              <ul className="list-disc pl-5 space-y-2 text-gray-700 dark:text-gray-300">
+              <ul className="list-disc pl-5 space-y-2 text-gray-300 dark:text-gray-700">
                 <li>
                   Daily bite-sized quizzes covering key secondary school topics
                 </li>
@@ -71,7 +71,7 @@ export default function AboutPage() {
               <h3 className="text-xl font-medium mb-2 text-blue-600 dark:text-blue-400">
                 Platform Principles
               </h3>
-              <ul className="list-disc pl-5 space-y-2 text-gray-700 dark:text-gray-300">
+              <ul className="list-disc pl-5 space-y-2 text-gray-300 dark:text-gray-700">
                 <li>Mobile-first design</li>
                 <li>Low-bandwidth usage</li>
                 <li>Gamification at the core</li>
@@ -81,9 +81,9 @@ export default function AboutPage() {
           </div>
         </section>
 
-        <section className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 mb-8">
+        <section className="bg-gray-800 dark:bg-white rounded-xl shadow-lg p-8 mb-8">
           <h2 className="text-2xl font-semibold mb-4">Learn More</h2>
-          <p className="mb-4 text-gray-700 dark:text-gray-300">
+          <p className="mb-4 text-gray-300 dark:text-gray-700">
             Want to dive deeper into the EduBridge concept and vision? Read our
             detailed research document:
           </p>

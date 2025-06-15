@@ -10,7 +10,7 @@ export default function ContentPlaceholder() {
       </p>
       <div className="flex justify-center mt-4">
         <button
-          className="inline-flex items-center px-4 py-2 bg-white hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 text-green-600 dark:text-green-400 border border-green-300 dark:border-green-800 rounded transition-colors"
+          className="inline-flex items-center px-4 py-2 bg-white hover:bg-gray-800 dark:bg-gray-100 dark:hover:bg-gray-700 text-green-600 dark:text-green-400 border border-green-300 dark:border-green-800 rounded transition-colors"
           onClick={() => {
             if (quizPrompt) {
               const chatGPTUrl = `https://chat.openai.com/?prompt=${encodeURIComponent(quizPrompt)}`;

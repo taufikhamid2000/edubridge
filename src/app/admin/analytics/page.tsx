@@ -57,7 +57,7 @@ export default function AdminAnalyticsPage() {
     }
   }
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-900 dark:bg-gray-50">
       <div className="flex">
         <AdminNavigation />
         <div className="flex-1 p-8">
@@ -112,20 +112,20 @@ export default function AdminAnalyticsPage() {
               {[...Array(4)].map((_, i) => (
                 <div
                   key={i}
-                  className="bg-white dark:bg-gray-800 rounded-lg shadow p-6"
+                  className="bg-gray-800 dark:bg-white rounded-lg shadow p-6"
                 >
                   <div className="animate-pulse">
-                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-2"></div>
-                    <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-2"></div>
-                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
+                    <div className="h-4 bg-gray-700 dark:bg-gray-200 rounded w-1/2 mb-2"></div>
+                    <div className="h-8 bg-gray-700 dark:bg-gray-200 rounded w-1/3 mb-2"></div>
+                    <div className="h-4 bg-gray-700 dark:bg-gray-200 rounded w-1/4"></div>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-                <h3 className="text-gray-500 dark:text-gray-400 text-sm">
+              <div className="bg-gray-800 dark:bg-white rounded-lg shadow p-6">
+                <h3 className="text-gray-400 dark:text-gray-500 text-sm">
                   Daily Active Users
                 </h3>
                 <p className="text-3xl font-bold dark:text-white">
@@ -135,8 +135,8 @@ export default function AdminAnalyticsPage() {
                   +5.3% from last {timeFrame}
                 </p>
               </div>
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-                <h3 className="text-gray-500 dark:text-gray-400 text-sm">
+              <div className="bg-gray-800 dark:bg-white rounded-lg shadow p-6">
+                <h3 className="text-gray-400 dark:text-gray-500 text-sm">
                   Quiz Attempts
                 </h3>
                 <p className="text-3xl font-bold dark:text-white">
@@ -146,8 +146,8 @@ export default function AdminAnalyticsPage() {
                   +2.7% from last {timeFrame}
                 </p>
               </div>{' '}
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-                <h3 className="text-gray-500 dark:text-gray-400 text-sm">
+              <div className="bg-gray-800 dark:bg-white rounded-lg shadow p-6">
+                <h3 className="text-gray-400 dark:text-gray-500 text-sm">
                   Average Score
                 </h3>
                 <p className="text-3xl font-bold dark:text-white">
@@ -157,8 +157,8 @@ export default function AdminAnalyticsPage() {
                   +1.2% from last {timeFrame}
                 </p>
               </div>{' '}
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-                <h3 className="text-gray-500 dark:text-gray-400 text-sm">
+              <div className="bg-gray-800 dark:bg-white rounded-lg shadow p-6">
+                <h3 className="text-gray-400 dark:text-gray-500 text-sm">
                   Completion Rate
                 </h3>
                 <p className="text-3xl font-bold dark:text-white">
@@ -170,23 +170,23 @@ export default function AdminAnalyticsPage() {
               </div>
             </div>
           )}{' '}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-8">
+          <div className="bg-gray-800 dark:bg-white rounded-lg shadow p-6 mb-8">
             <h2 className="text-xl font-medium mb-4 dark:text-white">
               User Activity
             </h2>
-            <p className="text-gray-500 dark:text-gray-400 mb-6">
+            <p className="text-gray-400 dark:text-gray-500 mb-6">
               User activity chart will be displayed here. This requires a
               charting library like Chart.js or Recharts.
             </p>
             {/* Placeholder for a chart */}
             <div className="h-64 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center">
-              <p className="text-gray-500 dark:text-gray-400">
+              <p className="text-gray-400 dark:text-gray-500">
                 Activity Chart Placeholder
               </p>
             </div>
           </div>{' '}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <div className="bg-gray-800 dark:bg-white rounded-lg shadow p-6">
               <h2 className="text-xl font-medium mb-4 dark:text-white">
                 Most Active Subjects
               </h2>{' '}
@@ -199,7 +199,7 @@ export default function AdminAnalyticsPage() {
                         {subject.percentage}%
                       </span>
                     </div>
-                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                    <div className="w-full bg-gray-700 dark:bg-gray-200 rounded-full h-2.5">
                       <div
                         className="bg-blue-600 h-2.5 rounded-full"
                         style={{ width: `${subject.percentage}%` }}
@@ -209,12 +209,12 @@ export default function AdminAnalyticsPage() {
                 ))}
               </div>
             </div>{' '}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <div className="bg-gray-800 dark:bg-white rounded-lg shadow p-6">
               <h2 className="text-xl font-medium mb-4 dark:text-white">
                 User Demographics
               </h2>
               <div className="h-64 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center">
-                <p className="text-gray-500 dark:text-gray-400">
+                <p className="text-gray-400 dark:text-gray-500">
                   Demographics Chart Placeholder
                 </p>
               </div>

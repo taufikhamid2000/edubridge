@@ -48,10 +48,10 @@ export default function FilterSortControls({
   return (
     <>
       {/* Desktop view */}
-      <div className="hidden md:flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm mb-4">
+      <div className="hidden md:flex items-center justify-between p-4 bg-gray-800 dark:bg-white rounded-lg shadow-sm mb-4">
         <div className="flex items-center space-x-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-gray-300 dark:text-gray-700 mb-1">
               Filter
             </label>
             <div className="flex space-x-2">
@@ -74,7 +74,7 @@ export default function FilterSortControls({
 
         <div className="flex items-center space-x-3">
           <div className="relative">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-gray-300 dark:text-gray-700 mb-1">
               Sort by
             </label>
             <select
@@ -91,7 +91,7 @@ export default function FilterSortControls({
             <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none mt-6">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4 text-gray-500 dark:text-gray-400"
+                className="h-4 w-4 text-gray-400 dark:text-gray-500"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -107,7 +107,7 @@ export default function FilterSortControls({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-gray-300 dark:text-gray-700 mb-1">
               Direction
             </label>
             <button
@@ -159,7 +159,7 @@ export default function FilterSortControls({
 
           {onItemsPerPageChange && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-300 dark:text-gray-700 mb-1">
                 Per Page
               </label>
               <select
@@ -217,7 +217,7 @@ export default function FilterSortControls({
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4 text-gray-500 dark:text-gray-400"
+                className="h-4 w-4 text-gray-400 dark:text-gray-500"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -276,7 +276,7 @@ export default function FilterSortControls({
         {/* Mobile filter dropdown */}
         {isFilterMenuOpen && (
           <div className="mt-2 p-4 bg-white border border-gray-200 rounded-lg shadow-lg dark:bg-gray-800 dark:border-gray-700">
-            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <h3 className="text-sm font-medium text-gray-300 dark:text-gray-700 mb-2">
               Filter
             </h3>
             <div className="grid grid-cols-2 gap-2">

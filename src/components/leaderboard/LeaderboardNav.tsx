@@ -11,7 +11,7 @@ export default function LeaderboardNav({
 }: LeaderboardNavProps) {
   return (
     <div className="mb-8">
-      <div className="border-b border-gray-200 dark:border-gray-700">
+      <div className="border-b border-gray-700 dark:border-gray-200">
         <nav
           className="-mb-px flex space-x-8"
           aria-label="Leaderboard navigation"

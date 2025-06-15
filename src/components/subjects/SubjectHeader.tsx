@@ -22,13 +22,13 @@ export default function SubjectHeader({
         <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
           {subject.name}
           {isStatic && (
-            <span className="ml-2 text-sm text-gray-500 dark:text-gray-400">
+            <span className="ml-2 text-sm text-gray-400 dark:text-gray-500">
               (Static Version)
             </span>
           )}
         </h1>
       </div>
-      <p className="text-gray-600 dark:text-gray-400">{subject.description}</p>
+      <p className="text-gray-400 dark:text-gray-600">{subject.description}</p>
     </div>
   );
 }

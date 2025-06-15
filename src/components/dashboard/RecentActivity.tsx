@@ -62,7 +62,7 @@ const RecentActivity = ({
 
   if (isLoading) {
     return (
-      <section className="bg-white shadow-md rounded-lg p-6 dark:bg-gray-800">
+      <section className="bg-gray-800 dark:bg-white shadow-md rounded-lg p-6 text-gray-200 dark:text-gray-800">
         <h2 className="text-2xl font-semibold mb-4">Recent Activity</h2>
         <div className="animate-pulse">
           {[...Array(3)].map((_, i) => (
@@ -82,7 +82,7 @@ const RecentActivity = ({
 
   if (error) {
     return (
-      <section className="bg-white shadow-md rounded-lg p-6 dark:bg-gray-800">
+      <section className="bg-gray-800 dark:bg-white shadow-md rounded-lg p-6 text-gray-200 dark:text-gray-800">
         <h2 className="text-2xl font-semibold mb-4">Recent Activity</h2>
         <div className="text-red-500 p-4 bg-red-100 rounded-lg dark:bg-red-900 dark:text-red-200">
           Error loading recent activity: {error}
@@ -92,7 +92,7 @@ const RecentActivity = ({
   }
 
   return (
-    <section className="bg-white shadow-md rounded-lg p-6 dark:bg-gray-800">
+    <section className="bg-gray-800 dark:bg-white shadow-md rounded-lg p-6 text-gray-200 dark:text-gray-800">
       <h2 className="text-2xl font-semibold mb-4">Recent Activity</h2>
 
       {recentActivity.length === 0 ? (
@@ -122,11 +122,11 @@ const RecentActivity = ({
                       {attempt.quizTitle}
                     </Link>
                   </h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-sm text-gray-400 dark:text-gray-500">
                     {attempt.subject} &gt; {attempt.topic}
                   </p>
                 </div>
-                <div className="text-xs text-gray-500 dark:text-gray-400">
+                <div className="text-xs text-gray-400 dark:text-gray-500">
                   {formatDate(attempt.attemptedAt)}
                 </div>
               </div>

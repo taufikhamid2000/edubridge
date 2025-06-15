@@ -37,14 +37,14 @@ export default function AwardAchievementModal({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6">
-        <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
+      <div className="bg-gray-800 dark:bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+        <h3 className="text-xl font-bold mb-4 text-white dark:text-gray-900">
           Award Achievement
         </h3>
 
         <div className="mb-4">
           <label
-            className="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+            className="block text-gray-300 dark:text-gray-700 text-sm font-bold mb-2"
             htmlFor="title"
           >
             Achievement Title*
@@ -56,14 +56,14 @@ export default function AwardAchievementModal({
             onChange={(e) =>
               setFormData({ ...formData, title: e.target.value })
             }
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            className="w-full px-3 py-2 border border-gray-600 dark:border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-white dark:text-gray-900"
             required
           />
         </div>
 
         <div className="mb-4">
           <label
-            className="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+            className="block text-gray-300 dark:text-gray-700 text-sm font-bold mb-2"
             htmlFor="description"
           >
             Description
@@ -74,14 +74,14 @@ export default function AwardAchievementModal({
             onChange={(e) =>
               setFormData({ ...formData, description: e.target.value })
             }
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            className="w-full px-3 py-2 border border-gray-600 dark:border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-white dark:text-gray-900"
             rows={3}
           />
         </div>
 
         <div className="mb-6">
           <label
-            className="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+            className="block text-gray-300 dark:text-gray-700 text-sm font-bold mb-2"
             htmlFor="earnedAt"
           >
             Date Earned
@@ -93,14 +93,14 @@ export default function AwardAchievementModal({
             onChange={(e) =>
               setFormData({ ...formData, earned_at: e.target.value })
             }
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            className="w-full px-3 py-2 border border-gray-600 dark:border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-white dark:text-gray-900"
           />
         </div>
 
         <div className="flex justify-end space-x-2">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded hover:bg-gray-400 dark:hover:bg-gray-500"
+            className="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-200 dark:text-gray-800 rounded hover:bg-gray-400 dark:hover:bg-gray-500"
           >
             Cancel
           </button>

@@ -98,10 +98,10 @@ export default function StaticDashboardPage() {
 
   return (
     <main className="container mx-auto py-6 px-4 sm:px-6 md:px-8">
-      <div className="sticky top-0 z-10 bg-white dark:bg-gray-900 py-2 px-4 -mx-4 sm:-mx-6 md:-mx-8 mb-4">
+      <div className="sticky top-0 z-10 bg-gray-900 dark:bg-white py-2 px-4 -mx-4 sm:-mx-6 md:-mx-8 mb-4">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-gray-400 dark:text-gray-600">
               ⚡ Static version for offline access
             </p>
             <button
@@ -136,7 +136,7 @@ export default function StaticDashboardPage() {
 
           {/* Subjects Grid with Results Count */}
           <div className="mb-4">
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-gray-400 dark:text-gray-500">
               Showing {staticSubjects.length} subjects
             </p>
           </div>

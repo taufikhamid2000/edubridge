@@ -109,7 +109,7 @@ export default function StaticQuizPage({ params }: StaticQuizPageProps) {
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">
             Subject Not Found
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
+          <p className="text-gray-400 dark:text-gray-600 mb-6">
             The subject you are looking for does not exist in the static
             version.
           </p>
@@ -130,7 +130,7 @@ export default function StaticQuizPage({ params }: StaticQuizPageProps) {
       <div className="mb-8">
         <button
           onClick={() => router.push('/static/dashboard')}
-          className="mb-4 flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+          className="mb-4 flex items-center text-gray-400 dark:text-gray-600 hover:text-gray-900 dark:hover:text-gray-200"
         >
           <ArrowLeftIcon className="h-5 w-5 mr-2" />
           Back to Dashboard
@@ -142,7 +142,7 @@ export default function StaticQuizPage({ params }: StaticQuizPageProps) {
             {subject.name}
           </h1>
         </div>
-        <p className="text-gray-600 dark:text-gray-400">
+        <p className="text-gray-400 dark:text-gray-600">
           {subject.description}
         </p>
       </div>
@@ -152,23 +152,23 @@ export default function StaticQuizPage({ params }: StaticQuizPageProps) {
         {STATIC_CHAPTERS.map((chapter) => (
           <div
             key={chapter.id}
-            className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6 hover:shadow-lg transition-shadow"
+            className="bg-gray-800 dark:bg-white rounded-lg shadow-md border border-gray-700 dark:border-gray-200 p-6 hover:shadow-lg transition-shadow"
           >
             <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
               {chapter.title}
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
+            <p className="text-gray-400 dark:text-gray-600 mb-4">
               {chapter.description}
             </p>
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-gray-500 dark:text-gray-400">
+              <span className="text-sm text-gray-400 dark:text-gray-500">
                 {chapter.quizCount} quizzes
               </span>
-              <span className="text-sm text-gray-500 dark:text-gray-400">
+              <span className="text-sm text-gray-400 dark:text-gray-500">
                 {chapter.progress}% complete
               </span>
             </div>
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+            <div className="w-full bg-gray-700 dark:bg-gray-200 rounded-full h-2">
               <div
                 className="bg-blue-600 h-2 rounded-full"
                 style={{ width: `${chapter.progress}%` }}
@@ -179,7 +179,7 @@ export default function StaticQuizPage({ params }: StaticQuizPageProps) {
       </div>
 
       {/* Demo Notice */}
-      <div className="mt-8 text-center text-sm text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4">
+      <div className="mt-8 text-center text-sm text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4">
         This is a static preview page. The same content is shown for all
         subjects in the demo version.
       </div>

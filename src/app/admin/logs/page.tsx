@@ -74,13 +74,13 @@ export default function AdminLogsPage() {
       case 'info':
         return 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200';
       case 'debug':
-        return 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200';
+        return 'bg-gray-800 dark:bg-gray-100 text-gray-200 dark:text-gray-800';
       default:
-        return 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200';
+        return 'bg-gray-800 dark:bg-gray-100 text-gray-200 dark:text-gray-800';
     }
   }
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-900 dark:bg-gray-50">
       <div className="flex">
         <AdminNavigation />
         <div className="flex-1 p-8">
@@ -100,7 +100,7 @@ export default function AdminLogsPage() {
                       | 'debug'
                   )
                 }
-                className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-100 sm:text-sm"
+                className="bg-white dark:bg-gray-700 border border-gray-600 dark:border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-100 sm:text-sm"
               >
                 <option value="all">All Levels</option>
                 <option value="error">Errors</option>
@@ -111,7 +111,7 @@ export default function AdminLogsPage() {
               <select
                 value={days}
                 onChange={(e) => setDays(Number(e.target.value))}
-                className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-100 sm:text-sm"
+                className="bg-white dark:bg-gray-700 border border-gray-600 dark:border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-100 sm:text-sm"
               >
                 <option value={1}>Last 24 hours</option>
                 <option value={7}>Last 7 days</option>
@@ -121,7 +121,7 @@ export default function AdminLogsPage() {
               <select
                 value={source}
                 onChange={(e) => setSource(e.target.value)}
-                className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-100 sm:text-sm"
+                className="bg-white dark:bg-gray-700 border border-gray-600 dark:border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-100 sm:text-sm"
               >
                 <option value="all">All Sources</option>
                 <option value="server">Server</option>
@@ -138,12 +138,12 @@ export default function AdminLogsPage() {
               </button>
             </div>
           </div>{' '}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
-            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+          <div className="bg-gray-800 dark:bg-white rounded-lg shadow">
+            <div className="p-6 border-b border-gray-700 dark:border-gray-200">
               <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
                 System Log Entries
               </h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
                 Showing {logs.length} logs from the past {days} days
                 {logLevel !== 'all' && ` with level "${logLevel}"`}
                 {source !== 'all' && ` from "${source}"`}
@@ -155,12 +155,12 @@ export default function AdminLogsPage() {
                 <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 dark:border-blue-400"></div>
               </div>
             ) : logs.length === 0 ? (
-              <div className="p-8 text-center text-gray-500 dark:text-gray-400">
+              <div className="p-8 text-center text-gray-400 dark:text-gray-500">
                 No log entries found matching your criteria.
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <table className="min-w-full divide-y divide-gray-700 dark:divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">

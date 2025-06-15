@@ -58,7 +58,7 @@ export default function QuizResults({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+    <div className="bg-gray-800 dark:bg-white rounded-lg shadow-md p-6">
       <div className="text-center mb-8">
         <h2 className="text-2xl font-bold mb-4">Quiz Completed!</h2>
         <div className="relative w-48 h-48 mx-auto mb-4">
@@ -93,7 +93,7 @@ export default function QuizResults({
               <span className={`text-4xl font-bold ${getStatusClass(score)}`}>
                 {score}%
               </span>
-              <span className="block text-sm text-gray-500 dark:text-gray-400">
+              <span className="block text-sm text-gray-400 dark:text-gray-500">
                 Score
               </span>
             </div>
@@ -102,7 +102,7 @@ export default function QuizResults({
         <p className={`text-xl font-medium ${getStatusClass(score)} mb-2`}>
           {getStatusText(score)}
         </p>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
+        <p className="text-sm text-gray-400 dark:text-gray-600">
           You scored {score}% ({Math.round((score / 100) * totalQuestions)}/
           {totalQuestions} correct)
         </p>
@@ -119,7 +119,7 @@ export default function QuizResults({
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
         <div className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg text-center">
           <span className="block text-xl font-semibold">{totalQuestions}</span>
-          <span className="text-sm text-gray-500 dark:text-gray-400">
+          <span className="text-sm text-gray-400 dark:text-gray-500">
             Questions
           </span>
         </div>
@@ -127,7 +127,7 @@ export default function QuizResults({
           <span className="block text-xl font-semibold">
             {score >= 60 ? 'Passed' : 'Try Again'}
           </span>
-          <span className="text-sm text-gray-500 dark:text-gray-400">
+          <span className="text-sm text-gray-400 dark:text-gray-500">
             Status
           </span>
         </div>
@@ -198,13 +198,13 @@ export default function QuizResults({
         <div className="flex gap-3">
           <button
             onClick={handleShare}
-            className="px-4 py-2 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md transition-colors"
+            className="px-4 py-2 border border-gray-600 dark:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md transition-colors"
           >
             Share Result
           </button>
           <button
             onClick={onViewAll}
-            className="px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-md transition-colors text-gray-800 dark:text-gray-200"
+            className="px-4 py-2 bg-gray-700 dark:bg-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-md transition-colors text-gray-200 dark:text-gray-800"
           >
             View All Quizzes
           </button>

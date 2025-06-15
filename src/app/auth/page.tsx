@@ -137,8 +137,8 @@ export default function Auth() {
   };
 
   return (
-    <section className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
-      <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-lg shadow-xl p-8">
+    <section className="min-h-screen flex items-center justify-center bg-gray-900 dark:bg-gray-50 p-4">
+      <div className="w-full max-w-md bg-gray-800 dark:bg-white rounded-lg shadow-xl p-8">
         <h1 className="text-2xl font-semibold text-center mb-6">
           {isSignUp ? 'Create an account' : 'Welcome back'}
         </h1>
@@ -154,14 +154,14 @@ export default function Auth() {
         </button>
 
         <div className="flex items-center gap-2 my-10">
-          <hr className="flex-grow border-t border-gray-300 dark:border-gray-600" />
-          <span className="text-gray-500 dark:text-gray-400">or</span>
-          <hr className="flex-grow border-t border-gray-300 dark:border-gray-600" />
+          <hr className="flex-grow border-t border-gray-600 dark:border-gray-300" />
+          <span className="text-gray-400 dark:text-gray-500">or</span>
+          <hr className="flex-grow border-t border-gray-600 dark:border-gray-300" />
         </div>
 
         <form onSubmit={onSubmit} className="flex flex-col gap-8">
           <div className="flex flex-col gap-2">
-            <label htmlFor="email" className="text-gray-700 dark:text-gray-300">
+            <label htmlFor="email" className="text-gray-300 dark:text-gray-700">
               Email
             </label>
             <input
@@ -177,7 +177,7 @@ export default function Auth() {
           <div className="flex flex-col gap-2">
             <label
               htmlFor="password"
-              className="text-gray-700 dark:text-gray-300"
+              className="text-gray-300 dark:text-gray-700"
             >
               Password
             </label>
@@ -195,7 +195,7 @@ export default function Auth() {
             <div className="flex flex-col gap-2">
               <label
                 htmlFor="confirmPassword"
-                className="text-gray-700 dark:text-gray-300"
+                className="text-gray-300 dark:text-gray-700"
               >
                 Confirm Password
               </label>

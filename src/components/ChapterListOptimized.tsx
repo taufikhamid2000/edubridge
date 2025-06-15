@@ -42,13 +42,13 @@ export default function ChapterListOptimized({
         .sort((a, b) => Number(a) - Number(b)) // Sort forms numerically
         .map((form) => (
           <div key={form} className="mb-6">
-            <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-200">
+            <h2 className="text-2xl font-bold mb-4 text-gray-200 dark:text-gray-800">
               Form {form}
             </h2>
             <ol className="list-decimal pl-6 space-y-3">
               {groupedChapters[Number(form)].map((chapter) => (
                 <li key={chapter.id} className="mb-2">
-                  <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                  <div className="bg-gray-800 dark:bg-white rounded-lg shadow-sm border border-gray-700 dark:border-gray-200">
                     <button
                       onClick={() => toggleChapter(chapter.id)}
                       className="text-left w-full p-4 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200 flex items-center justify-between"
@@ -57,7 +57,7 @@ export default function ChapterListOptimized({
                         {chapter.name}
                       </span>
                       <div className="flex items-center space-x-2">
-                        <span className="text-sm text-gray-500 dark:text-gray-400">
+                        <span className="text-sm text-gray-400 dark:text-gray-500">
                           {chapter.topics?.length || 0} topics
                         </span>
                         <svg
@@ -85,7 +85,7 @@ export default function ChapterListOptimized({
                             {chapter.topics.map((topic: Topic) => (
                               <li
                                 key={topic.id}
-                                className="bg-white dark:bg-gray-800 rounded-md p-3 border border-gray-200 dark:border-gray-600 hover:shadow-sm transition-shadow duration-200"
+                                className="bg-gray-800 dark:bg-white rounded-md p-3 border border-gray-200 dark:border-gray-600 hover:shadow-sm transition-shadow duration-200"
                               >
                                 {' '}
                                 <Link
@@ -98,7 +98,7 @@ export default function ChapterListOptimized({
                                         {topic.name}
                                       </h4>
                                       {topic.description && (
-                                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                        <p className="text-sm text-gray-400 dark:text-gray-600 mt-1">
                                           {topic.description}
                                         </p>
                                       )}
@@ -117,7 +117,7 @@ export default function ChapterListOptimized({
                                       />
                                     </svg>
                                   </div>
-                                  <div className="flex items-center space-x-4 mt-2 text-xs text-gray-500 dark:text-gray-400">
+                                  <div className="flex items-center space-x-4 mt-2 text-xs text-gray-400 dark:text-gray-500">
                                     <span className="flex items-center">
                                       <svg
                                         className="w-3 h-3 mr-1"
@@ -167,7 +167,7 @@ export default function ChapterListOptimized({
                                 d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                               />
                             </svg>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                            <p className="text-sm text-gray-400 dark:text-gray-500">
                               No topics available for this chapter.
                             </p>
                           </div>

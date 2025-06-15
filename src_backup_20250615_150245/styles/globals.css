@@ -1,0 +1,129 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-bg: #ffffff;
+  --scroll: 0;
+  --color-text: #1a1a1a;
+  --color-accent: #0071e3;
+}
+
+/* Enhanced scrolling behavior for parallax effects */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom clip path shapes for parallax effects */
+.clip-path-star {
+  clip-path: polygon(
+    50% 0%,
+    61% 35%,
+    98% 35%,
+    68% 57%,
+    79% 91%,
+    50% 70%,
+    21% 91%,
+    32% 57%,
+    2% 35%,
+    39% 35%
+  );
+}
+
+/* Timeline animation */
+.timeline-line {
+  background: linear-gradient(
+    to bottom,
+    rgba(96, 165, 250, 0.4),
+    rgba(96, 165, 250, 0.8),
+    rgba(96, 165, 250, 0.4)
+  );
+  background-size: 100% 200%;
+  animation: timelineShimmer 4s infinite linear;
+}
+
+@keyframes timelineShimmer {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 0% 200%;
+  }
+}
+
+.dark {
+  --color-bg: #121212;
+  --color-text: #e0e0e0;
+  --color-accent: #1e90ff;
+}
+
+body {
+  @apply bg-[var(--color-bg)] text-[var(--color-text)];
+  margin: 0;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    'Helvetica Neue',
+    Arial,
+    sans-serif;
+}
+
+.header-container {
+  @apply container mx-auto flex items-center justify-between py-4 px-4;
+}
+
+.header-link {
+  @apply flex items-center text-2xl md:text-3xl font-extrabold;
+}
+
+.header-nav {
+  @apply flex items-center space-x-2 md:space-x-4;
+}
+
+.header-menu {
+  @apply relative;
+}
+
+.header-menu-button {
+  @apply btn;
+}
+
+.header-menu-dropdown {
+  @apply absolute right-0 mt-2 w-48 bg-[var(--color-bg)] text-[var(--color-text)] shadow-lg rounded-lg hidden group-hover:block;
+  border: 1px solid var(--color-accent);
+}
+
+.header-menu.open .header-menu-dropdown {
+  @apply block;
+}
+
+.header-menu-link {
+  @apply block px-4 py-2 hover:bg-gray-100;
+  color: var(--color-text);
+}
+
+.header-menu-link:hover {
+  @apply bg-[var(--color-accent)] text-white;
+}
+
+.header-theme-button {
+  @apply btn p-2 rounded-full border border-gray-300 hover:bg-gray-100;
+}
+
+@layer components {
+  .btn {
+    @apply inline-block font-medium uppercase tracking-wide rounded-full shadow-md transition-all duration-300 ease-in-out px-6 py-2 sm:px-8 sm:py-3;
+    background: linear-gradient(135deg, var(--color-text), #333333);
+    color: var(--color-bg);
+  }
+  .btn:hover {
+    @apply shadow-lg;
+    transform: translateY(-1px) scale(1.01);
+  }
+  .btn:focus {
+    @apply outline-none ring-4 ring-[var(--color-accent)];
+  }
+}

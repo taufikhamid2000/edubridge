@@ -15,7 +15,7 @@ export default function LeaderboardHeader({
       <p className="text-gray-600 dark:text-gray-300 mb-2">
         See how you rank among other students and compete for the top positions!
       </p>{' '}
-      <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+      <p className="text-sm text-gray-400 dark:text-gray-500 mb-4">
         {' '}
         Note: The page may take 5-10 seconds to load. If you don&apos;t see any
         rankings, try refreshing the page. If issues persist, clearing your

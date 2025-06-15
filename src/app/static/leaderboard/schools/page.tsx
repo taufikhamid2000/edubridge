@@ -85,7 +85,7 @@ export default function StaticSchoolLeaderboardPage() {
         <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
           🏫 School Rankings
         </h1>
-        <p className="mt-2 text-gray-600 dark:text-gray-400">
+        <p className="mt-2 text-gray-400 dark:text-gray-600">
           Compare and track performance across different schools, districts, and
           states
         </p>
@@ -94,11 +94,11 @@ export default function StaticSchoolLeaderboardPage() {
       <>
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+          <div className="bg-gray-800 dark:bg-white rounded-lg shadow p-6">
+            <h3 className="text-sm font-medium text-gray-400 dark:text-gray-500">
               Total Active Schools
             </h3>
-            <p className="text-2xl font-semibold text-gray-900 dark:text-white mt-2">
+            <p className="text-2xl font-semibold text-white dark:text-gray-900 mt-2">
               {STATIC_SCHOOL_STATS.totalSchools.toLocaleString()}
             </p>
             <div className="mt-2 flex items-center text-sm">
@@ -108,11 +108,11 @@ export default function StaticSchoolLeaderboardPage() {
               <span className="text-gray-500">from last month</span>
             </div>
           </div>
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+          <div className="bg-gray-800 dark:bg-white rounded-lg shadow p-6">
+            <h3 className="text-sm font-medium text-gray-400 dark:text-gray-500">
               Average Participation
             </h3>
-            <p className="text-2xl font-semibold text-gray-900 dark:text-white mt-2">
+            <p className="text-2xl font-semibold text-white dark:text-gray-900 mt-2">
               {STATIC_SCHOOL_STATS.averageParticipation.toFixed(1)}%
             </p>
             <div className="mt-2 flex items-center text-sm">
@@ -122,11 +122,11 @@ export default function StaticSchoolLeaderboardPage() {
               <span className="text-gray-500">from last month</span>
             </div>
           </div>
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+          <div className="bg-gray-800 dark:bg-white rounded-lg shadow p-6">
+            <h3 className="text-sm font-medium text-gray-400 dark:text-gray-500">
               Total Student Users
             </h3>
-            <p className="text-2xl font-semibold text-gray-900 dark:text-white mt-2">
+            <p className="text-2xl font-semibold text-white dark:text-gray-900 mt-2">
               {STATIC_SCHOOL_STATS.totalStudents.toLocaleString()}
             </p>
             <div className="mt-2 flex items-center text-sm">
@@ -139,12 +139,12 @@ export default function StaticSchoolLeaderboardPage() {
         </div>
 
         {/* Main Content */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
+        <div className="bg-gray-800 dark:bg-white rounded-lg shadow-lg border border-gray-700 dark:border-gray-200">
           <SchoolLeaderboardTable data={STATIC_SCHOOL_LEADERBOARD} />
         </div>
 
         {/* Bottom Info */}
-        <div className="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
+        <div className="mt-8 text-center text-sm text-gray-400 dark:text-gray-500">
           Showing demo data • This is a static preview of the school rankings
         </div>
       </>

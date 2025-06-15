@@ -120,7 +120,7 @@ export default function AdminDashboard() {
         />{' '}
       </div>{' '}
       {/* Audit System Statistics */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-8">
+      <div className="bg-gray-800 dark:bg-white rounded-lg shadow p-6 mb-8">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold dark:text-gray-100">
             Quiz Audit System
@@ -137,8 +137,8 @@ export default function AdminDashboard() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {[...Array(4)].map((_, i) => (
               <div key={i} className="animate-pulse">
-                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-2"></div>
-                <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-2"></div>
+                <div className="h-4 bg-gray-700 dark:bg-gray-200 rounded w-1/2 mb-2"></div>
+                <div className="h-8 bg-gray-700 dark:bg-gray-200 rounded w-1/3 mb-2"></div>
               </div>
             ))}
           </div>
@@ -149,7 +149,7 @@ export default function AdminDashboard() {
                 <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
                   {auditStats?.total_unverified_quizzes || 0}
                 </div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">
+                <div className="text-sm text-gray-400 dark:text-gray-500">
                   Unverified Quizzes
                 </div>
               </div>
@@ -157,7 +157,7 @@ export default function AdminDashboard() {
                 <div className="text-2xl font-bold text-red-600 dark:text-red-400">
                   {auditStats?.total_pending_comments || 0}
                 </div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">
+                <div className="text-sm text-gray-400 dark:text-gray-500">
                   Pending Comments
                 </div>
               </div>
@@ -165,7 +165,7 @@ export default function AdminDashboard() {
                 <div className="text-2xl font-bold text-green-600 dark:text-green-400">
                   {auditStats?.total_verified_today || 0}
                 </div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">
+                <div className="text-sm text-gray-400 dark:text-gray-500">
                   Verified Today
                 </div>
               </div>
@@ -173,7 +173,7 @@ export default function AdminDashboard() {
                 <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
                   {auditStats?.total_rejected_today || 0}
                 </div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">
+                <div className="text-sm text-gray-400 dark:text-gray-500">
                   Rejected Today
                 </div>
               </div>
@@ -197,7 +197,7 @@ export default function AdminDashboard() {
                             <h4 className="font-medium dark:text-gray-100">
                               {quiz.name}
                             </h4>{' '}
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                            <p className="text-sm text-gray-400 dark:text-gray-500">
                               Created{' '}
                               {new Date(quiz.created_at).toLocaleDateString()}
                             </p>
@@ -228,16 +228,16 @@ export default function AdminDashboard() {
           </>
         )}
       </div>
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-8">
+      <div className="bg-gray-800 dark:bg-white rounded-lg shadow p-6 mb-8">
         <h2 className="text-xl font-semibold mb-4 dark:text-gray-100">
           Recent Activities
         </h2>
         {loading ? (
           <div className="animate-pulse">
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-4"></div>
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-4"></div>
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6 mb-4"></div>
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-2/3 mb-4"></div>
+            <div className="h-4 bg-gray-700 dark:bg-gray-200 rounded w-3/4 mb-4"></div>
+            <div className="h-4 bg-gray-700 dark:bg-gray-200 rounded w-1/2 mb-4"></div>
+            <div className="h-4 bg-gray-700 dark:bg-gray-200 rounded w-5/6 mb-4"></div>
+            <div className="h-4 bg-gray-700 dark:bg-gray-200 rounded w-2/3 mb-4"></div>
           </div>
         ) : (
           <div className="space-y-4">
@@ -249,15 +249,15 @@ export default function AdminDashboard() {
         )}
       </div>{' '}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <div className="bg-gray-800 dark:bg-white rounded-lg shadow p-6">
           <h2 className="text-xl font-semibold mb-4 dark:text-gray-100">
             Top Performing Students
           </h2>
           {loading ? (
             <div className="animate-pulse space-y-3">
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
+              <div className="h-4 bg-gray-700 dark:bg-gray-200 rounded w-full"></div>
+              <div className="h-4 bg-gray-700 dark:bg-gray-200 rounded w-full"></div>
+              <div className="h-4 bg-gray-700 dark:bg-gray-200 rounded w-full"></div>
             </div>
           ) : (
             <div className="space-y-2">
@@ -267,15 +267,15 @@ export default function AdminDashboard() {
             </div>
           )}
         </div>{' '}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <div className="bg-gray-800 dark:bg-white rounded-lg shadow p-6">
           <h2 className="text-xl font-semibold mb-4 dark:text-gray-100">
             Popular Quizzes
           </h2>
           {loading ? (
             <div className="animate-pulse space-y-3">
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
+              <div className="h-4 bg-gray-700 dark:bg-gray-200 rounded w-full"></div>
+              <div className="h-4 bg-gray-700 dark:bg-gray-200 rounded w-full"></div>
+              <div className="h-4 bg-gray-700 dark:bg-gray-200 rounded w-full"></div>
             </div>
           ) : (
             <div className="space-y-2">
@@ -292,10 +292,10 @@ export default function AdminDashboard() {
 
 function StatCard({ title, value, change, icon }: StatsCard) {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+    <div className="bg-gray-800 dark:bg-white rounded-lg shadow p-6">
       <div className="flex justify-between items-start">
         <div>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
+          <p className="text-sm text-gray-400 dark:text-gray-500 mb-1">
             {title}
           </p>
           <p className="text-2xl font-bold dark:text-white">{value}</p>
@@ -306,7 +306,7 @@ function StatCard({ title, value, change, icon }: StatsCard) {
               {change >= 0 ? '+' : ''}
               {change}%
             </span>
-            <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">
+            <span className="text-xs text-gray-400 dark:text-gray-500 ml-1">
               from last month
             </span>
           </div>

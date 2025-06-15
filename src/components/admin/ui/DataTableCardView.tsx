@@ -53,10 +53,10 @@ export default function DataTableCardView<T>({
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
+    <div className="bg-gray-800 dark:bg-white rounded-lg shadow">
       <div className="overflow-x-auto">
         {/* Desktop Table View */}
-        <table className="hidden md:table min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <table className="hidden md:table min-w-full divide-y divide-gray-700 dark:divide-gray-200">
           <thead className="bg-gray-50 dark:bg-gray-700">
             <tr>
               {columns.map((column) => (
@@ -76,12 +76,12 @@ export default function DataTableCardView<T>({
               )}
             </tr>
           </thead>
-          <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+          <tbody className="bg-gray-800 dark:bg-white divide-y divide-gray-700 dark:divide-gray-200">
             {data.length === 0 ? (
               <tr>
                 <td
                   colSpan={columns.length + (actions ? 1 : 0)}
-                  className="px-6 py-4 text-center text-gray-500 dark:text-gray-400"
+                  className="px-6 py-4 text-center text-gray-400 dark:text-gray-500"
                 >
                   {isFiltered ? emptyFilteredMessage : emptyMessage}
                 </td>
@@ -113,14 +113,14 @@ export default function DataTableCardView<T>({
         {/* Mobile Card View */}
         <div className="md:hidden grid grid-cols-1 gap-4 p-4">
           {data.length === 0 ? (
-            <div className="px-4 py-6 text-center text-gray-500 dark:text-gray-400">
+            <div className="px-4 py-6 text-center text-gray-400 dark:text-gray-500">
               {isFiltered ? emptyFilteredMessage : emptyMessage}
             </div>
           ) : (
             data.map((item) => (
               <div
                 key={keyExtractor(item)}
-                className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700"
+                className="p-4 bg-gray-800 dark:bg-white rounded-lg shadow-sm border border-gray-100 dark:border-gray-700"
               >
                 {/* Header section (if any) */}
                 {cardFields
@@ -143,7 +143,7 @@ export default function DataTableCardView<T>({
                         key={`${keyExtractor(item)}-${field.key}`}
                         className={field.className || ''}
                       >
-                        <div className="text-xs text-gray-500 dark:text-gray-400 uppercase mb-1">
+                        <div className="text-xs text-gray-400 dark:text-gray-500 uppercase mb-1">
                           {field.label}
                         </div>
                         <div>{field.render(item)}</div>
@@ -159,7 +159,7 @@ export default function DataTableCardView<T>({
                       key={`${keyExtractor(item)}-${field.key}`}
                       className={`mb-3 ${field.className || ''}`}
                     >
-                      <div className="text-xs text-gray-500 dark:text-gray-400 uppercase mb-1">
+                      <div className="text-xs text-gray-400 dark:text-gray-500 uppercase mb-1">
                         {field.label}
                       </div>
                       <div>{field.render(item)}</div>

@@ -324,7 +324,7 @@ export default function AdminUsersPage() {
                 unoptimized={user.avatar_url.startsWith('data:')}
               />
             ) : (
-              <div className={`h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 ${user.is_disabled ? 'opacity-60' : ''}`}>
+              <div className={`h-10 w-10 rounded-full bg-gray-700 dark:bg-gray-200 flex items-center justify-center text-gray-400 dark:text-gray-500 ${user.is_disabled ? 'opacity-60' : ''}`}>
                 {(user.display_name || user.email || '?')
                   .charAt(0)
                   .toUpperCase()}
@@ -338,8 +338,8 @@ export default function AdminUsersPage() {
           </div>
           <div className="ml-4">
             <div className={`text-sm font-medium ${user.is_disabled 
-              ? 'text-gray-500 dark:text-gray-400 line-through' 
-              : 'text-gray-900 dark:text-white'}`}>
+              ? 'text-gray-400 dark:text-gray-500 line-through' 
+              : 'text-white dark:text-gray-900'}`}>
               {user.display_name || 'Unnamed User'}
               {user.is_disabled && (
                 <span className="ml-2 text-xs px-1.5 py-0.5 bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100 rounded-md font-semibold no-underline">
@@ -355,7 +355,7 @@ export default function AdminUsersPage() {
       key: 'email',
       header: 'Email',
       render: (user) => (
-        <div className="text-sm text-gray-500 dark:text-gray-400">
+        <div className="text-sm text-gray-400 dark:text-gray-500">
           {user.email}
         </div>
       ),
@@ -365,10 +365,10 @@ export default function AdminUsersPage() {
       header: 'Level/XP',
       render: (user) => (
         <>
-          <div className="text-sm font-medium text-gray-900 dark:text-white">
+          <div className="text-sm font-medium text-white dark:text-gray-900">
             Level {user.level}
           </div>
-          <div className="text-sm text-gray-500 dark:text-gray-400">
+          <div className="text-sm text-gray-400 dark:text-gray-500">
             {user.xp} XP
           </div>
         </>
@@ -378,7 +378,7 @@ export default function AdminUsersPage() {
       key: 'joined',
       header: 'Joined',
       render: (user) => (
-        <div className="text-sm text-gray-500 dark:text-gray-400">
+        <div className="text-sm text-gray-400 dark:text-gray-500">
           {new Date(user.created_at).toLocaleDateString()}
         </div>
       ),
@@ -419,7 +419,7 @@ export default function AdminUsersPage() {
                 unoptimized={user.avatar_url.startsWith('data:')}
               />
             ) : (
-              <div className={`h-12 w-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 ${user.is_disabled ? 'opacity-60' : ''}`}>
+              <div className={`h-12 w-12 rounded-full bg-gray-700 dark:bg-gray-200 flex items-center justify-center text-gray-400 dark:text-gray-500 ${user.is_disabled ? 'opacity-60' : ''}`}>
                 {(user.display_name || user.email || '?')
                   .charAt(0)
                   .toUpperCase()}
@@ -433,7 +433,7 @@ export default function AdminUsersPage() {
           </div>
           <div>
             <div className={`text-base font-medium ${user.is_disabled 
-              ? 'text-gray-500 dark:text-gray-400' 
+              ? 'text-gray-400 dark:text-gray-500' 
               : 'text-gray-900 dark:text-gray-100'}`}>
               {user.display_name || 'Unnamed User'}
               {user.is_disabled && (
@@ -442,7 +442,7 @@ export default function AdminUsersPage() {
                 </span>
               )}
             </div>
-            <div className={`text-sm text-gray-500 dark:text-gray-400 break-all ${user.is_disabled ? 'line-through' : ''}`}>
+            <div className={`text-sm text-gray-400 dark:text-gray-500 break-all ${user.is_disabled ? 'line-through' : ''}`}>
               {user.email}
             </div>
           </div>
@@ -564,7 +564,7 @@ export default function AdminUsersPage() {
 
         {isFilterMenuOpen && (
           <div className="mt-2 p-4 bg-white border border-gray-200 rounded-lg shadow-lg dark:bg-gray-800 dark:border-gray-700">
-            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <h3 className="text-sm font-medium text-gray-300 dark:text-gray-700 mb-2">
               Filter by Role
             </h3>
             <div className="grid grid-cols-2 gap-2 mb-4">
@@ -583,7 +583,7 @@ export default function AdminUsersPage() {
               ))}
             </div>
 
-            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <h3 className="text-sm font-medium text-gray-300 dark:text-gray-700 mb-2">
               Sort By
             </h3>
             <div className="flex flex-col gap-2">

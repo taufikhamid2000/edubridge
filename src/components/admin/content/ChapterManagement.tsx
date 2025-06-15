@@ -218,7 +218,7 @@ export default function ChapterManagement({
       key: 'subject',
       header: 'Subject',
       render: (chapter) => (
-        <div className="text-sm text-gray-500 dark:text-gray-400">
+        <div className="text-sm text-gray-400 dark:text-gray-500">
           {subjects.find((s) => s.id === chapter.subject_id)?.name || 'N/A'}
         </div>
       ),
@@ -227,7 +227,7 @@ export default function ChapterManagement({
       key: 'form',
       header: 'Form',
       render: (chapter) => (
-        <div className="text-sm text-gray-500 dark:text-gray-400">
+        <div className="text-sm text-gray-400 dark:text-gray-500">
           {chapter.form}
         </div>
       ),
@@ -305,10 +305,10 @@ export default function ChapterManagement({
 
         <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3 mb-3">
           {/* Subject Filter Dropdown */}
-          <div className="w-full md:w-56 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-2">
+          <div className="w-full md:w-56 bg-gray-800 dark:bg-white rounded-lg shadow-sm p-2">
             <label
               htmlFor="subject-filter"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              className="block text-sm font-medium text-gray-300 dark:text-gray-700 mb-1"
             >
               Filter by Subject
             </label>
@@ -330,10 +330,10 @@ export default function ChapterManagement({
           </div>
 
           {/* Form Filter Dropdown */}
-          <div className="w-full md:w-56 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-2">
+          <div className="w-full md:w-56 bg-gray-800 dark:bg-white rounded-lg shadow-sm p-2">
             <label
               htmlFor="form-filter"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              className="block text-sm font-medium text-gray-300 dark:text-gray-700 mb-1"
             >
               Filter by Form
             </label>
@@ -382,7 +382,7 @@ export default function ChapterManagement({
             <div className="mb-3">
               <label
                 htmlFor="chapter-name"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                className="block text-sm font-medium text-gray-300 dark:text-gray-700 mb-1"
               >
                 Chapter Title
               </label>
@@ -403,7 +403,7 @@ export default function ChapterManagement({
             <div className="mb-3">
               <label
                 htmlFor="chapter-subject"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                className="block text-sm font-medium text-gray-300 dark:text-gray-700 mb-1"
               >
                 Subject
               </label>
@@ -429,7 +429,7 @@ export default function ChapterManagement({
             <div className="mb-3">
               <label
                 htmlFor="chapter-form"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                className="block text-sm font-medium text-gray-300 dark:text-gray-700 mb-1"
               >
                 Form
               </label>

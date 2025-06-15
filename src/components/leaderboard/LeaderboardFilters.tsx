@@ -88,7 +88,7 @@ export default function LeaderboardFilters({
         <select
           value={subjectFilter || ''}
           onChange={(e) => onSubjectFilterChange(e.target.value || null)}
-          className="border dark:border-gray-600 rounded-md px-3 py-1.5 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="border dark:border-gray-600 rounded-md px-3 py-1.5 text-sm bg-gray-800 dark:bg-white text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="">All Subjects</option>
           {subjects.map((subject) => (

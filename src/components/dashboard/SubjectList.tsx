@@ -138,7 +138,7 @@ const SubjectList = ({
 
       {/* Subjects Grid with Results Count */}
       <div className="mb-4">
-        <p className="text-sm text-gray-500 dark:text-gray-400">
+        <p className="text-sm text-gray-400 dark:text-gray-500">
           Showing {currentSubjects.length} of {filteredSubjects.length} subjects
           {searchQuery && ` matching "${searchQuery}"`}
           {selectedCategory !== 'all' && ` in ${selectedCategory}`}
@@ -170,7 +170,7 @@ const SubjectList = ({
                   <h3 className="text-lg sm:text-xl font-semibold text-dashboard-blue">
                     {subject.name}
                   </h3>
-                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-xs sm:text-sm text-gray-400 dark:text-gray-600">
                     {subject.description}
                   </p>
                   {subject.category && (

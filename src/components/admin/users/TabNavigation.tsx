@@ -10,7 +10,7 @@ export default function TabNavigation({
   onTabChange,
 }: TabNavigationProps) {
   return (
-    <div className="border-b border-gray-200 dark:border-gray-700">
+    <div className="border-b border-gray-700 dark:border-gray-200">
       <nav className="-mb-px flex">
         <button
           onClick={() => onTabChange('overview')}

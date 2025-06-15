@@ -55,7 +55,7 @@ export default function LeaderboardPage() {
       <LeaderboardNav activeTab="students" />
       <LeaderboardHeader currentUserRank={data?.currentUserRank ?? null} />
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6 border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-xl">
+      <div className="bg-gray-800 dark:bg-white rounded-lg shadow-lg p-6 mb-6 border border-gray-700 dark:border-gray-200 transition-all duration-300 hover:shadow-xl">
         <LeaderboardFilters
           timeFrame={timeFrame}
           onTimeFrameChange={handleTimeFrameChange}
@@ -87,10 +87,10 @@ export default function LeaderboardPage() {
                 />
               </svg>
             </div>
-            <p className="text-xl font-medium text-gray-800 dark:text-gray-200 mb-2">
+            <p className="text-xl font-medium text-gray-200 dark:text-gray-800 mb-2">
               {errorMessage}
             </p>
-            <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
+            <p className="text-gray-400 dark:text-gray-600 mb-6 max-w-md mx-auto">
               {errorMessage.includes('No leaderboard data')
                 ? 'Complete quizzes to appear on the leaderboard and compete with other students!'
                 : 'There was a problem loading the leaderboard data. Please try again later.'}
@@ -105,7 +105,7 @@ export default function LeaderboardPage() {
         ) : (
           <div className="fade-in animate-fadeIn">
             <LeaderboardTable data={data?.data || []} timeFrame={timeFrame} />
-            <div className="text-center mt-6 text-sm text-gray-500 dark:text-gray-400">
+            <div className="text-center mt-6 text-sm text-gray-400 dark:text-gray-500">
               Showing top {data?.data.length || 0} students • Last updated:{' '}
               {lastUpdated.toLocaleTimeString()} • Auto-refreshing every minute
             </div>

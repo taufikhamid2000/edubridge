@@ -46,30 +46,30 @@ export function QuizForm({
           <dl className="grid grid-cols-1 gap-2 text-sm">
             {subjectName && (
               <div className="flex">
-                <dt className="font-medium text-gray-500 dark:text-gray-400 w-24">
+                <dt className="font-medium text-gray-400 dark:text-gray-500 w-24">
                   Subject:
                 </dt>
-                <dd className="text-gray-800 dark:text-gray-200">
+                <dd className="text-gray-200 dark:text-gray-800">
                   {subjectName}
                 </dd>
               </div>
             )}
             {chapterName && (
               <div className="flex">
-                <dt className="font-medium text-gray-500 dark:text-gray-400 w-24">
+                <dt className="font-medium text-gray-400 dark:text-gray-500 w-24">
                   Chapter:
                 </dt>
-                <dd className="text-gray-800 dark:text-gray-200">
+                <dd className="text-gray-200 dark:text-gray-800">
                   {chapterName}
                 </dd>
               </div>
             )}
             {topicName && (
               <div className="flex">
-                <dt className="font-medium text-gray-500 dark:text-gray-400 w-24">
+                <dt className="font-medium text-gray-400 dark:text-gray-500 w-24">
                   Topic:
                 </dt>
-                <dd className="text-gray-800 dark:text-gray-200">
+                <dd className="text-gray-200 dark:text-gray-800">
                   {topicName}
                 </dd>
               </div>
@@ -84,14 +84,14 @@ export function QuizForm({
         <div className="space-y-2">
           <label
             htmlFor="quizName"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+            className="block text-sm font-medium text-gray-300 dark:text-gray-700"
           >
             Quiz Code
           </label>
           <div className="relative">
             <input
               id="quizName"
-              className="w-full px-3 py-2 border rounded-md shadow-sm bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-700 text-gray-800 dark:text-gray-200 font-mono"
+              className="w-full px-3 py-2 border rounded-md shadow-sm bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-700 text-gray-200 dark:text-gray-800 font-mono"
               readOnly
               value={quizCode}
               {...register('name', {
@@ -100,14 +100,14 @@ export function QuizForm({
               })}
             />
           </div>
-          <p className="text-xs text-gray-500 dark:text-gray-400">
+          <p className="text-xs text-gray-400 dark:text-gray-500">
             Auto-generated unique quiz identifier
           </p>
         </div>
         <div className="space-y-2">
           <label
             htmlFor="description"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+            className="block text-sm font-medium text-gray-300 dark:text-gray-700"
           >
             Description
           </label>{' '}
@@ -128,7 +128,7 @@ export function QuizForm({
         <div className="space-y-2 opacity-50">
           <label
             htmlFor="difficulty"
-            className="flex items-center text-sm font-medium text-gray-700 dark:text-gray-300"
+            className="flex items-center text-sm font-medium text-gray-300 dark:text-gray-700"
           >
             Difficulty Level
             <span className="ml-2 text-xs py-0.5 px-1.5 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded">
@@ -149,7 +149,7 @@ export function QuizForm({
         <div className="space-y-2 opacity-50">
           <label
             htmlFor="timeLimit"
-            className="flex items-center text-sm font-medium text-gray-700 dark:text-gray-300"
+            className="flex items-center text-sm font-medium text-gray-300 dark:text-gray-700"
           >
             Time Limit (minutes)
             <span className="ml-2 text-xs py-0.5 px-1.5 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded">
@@ -168,7 +168,7 @@ export function QuizForm({
           />
         </div>{' '}
         <div className="space-y-2 opacity-50">
-          <label className="flex items-center text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label className="flex items-center text-sm font-medium text-gray-300 dark:text-gray-700">
             Number of Questions
             <span className="ml-2 text-xs py-0.5 px-1.5 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded">
               Coming soon
@@ -181,11 +181,11 @@ export function QuizForm({
               max="20"
               disabled
               value={questionCount}
-              className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-not-allowed"
+              className="w-full h-2 bg-gray-700 dark:bg-gray-200 rounded-lg appearance-none cursor-not-allowed"
             />
             <span className="w-8 text-center">{questionCount}</span>
           </div>
-          <p className="text-xs text-gray-500 dark:text-gray-400">
+          <p className="text-xs text-gray-400 dark:text-gray-500">
             Default questions will be added after creating the quiz
           </p>
         </div>
@@ -199,7 +199,7 @@ export function QuizForm({
           />
           <label
             htmlFor="isPublic"
-            className="ml-2 flex items-center text-sm text-gray-700 dark:text-gray-300"
+            className="ml-2 flex items-center text-sm text-gray-300 dark:text-gray-700"
           >
             Make this quiz public
             <span className="ml-2 text-xs py-0.5 px-1.5 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded">

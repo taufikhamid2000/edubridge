@@ -51,7 +51,7 @@ export default function SchoolLeaderboardPage() {
         <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
           🏫 School Rankings
         </h1>
-        <p className="mt-2 text-gray-600 dark:text-gray-400">
+        <p className="mt-2 text-gray-400 dark:text-gray-600">
           Compare and track performance across different schools, districts, and
           states
         </p>
@@ -82,7 +82,7 @@ export default function SchoolLeaderboardPage() {
               />
             </svg>
           </div>
-          <p className="text-xl font-medium text-gray-800 dark:text-gray-200 mb-2">
+          <p className="text-xl font-medium text-gray-200 dark:text-gray-800 mb-2">
             {errorMessage}
           </p>
           <button
@@ -96,11 +96,11 @@ export default function SchoolLeaderboardPage() {
         <>
           {/* Stats Overview */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+            <div className="bg-gray-800 dark:bg-white rounded-lg shadow p-6">
+              <h3 className="text-sm font-medium text-gray-400 dark:text-gray-500">
                 Total Active Schools
               </h3>
-              <p className="text-2xl font-semibold text-gray-900 dark:text-white mt-2">
+              <p className="text-2xl font-semibold text-white dark:text-gray-900 mt-2">
                 {data?.stats.totalSchools.toLocaleString()}
               </p>
               <div className="mt-2 flex items-center text-sm">
@@ -110,11 +110,11 @@ export default function SchoolLeaderboardPage() {
                 <span className="text-gray-500">from last month</span>
               </div>
             </div>
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+            <div className="bg-gray-800 dark:bg-white rounded-lg shadow p-6">
+              <h3 className="text-sm font-medium text-gray-400 dark:text-gray-500">
                 Average Participation
               </h3>
-              <p className="text-2xl font-semibold text-gray-900 dark:text-white mt-2">
+              <p className="text-2xl font-semibold text-white dark:text-gray-900 mt-2">
                 {data?.stats.averageParticipation.toFixed(1)}%
               </p>
               <div className="mt-2 flex items-center text-sm">
@@ -124,11 +124,11 @@ export default function SchoolLeaderboardPage() {
                 <span className="text-gray-500">from last month</span>
               </div>
             </div>
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+            <div className="bg-gray-800 dark:bg-white rounded-lg shadow p-6">
+              <h3 className="text-sm font-medium text-gray-400 dark:text-gray-500">
                 Total Student Users
               </h3>
-              <p className="text-2xl font-semibold text-gray-900 dark:text-white mt-2">
+              <p className="text-2xl font-semibold text-white dark:text-gray-900 mt-2">
                 {data?.stats.totalStudents.toLocaleString()}
               </p>
               <div className="mt-2 flex items-center text-sm">
@@ -141,12 +141,12 @@ export default function SchoolLeaderboardPage() {
           </div>
 
           {/* Main Content */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
+          <div className="bg-gray-800 dark:bg-white rounded-lg shadow-lg border border-gray-700 dark:border-gray-200">
             <SchoolLeaderboardTable data={data?.data || []} />
           </div>
 
           {/* Bottom Info */}
-          <div className="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
+          <div className="mt-8 text-center text-sm text-gray-400 dark:text-gray-500">
             Last updated: {lastUpdated.toLocaleString()} • Rankings are updated
             daily
           </div>

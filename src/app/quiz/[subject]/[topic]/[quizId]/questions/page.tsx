@@ -329,10 +329,10 @@ export default function QuestionsManagementPage() {
     return (
       <div className="container mx-auto py-8 px-4">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 flex justify-center items-center h-64">
+          <div className="bg-gray-800 dark:bg-white rounded-lg shadow-md p-6 flex justify-center items-center h-64">
             <div className="text-center">
               <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-t-blue-500 border-r-transparent border-b-blue-500 border-l-transparent mb-4"></div>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-gray-400 dark:text-gray-600">
                 Loading quiz...
               </p>
             </div>
@@ -354,12 +354,12 @@ export default function QuestionsManagementPage() {
           </button>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+        <div className="bg-gray-800 dark:bg-white rounded-lg shadow-md p-6">
           <div className="mb-6">
             <h1 className="text-2xl font-bold mb-2">
               {quiz?.name}: Add Questions
             </h1>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-gray-400 dark:text-gray-600">
               Add questions and answers to your quiz
             </p>
           </div>
@@ -374,7 +374,7 @@ export default function QuestionsManagementPage() {
             {questions.map((question, qIndex) => (
               <div
                 key={question.tempId}
-                className="border border-gray-200 dark:border-gray-700 rounded-lg p-4"
+                className="border border-gray-700 dark:border-gray-200 rounded-lg p-4"
               >
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-lg font-medium">Question {qIndex + 1}</h3>
@@ -387,7 +387,7 @@ export default function QuestionsManagementPage() {
                 </div>
 
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium text-gray-300 dark:text-gray-700 mb-1">
                     Question Text
                   </label>
                   <textarea
@@ -402,7 +402,7 @@ export default function QuestionsManagementPage() {
                 </div>
 
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium text-gray-300 dark:text-gray-700 mb-1">
                     Question Type
                   </label>
                   <div className="flex space-x-4">
@@ -413,7 +413,7 @@ export default function QuestionsManagementPage() {
                         onChange={() => updateQuestion(qIndex, 'type', 'radio')}
                         className="h-4 w-4 text-blue-600 focus:ring-blue-500"
                       />
-                      <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                      <span className="ml-2 text-sm text-gray-300 dark:text-gray-700">
                         Single choice
                       </span>
                     </label>
@@ -426,7 +426,7 @@ export default function QuestionsManagementPage() {
                         }
                         className="h-4 w-4 text-blue-600 focus:ring-blue-500"
                       />
-                      <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                      <span className="ml-2 text-sm text-gray-300 dark:text-gray-700">
                         Multiple choice
                       </span>
                     </label>
@@ -434,7 +434,7 @@ export default function QuestionsManagementPage() {
                 </div>
 
                 <div className="mb-2">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 dark:text-gray-700 mb-2">
                     Answers
                   </label>
 
@@ -514,7 +514,7 @@ export default function QuestionsManagementPage() {
                   <button
                     type="button"
                     onClick={() => addAnswer(qIndex)}
-                    className="mt-3 inline-flex items-center px-3 py-1 border border-gray-300 dark:border-gray-600 text-sm rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    className="mt-3 inline-flex items-center px-3 py-1 border border-gray-600 dark:border-gray-300 text-sm rounded-md text-gray-300 dark:text-gray-700 bg-gray-800 dark:bg-white hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -537,7 +537,7 @@ export default function QuestionsManagementPage() {
             <button
               type="button"
               onClick={addNewQuestion}
-              className="w-full p-3 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center justify-center"
+              className="w-full p-3 border border-dashed border-gray-600 dark:border-gray-300 rounded-lg text-gray-300 dark:text-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center justify-center"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -554,11 +554,11 @@ export default function QuestionsManagementPage() {
               Add New Question
             </button>
 
-            <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="pt-4 border-t border-gray-700 dark:border-gray-200">
               <div className="flex justify-end">
                 <button
                   onClick={() => router.back()}
-                  className="mr-3 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700"
+                  className="mr-3 px-4 py-2 border border-gray-600 dark:border-gray-300 text-gray-300 dark:text-gray-700 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700"
                 >
                   Cancel
                 </button>

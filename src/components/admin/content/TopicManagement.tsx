@@ -51,7 +51,7 @@ export default function TopicManagement({
       key: 'chapter',
       header: 'Chapter',
       render: (topic: Topic) => (
-        <div className="text-sm text-gray-500 dark:text-gray-400">
+        <div className="text-sm text-gray-400 dark:text-gray-500">
           {getChapterTitle(topic.chapter_id)}
         </div>
       ),
@@ -60,7 +60,7 @@ export default function TopicManagement({
       key: 'created_at',
       header: 'Created',
       render: (topic: Topic) => (
-        <div className="text-sm text-gray-500 dark:text-gray-400">
+        <div className="text-sm text-gray-400 dark:text-gray-500">
           {new Date(topic.created_at).toLocaleDateString()}
         </div>
       ),
@@ -112,7 +112,7 @@ export default function TopicManagement({
       <div className="mb-3">
         <label
           htmlFor="topic-title"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+          className="block text-sm font-medium text-gray-300 dark:text-gray-700 mb-1"
         >
           Topic Title
         </label>
@@ -135,7 +135,7 @@ export default function TopicManagement({
       <div className="mb-3">
         <label
           htmlFor="topic-chapter"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+          className="block text-sm font-medium text-gray-300 dark:text-gray-700 mb-1"
         >
           Chapter
         </label>

@@ -86,7 +86,7 @@ export default function SubjectEditPage() {
               type="text"
               id="icon-url"
               placeholder="Enter a URL (https://...) or an emoji (e.g., 📚)"
-              className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:text-white"
+              className="mt-1 block w-full border border-gray-600 dark:border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:text-white"
               value={iconValue}
               onChange={(e) => onChange(e.target.value)}
               disabled={disabled}
@@ -117,7 +117,7 @@ export default function SubjectEditPage() {
                     </div>
                   )}
                 </div>
-                <span className="text-xs text-gray-500 dark:text-gray-400">
+                <span className="text-xs text-gray-400 dark:text-gray-500">
                   Icon preview
                 </span>
               </div>
@@ -309,7 +309,7 @@ export default function SubjectEditPage() {
   const renderChaptersTab = () => (
     <div>
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-medium text-gray-900 dark:text-white">
+        <h2 className="text-lg font-medium text-white dark:text-gray-900">
           Chapters
         </h2>
         <Link
@@ -321,7 +321,7 @@ export default function SubjectEditPage() {
       </div>
 
       {chapters.length === 0 ? (
-        <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+        <div className="text-center py-8 text-gray-400 dark:text-gray-500">
           <p className="mb-4">No chapters found for this subject.</p>
           <p>To begin building your course content:</p>
           <ol className="list-decimal list-inside text-left max-w-md mx-auto mt-4">
@@ -334,7 +334,7 @@ export default function SubjectEditPage() {
         </div>
       ) : (
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <table className="min-w-full divide-y divide-gray-700 dark:divide-gray-200">
             <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
@@ -354,28 +354,28 @@ export default function SubjectEditPage() {
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody className="bg-gray-800 dark:bg-white divide-y divide-gray-700 dark:divide-gray-200">
               {chapters.map((chapter) => (
                 <tr key={chapter.id}>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900 dark:text-white">
+                    <div className="text-sm font-medium text-white dark:text-gray-900">
                       {chapter.name}
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                    <div className="text-sm text-gray-400 dark:text-gray-500">
                       {chapter.form}
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                    <div className="text-sm text-gray-400 dark:text-gray-500">
                       <span className="px-2 py-1 text-xs rounded bg-gray-100 dark:bg-gray-700">
                         {chapter.topic_count || 0} topics
                       </span>
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                    <div className="text-sm text-gray-400 dark:text-gray-500">
                       {chapter.order_index}
                     </div>
                   </td>

@@ -3,10 +3,10 @@
 @tailwind utilities;
 
 :root {
-  --color-bg: #ffffff;
+  --color-bg: #121212;
   --scroll: 0;
-  --color-text: #1a1a1a;
-  --color-accent: #0071e3;
+  --color-text: #e0e0e0;
+  --color-accent: #1e90ff;
 }
 
 /* Enhanced scrolling behavior for parallax effects */
@@ -52,9 +52,9 @@ html {
 }
 
 .dark {
-  --color-bg: #121212;
-  --color-text: #e0e0e0;
-  --color-accent: #1e90ff;
+  --color-bg: #ffffff;
+  --color-text: #1a1a1a;
+  --color-accent: #0071e3;
 }
 
 body {
@@ -101,7 +101,7 @@ body {
 }
 
 .header-menu-link {
-  @apply block px-4 py-2 hover:bg-gray-100;
+  @apply block px-4 py-2 hover:bg-gray-800 dark:hover:bg-gray-100;
   color: var(--color-text);
 }
 
@@ -110,7 +110,7 @@ body {
 }
 
 .header-theme-button {
-  @apply btn p-2 rounded-full border border-gray-300 hover:bg-gray-100;
+  @apply btn p-2 rounded-full border border-gray-600 hover:bg-gray-800 dark:border-gray-300 dark:hover:bg-gray-100;
 }
 
 @layer components {

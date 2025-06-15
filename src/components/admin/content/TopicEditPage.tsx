@@ -248,19 +248,19 @@ export default function TopicEditPage() {
   const renderQuizzesTab = () => (
     <div>
       <div className="mb-4">
-        <h2 className="text-lg font-medium text-gray-900 dark:text-white">
+        <h2 className="text-lg font-medium text-white dark:text-gray-900">
           Quizzes
         </h2>
       </div>
 
       {quizzes.length === 0 ? (
-        <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+        <div className="text-center py-8 text-gray-400 dark:text-gray-500">
           <p className="mb-4">No quizzes found for this topic.</p>
           <p>Create quizzes to test knowledge of this topic.</p>
         </div>
       ) : (
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <table className="min-w-full divide-y divide-gray-700 dark:divide-gray-200">
             <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
@@ -274,15 +274,15 @@ export default function TopicEditPage() {
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody className="bg-gray-800 dark:bg-white divide-y divide-gray-700 dark:divide-gray-200">
               {quizzes.map((quiz) => (
                 <tr key={quiz.id}>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900 dark:text-white">
+                    <div className="text-sm font-medium text-white dark:text-gray-900">
                       {quiz.title}
                     </div>
                     {quiz.description && (
-                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                      <div className="text-xs text-gray-400 dark:text-gray-500">
                         {quiz.description.length > 60
                           ? `${quiz.description.substring(0, 60)}...`
                           : quiz.description}
@@ -290,7 +290,7 @@ export default function TopicEditPage() {
                     )}
                   </td>
                   <td className="px-6 py-4">
-                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                    <div className="text-sm text-gray-400 dark:text-gray-500">
                       {new Date(quiz.created_at).toLocaleDateString()}
                     </div>
                   </td>

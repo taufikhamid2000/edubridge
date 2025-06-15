@@ -53,7 +53,7 @@ const SubjectGrid = ({
             <div
               key={subject.id}
               onClick={() => handleSubjectClick(subject)}
-              className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow cursor-pointer"
+              className="bg-gray-800 dark:bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-700 dark:border-gray-200 hover:shadow-md transition-shadow cursor-pointer"
             >
               <div className="flex items-center gap-3 mb-2">
                 <div className="text-blue-500 text-2xl">
@@ -79,7 +79,7 @@ const SubjectGrid = ({
                 </div>
                 <h3 className="text-lg font-medium">{subject.name}</h3>
               </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-gray-400 dark:text-gray-600">
                 {subject.description.length > 120
                   ? `${subject.description.substring(0, 120)}...`
                   : subject.description}

@@ -123,9 +123,9 @@ function ProfileContent() {
   // Only show error if we can't get any data at all
   if (hasError && !displayUser) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
+      <div className="min-h-screen bg-gray-900 dark:bg-gray-50 py-12">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-8">
+          <div className="bg-gray-800 dark:bg-white shadow rounded-lg p-8">
             <h2 className="text-2xl font-bold text-red-600 dark:text-red-500 mb-4">
               Error
             </h2>
@@ -145,7 +145,7 @@ function ProfileContent() {
     );
   }
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
+    <div className="min-h-screen bg-gray-900 dark:bg-gray-50 py-12">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Profile Header with Avatar and Basic Info */}
         <div className="relative">
@@ -163,8 +163,8 @@ function ProfileContent() {
         </div>
 
         {/* Tab Navigation */}
-        <div className="bg-white dark:bg-gray-800 shadow rounded-lg mt-6 overflow-hidden">
-          <div className="border-b border-gray-200 dark:border-gray-700">
+        <div className="bg-gray-800 dark:bg-white shadow rounded-lg mt-6 overflow-hidden">
+          <div className="border-b border-gray-700 dark:border-gray-200">
             <nav className="flex -mb-px">
               <button
                 className={`px-6 py-4 text-sm font-medium ${
@@ -255,7 +255,7 @@ function ProfileContent() {
                           // TODO: Add edit functionality
                           console.log('Edit quiz:', quiz.id);
                         }}
-                        className="px-2 py-1 text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-300 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                        className="px-2 py-1 text-xs font-medium text-gray-400 dark:text-gray-600 hover:text-gray-800 dark:hover:text-gray-300 border border-gray-600 dark:border-gray-300 rounded hover:bg-gray-800 dark:hover:bg-gray-50 transition-colors"
                       >
                         Edit
                       </button>
