@@ -215,6 +215,7 @@ export default function QuizTable({
         <table className="table-auto w-full">
           <thead>
             <tr className="bg-gray-100 dark:bg-gray-800">
+              {' '}
               <th className="px-4 py-2 text-left">Quiz Code</th>
               {showCreator && (
                 <th className="px-4 py-2 text-left hidden sm:table-cell">
@@ -241,29 +242,11 @@ export default function QuizTable({
                         ? '↓'
                         : '⇅'}
                   </span>
-                  <span className="sr-only">
-                    {sortDirection
-                      ? sortDirection === 'asc'
-                        ? 'sorted oldest first'
-                        : 'sorted newest first'
-                      : 'not sorted, click to sort'}
-                  </span>
-                  <span
-                    className="ml-1 text-xs text-gray-500 dark:text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity hidden md:inline"
-                    aria-hidden="true"
-                  >
-                    {sortDirection
-                      ? sortDirection === 'asc'
-                        ? 'Oldest first'
-                        : 'Newest first'
-                      : 'Click to sort'}
-                  </span>
                 </div>
-              </th>
+              </th>{' '}
               <th className="px-4 py-2 text-left hidden sm:table-cell">
                 Status
               </th>
-              {showActions && <th className="px-4 py-2 text-right">Actions</th>}
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
@@ -354,9 +337,13 @@ export default function QuizTable({
                         </span>
                       )}
                     </td>
-                  )}
+                  )}{' '}
                   <td className="px-4 py-3">
-                    {new Date(quiz.created_at).toLocaleDateString()}
+                    {new Date(quiz.created_at).toLocaleDateString('en-GB', {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric',
+                    })}
                   </td>
                   <td className="px-4 py-3 hidden sm:table-cell">
                     <span

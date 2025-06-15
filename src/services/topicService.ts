@@ -271,16 +271,18 @@ export async function fetchTopicDataAPI(topicId: string): Promise<{
     logger.log(`Fetching topic data via API: ${topicId}`);
 
     const response = await fetch(`/api/topics/${topicId}`);
-    
+
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+      throw new Error(
+        errorData.error || `HTTP error! status: ${response.status}`
+      );
     }
 
     const data = await response.json();
-    
+
     logger.log(`Successfully fetched topic data via API for topic: ${topicId}`);
-    
+
     return {
       topic: data.topic,
       chapter: data.chapter,
@@ -294,7 +296,8 @@ export async function fetchTopicDataAPI(topicId: string): Promise<{
       chapter: null,
       subject: null,
       quizzes: [],
-      error: error instanceof Error ? error.message : 'Failed to fetch topic data',
+      error:
+        error instanceof Error ? error.message : 'Failed to fetch topic data',
     };
   }
 }

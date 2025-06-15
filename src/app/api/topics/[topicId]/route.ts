@@ -16,10 +16,11 @@ export async function GET(
       );
     }
 
-    logger.log(`Fetching topic data for topic ID: ${topicId}`);    // Single optimized query to get topic with chapter, subject, and quizzes
+    logger.log(`Fetching topic data for topic ID: ${topicId}`); // Single optimized query to get topic with chapter, subject, and quizzes
     const { data: topicData, error: topicError } = await supabase
       .from('topics')
-      .select(`
+      .select(
+        `
         id,
         name,
         description,
@@ -51,7 +52,8 @@ export async function GET(
           verified,
           topic_id
         )
-      `)
+      `
+      )
       .eq('id', topicId)
       .single();
 
@@ -64,20 +66,19 @@ export async function GET(
     }
 
     if (!topicData) {
-      return NextResponse.json(
-        { error: 'Topic not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Topic not found' }, { status: 404 });
     }
 
     // Extract and structure the response
-    const chapter = Array.isArray(topicData.chapters) 
-      ? topicData.chapters[0] 
+    const chapter = Array.isArray(topicData.chapters)
+      ? topicData.chapters[0]
       : topicData.chapters;
-    
-    const subject = chapter?.subjects 
-      ? (Array.isArray(chapter.subjects) ? chapter.subjects[0] : chapter.subjects)
-      : null;    // Process quizzes to add user profile data
+
+    const subject = chapter?.subjects
+      ? Array.isArray(chapter.subjects)
+        ? chapter.subjects[0]
+        : chapter.subjects
+      : null; // Process quizzes to add user profile data
     const processedQuizzes = await Promise.all(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (topicData.quizzes || []).map(async (quiz: any) => {
@@ -124,26 +125,32 @@ export async function GET(
         chapter_id: topicData.chapter_id,
         chapters: [], // Keep for compatibility
       },
-      chapter: chapter ? {
-        id: chapter.id,
-        name: chapter.name,
-        form: chapter.form,
-        order_index: chapter.order_index,
-      } : null,
-      subject: subject ? {
-        id: subject.id,
-        name: subject.name,
-        slug: subject.slug,
-        description: subject.description,
-        icon: subject.icon,
-        category: subject.category,
-        category_priority: subject.category_priority,
-        order_index: subject.order_index,
-      } : null,
+      chapter: chapter
+        ? {
+            id: chapter.id,
+            name: chapter.name,
+            form: chapter.form,
+            order_index: chapter.order_index,
+          }
+        : null,
+      subject: subject
+        ? {
+            id: subject.id,
+            name: subject.name,
+            slug: subject.slug,
+            description: subject.description,
+            icon: subject.icon,
+            category: subject.category,
+            category_priority: subject.category_priority,
+            order_index: subject.order_index,
+          }
+        : null,
       quizzes: processedQuizzes,
     };
 
-    logger.log(`Successfully fetched topic data with ${processedQuizzes.length} quizzes`);
+    logger.log(
+      `Successfully fetched topic data with ${processedQuizzes.length} quizzes`
+    );
 
     return NextResponse.json(response);
   } catch (error) {

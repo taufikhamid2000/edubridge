@@ -19,10 +19,11 @@ export function useTopicData(subject: string, topic: string) {
       setError('Missing subject or topic parameters');
       setLoading(false);
       return;
-    }    (async () => {
+    }
+    (async () => {
       try {
         logger.log(`Fetching topic data via API for topic: ${topic}`);
-        
+
         const result = await fetchTopicDataAPI(topic);
 
         if (result.error) {
@@ -32,10 +33,10 @@ export function useTopicData(subject: string, topic: string) {
         // Set the data from the API response
         setSubjectData(result.subject);
         setTopicData(result.topic);
-        
+
         // Handle chapter data - use API result or fallback to query parameters
         let chapterToSet = result.chapter;
-        
+
         if (!chapterToSet) {
           logger.log('No chapter data from API, checking query parameters...');
           const chapterId = searchParams.get('chapterId');
@@ -54,7 +55,7 @@ export function useTopicData(subject: string, topic: string) {
             };
           }
         }
-        
+
         setChapterData(chapterToSet);
         setQuizzes(result.quizzes);
       } catch (err) {

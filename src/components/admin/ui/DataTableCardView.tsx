@@ -1,7 +1,7 @@
 'use client';
 
 import { ReactNode } from 'react';
-import Image from 'next/image';
+// import Image from 'next/image';
 
 export interface Column<T> {
   key: string;
