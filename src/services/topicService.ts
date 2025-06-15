@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
 import { checkAdminAccess } from './adminAuthService';
+import { Topic as TopicType, Chapter, Subject, Quiz } from '@/types/topics';
 
 /**
  * Interface for Topic structure
@@ -253,5 +254,47 @@ export async function deleteTopic(id: string): Promise<{
     const err = error as Error;
     logger.error('Error in deleteTopic:', err);
     return { success: false, error: err };
+  }
+}
+
+/**
+ * Fetch topic data with chapter, subject, and quizzes via API
+ */
+export async function fetchTopicDataAPI(topicId: string): Promise<{
+  topic: TopicType | null;
+  chapter: Chapter | null;
+  subject: Subject | null;
+  quizzes: Quiz[];
+  error?: string;
+}> {
+  try {
+    logger.log(`Fetching topic data via API: ${topicId}`);
+
+    const response = await fetch(`/api/topics/${topicId}`);
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    logger.log(`Successfully fetched topic data via API for topic: ${topicId}`);
+    
+    return {
+      topic: data.topic,
+      chapter: data.chapter,
+      subject: data.subject,
+      quizzes: data.quizzes,
+    };
+  } catch (error) {
+    logger.error('Error fetching topic data via API:', error);
+    return {
+      topic: null,
+      chapter: null,
+      subject: null,
+      quizzes: [],
+      error: error instanceof Error ? error.message : 'Failed to fetch topic data',
+    };
   }
 }
