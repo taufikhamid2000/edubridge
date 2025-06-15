@@ -23,7 +23,7 @@ if (!supabaseUrl || !supabaseKey) {
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 const migrationFile =
-  'supabase/migrations/20250615001000_fix_questions_and_answers_rls.sql';
+  'supabase/migrations/20250616001000_fix_quiz_attempts_rls.sql';
 
 async function applyMigration() {
   try {

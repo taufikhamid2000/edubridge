@@ -70,6 +70,7 @@ export async function POST(
           quiz_title: quizData.name,
           time_taken: timeElapsed || null,
           created_at: new Date().toISOString(),
+          is_verified_quiz: isQuizVerified, // Store verification status with the attempt
         },
       ])
       .select()

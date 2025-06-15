@@ -79,6 +79,22 @@ export default function AdminNavigation({
       icon: <BookOpen className={isCollapsed ? '' : 'mr-3'} size={18} />,
     },
     {
+      name: 'Quizzes',
+      path: '/admin/quizzes',
+      icon: <BookOpen className={isCollapsed ? '' : 'mr-3'} size={18} />,
+      subitems: [
+        {
+          name: 'Pending Verification',
+          path: '/admin/quizzes/pending',
+          badge: 'new',
+        },
+        {
+          name: 'All Quizzes',
+          path: '/admin/quizzes/all',
+        },
+      ],
+    },
+    {
       name: 'Achievements',
       path: '/admin/achievements',
       icon: <Award className={isCollapsed ? '' : 'mr-3'} size={18} />,

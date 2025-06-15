@@ -166,7 +166,7 @@ export default function QuizResults({
               className={`p-3 rounded-md ${
                 isCorrect
                   ? 'bg-green-900/20 dark:bg-green-50 border-l-4 border-green-500'
-                  : 'bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500'
+                  : 'bg-red-900/20 dark:bg-red-900/20 border-l-4 border-red-500'
               }`}
             >
               <div className="flex justify-between">

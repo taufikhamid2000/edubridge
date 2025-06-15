@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { logger } from '@/lib/logger';
 import {
   fetchDashboardStats,
@@ -125,12 +126,12 @@ export default function AdminDashboard() {
           <h2 className="text-xl font-semibold dark:text-gray-100">
             Quiz Audit System
           </h2>
-          <a
+          <Link
             href="/admin/quizzes"
             className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-medium"
           >
             View All Quizzes →
-          </a>
+          </Link>
         </div>
 
         {loading ? (
@@ -191,7 +192,7 @@ export default function AdminDashboard() {
                       (quiz: QuizWithAudit) => (
                         <div
                           key={quiz.id}
-                          className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg"
+                          className="flex items-center justify-between p-3 bg-gray-500 dark:bg-gray-700 rounded-lg"
                         >
                           <div className="flex-1">
                             <h4 className="font-medium dark:text-gray-100">
