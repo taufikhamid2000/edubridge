@@ -2,6 +2,7 @@
 import { supabase } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
 import { checkAdminAccess } from './adminAuthService';
+import { QuizWithQuestionsAndContext } from '@/types/topics';
 
 /**
  * Interface for Quiz structure
@@ -363,6 +364,50 @@ export async function deleteQuiz(id: string): Promise<{
       error: {
         message: err instanceof Error ? err.message : 'Unknown error occurred',
       },
+    };
+  }
+}
+
+/**
+ * Fetch quiz with questions and topic context via API
+ */
+export async function fetchQuizWithQuestionsAPI(
+  quizId: string
+): Promise<
+  | (QuizWithQuestionsAndContext & { error?: undefined })
+  | {
+      error: string;
+      quiz?: undefined;
+      questions?: undefined;
+      topicContext?: undefined;
+    }
+> {
+  try {
+    logger.log(`Fetching quiz via API: ${quizId}`);
+
+    const response = await fetch(`/api/quiz/${quizId}`);
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(
+        errorData.error || `HTTP error! status: ${response.status}`
+      );
+    }
+
+    const data = await response.json();
+
+    logger.log(`Successfully fetched quiz data via API for quiz: ${quizId}`);
+
+    return {
+      quiz: data.quiz,
+      questions: data.questions,
+      topicContext: data.topicContext,
+    };
+  } catch (error) {
+    logger.error('Error fetching quiz via API:', error);
+    return {
+      error:
+        error instanceof Error ? error.message : 'Failed to fetch quiz data',
     };
   }
 }

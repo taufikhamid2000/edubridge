@@ -72,3 +72,17 @@ export interface QuizAttempt {
   time_taken?: number;
   created_at: string;
 }
+
+// New types for optimized quiz API
+export interface TopicContext {
+  topicTitle: string;
+  chapterTitle: string;
+  subjectName: string;
+  form?: number;
+}
+
+export interface QuizWithQuestionsAndContext {
+  quiz: Quiz;
+  questions: Question[];
+  topicContext: TopicContext;
+}

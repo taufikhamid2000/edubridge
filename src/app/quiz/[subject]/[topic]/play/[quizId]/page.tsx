@@ -2,18 +2,11 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { getQuizWithQuestions } from '@/lib/quiz';
+import { fetchQuizWithQuestionsAPI } from '@/services/quizService';
 import QuizPlayer from '@/components/quiz/QuizPlayer';
-import { Question, Quiz } from '@/types/topics';
+import { Question, Quiz, TopicContext } from '@/types/topics';
 import { logger } from '@/lib/logger';
 import { supabase } from '@/lib/supabase';
-
-interface TopicContext {
-  topicTitle: string;
-  chapterTitle: string;
-  subjectName: string;
-  form?: number;
-}
 
 export default function PlayQuizPage() {
   const params = useParams();
@@ -76,58 +69,24 @@ export default function PlayQuizPage() {
       if (authLoading || !userId) {
         return;
       }
-
       try {
-        const quizData = await getQuizWithQuestions(quizId);
+        const result = await fetchQuizWithQuestionsAPI(quizId);
 
-        if (!quizData) {
+        if (result.error) {
+          setError(result.error);
+          setLoading(false);
+          return;
+        }
+
+        if (!result.quiz) {
           setError('Failed to load quiz data');
           setLoading(false);
           return;
         }
 
-        // Fetch topic context with proper table relationships and column names
-        const { data: topicData, error: topicError } = await supabase
-          .from('topics')
-          .select(
-            `
-            name,
-            chapters:chapters!inner (
-              name,
-              form,
-              subjects:subjects!inner (
-                name
-              )
-            )
-          `
-          )
-          .eq('id', topic)
-          .single();
-
-        if (topicError) {
-          logger.error('Error fetching topic context:', topicError);
-        } else if (topicData && topicData.chapters) {
-          const chapter = Array.isArray(topicData.chapters)
-            ? topicData.chapters[0]
-            : topicData.chapters;
-
-          const subjectObj =
-            chapter.subjects && Array.isArray(chapter.subjects)
-              ? chapter.subjects[0]
-              : chapter.subjects;
-
-          if (chapter && subjectObj) {
-            setTopicContext({
-              topicTitle: topicData.name,
-              chapterTitle: chapter.name,
-              subjectName: subjectObj.name,
-              form: chapter.form,
-            });
-          }
-        }
-
-        setQuiz(quizData.quiz);
-        setQuestions(quizData.questions);
+        setQuiz(result.quiz);
+        setQuestions(result.questions);
+        setTopicContext(result.topicContext);
       } catch (err) {
         logger.error('Error fetching quiz:', err);
         setError(
