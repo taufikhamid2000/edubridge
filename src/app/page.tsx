@@ -41,7 +41,13 @@ export default function HomePage() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
-      setIsLoggedIn(!!session);
+      const loggedIn = !!session;
+      setIsLoggedIn(loggedIn);
+      console.log('Auth state changed:', {
+        event,
+        isLoggedIn: loggedIn,
+        hasSession: !!session,
+      });
     });
 
     return () => subscription.unsubscribe();
@@ -124,7 +130,13 @@ export default function HomePage() {
             {' '}
             <button
               className="inline-block uppercase tracking-wide rounded-full shadow-lg transition-all duration-300 ease-in-out px-8 py-4 bg-white text-blue-600 font-medium hover:bg-gray-100 hover:scale-105 transform"
-              onClick={() => router.push(isLoggedIn ? '/dashboard' : '/auth')}
+              onClick={() => {
+                console.log(
+                  'Dashboard button clicked, isLoggedIn:',
+                  isLoggedIn
+                );
+                router.push(isLoggedIn ? '/dashboard' : '/auth');
+              }}
             >
               Access your dashboard
             </button>{' '}
