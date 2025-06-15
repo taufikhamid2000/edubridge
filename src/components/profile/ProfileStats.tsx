@@ -70,7 +70,7 @@ export default function ProfileStats({ user }: ProfileStatsProps) {
           Recent Activity
         </h3>
         {user.lastQuizDate ? (
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="text-gray-300 dark:text-gray-600">
             Last quiz completed on{' '}
             {new Date(user.lastQuizDate).toLocaleDateString()}
           </p>

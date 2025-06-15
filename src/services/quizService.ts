@@ -168,6 +168,54 @@ export async function submitQuiz(data: {
 }
 
 /**
+ * Submits a quiz attempt with the user's answers
+ */
+export async function submitQuizAttempt({
+  quizId,
+  userId,
+  score,
+  answers,
+  timeElapsed,
+}: {
+  quizId: string;
+  userId: string;
+  score: number;
+  answers: { questionId: string; selectedAnswerIds: string[] }[];
+  timeElapsed?: number;
+}) {
+  try {
+    logger.log('Submitting quiz attempt via API:', { quizId, userId, score });
+
+    const response = await fetch(`/api/quiz/${quizId}/submit`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userId,
+        score,
+        answers,
+        timeElapsed,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(
+        errorData.error || `HTTP error! status: ${response.status}`
+      );
+    }
+
+    const result = await response.json();
+    logger.log('Quiz attempt submitted successfully:', result);
+    return result;
+  } catch (error) {
+    logger.error('Error submitting quiz attempt:', error);
+    throw error;
+  }
+}
+
+/**
  * Fetches all quizzes for admin use
  */
 export async function fetchAdminQuizzes(): Promise<{
@@ -371,9 +419,7 @@ export async function deleteQuiz(id: string): Promise<{
 /**
  * Fetch quiz with questions and topic context via API
  */
-export async function fetchQuizWithQuestionsAPI(
-  quizId: string
-): Promise<
+export async function fetchQuizWithQuestionsAPI(quizId: string): Promise<
   | (QuizWithQuestionsAndContext & { error?: undefined })
   | {
       error: string;

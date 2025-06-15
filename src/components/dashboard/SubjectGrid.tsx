@@ -86,7 +86,7 @@ const SubjectGrid = ({
               </p>
               {subject.category && (
                 <div className="mt-3">
-                  <span className="inline-block px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 rounded-full">
+                  <span className="inline-block px-2 py-1 text-xs bg-gray-900 dark:bg-gray-100 rounded-full">
                     {subject.category}
                   </span>
                 </div>

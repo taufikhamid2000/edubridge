@@ -502,7 +502,7 @@ export default function QuizAuditPage() {
                               {log.action}
                             </span>
                             {log.reason && (
-                              <span className="ml-2 text-sm text-gray-600 dark:text-gray-300">
+                              <span className="ml-2 text-sm text-gray-300 dark:text-gray-600">
                                 - {log.reason}
                               </span>
                             )}

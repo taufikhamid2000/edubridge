@@ -137,7 +137,7 @@ export default function StaticHomePage() {
         <div className="bg-gray-800 dark:bg-white rounded-xl shadow-xl p-8 mb-16 border border-gray-100 dark:border-gray-700 transform transition-all hover:shadow-2xl">
           <div className="max-w-4xl mx-auto">
             <div className="prose prose-lg max-w-none text-gray-300 dark:text-gray-700">
-              <h2 className="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-100">
+              <h2 className="text-3xl font-bold mb-6 text-gray-100 dark:text-gray-800">
                 Earn up to RM1000 when you join EduBridge – and make your school
                 proud!
               </h2>
@@ -242,7 +242,7 @@ export default function StaticHomePage() {
                   />
                 </svg>
               </div>
-              <h4 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+              <h4 className="text-xl font-semibold text-gray-100 dark:text-gray-800">
                 Market Overview
               </h4>
             </div>
@@ -322,7 +322,7 @@ export default function StaticHomePage() {
                   />
                 </svg>
               </div>
-              <h4 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+              <h4 className="text-xl font-semibold text-gray-100 dark:text-gray-800">
                 Gaps Identified
               </h4>
             </div>
@@ -424,10 +424,10 @@ export default function StaticHomePage() {
                 />
               </svg>
             </div>
-            <h4 className="text-xl font-semibold mb-3 text-center text-gray-800 dark:text-gray-100">
+            <h4 className="text-xl font-semibold mb-3 text-center text-gray-100 dark:text-gray-800">
               Primary
             </h4>
-            <p className="text-gray-600 dark:text-gray-300 text-center">
+            <p className="text-gray-300 dark:text-gray-600 text-center">
               Form 4 and Form 5 students aiming to strengthen academic mastery
               📚
             </p>
@@ -449,10 +449,10 @@ export default function StaticHomePage() {
                 />
               </svg>
             </div>
-            <h4 className="text-xl font-semibold mb-3 text-center text-gray-800 dark:text-gray-100">
+            <h4 className="text-xl font-semibold mb-3 text-center text-gray-100 dark:text-gray-800">
               Secondary
             </h4>
-            <p className="text-gray-600 dark:text-gray-300 text-center">
+            <p className="text-gray-300 dark:text-gray-600 text-center">
               Students retaking secondary-level examinations 🔄
             </p>
           </div>
@@ -473,10 +473,10 @@ export default function StaticHomePage() {
                 />
               </svg>
             </div>
-            <h4 className="text-xl font-semibold mb-3 text-center text-gray-800 dark:text-gray-100">
+            <h4 className="text-xl font-semibold mb-3 text-center text-gray-100 dark:text-gray-800">
               Quiz Makers
             </h4>
-            <p className="text-gray-600 dark:text-gray-300 text-center">
+            <p className="text-gray-300 dark:text-gray-600 text-center">
               Educators and content creators looking to earn through quiz
               creation 💡
             </p>

@@ -91,7 +91,7 @@ export function QuizForm({
           <div className="relative">
             <input
               id="quizName"
-              className="w-full px-3 py-2 border rounded-md shadow-sm bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-700 text-gray-200 dark:text-gray-800 font-mono"
+              className="w-full px-3 py-2 border rounded-md shadow-sm bg-gray-700/50 dark:bg-gray-50 border-gray-300 dark:border-gray-700 text-gray-200 dark:text-gray-800 font-mono"
               readOnly
               value={quizCode}
               {...register('name', {

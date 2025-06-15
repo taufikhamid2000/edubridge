@@ -179,7 +179,7 @@ export default function HomePage() {
         <div className="bg-gray-800 dark:bg-white rounded-xl shadow-xl p-8 mb-16 border border-gray-100 dark:border-gray-700 transform transition-all hover:shadow-2xl">
           <div className="max-w-4xl mx-auto">
             <div className="prose prose-lg max-w-none text-gray-300 dark:text-gray-700">
-              <h2 className="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-100">
+              <h2 className="text-3xl font-bold mb-6 text-gray-100 dark:text-gray-800">
                 Earn up to RM1000 when you join EduBridge – and make your school
                 proud!
               </h2>
@@ -289,7 +289,7 @@ export default function HomePage() {
                   />
                 </svg>
               </div>
-              <h4 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+              <h4 className="text-xl font-semibold text-gray-100 dark:text-gray-800">
                 Market Overview
               </h4>
             </div>
@@ -368,7 +368,7 @@ export default function HomePage() {
                   />
                 </svg>
               </div>
-              <h4 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+              <h4 className="text-xl font-semibold text-gray-100 dark:text-gray-800">
                 Gaps Identified
               </h4>
             </div>
@@ -468,10 +468,10 @@ export default function HomePage() {
                 />
               </svg>
             </div>
-            <h4 className="text-xl font-semibold mb-3 text-center text-gray-800 dark:text-gray-100">
+            <h4 className="text-xl font-semibold mb-3 text-center text-gray-100 dark:text-gray-800">
               Primary
             </h4>
-            <p className="text-gray-600 dark:text-gray-300 text-center">
+            <p className="text-gray-300 dark:text-gray-600 text-center">
               Form 4 and Form 5 students aiming to strengthen academic mastery
               📚
             </p>
@@ -493,10 +493,10 @@ export default function HomePage() {
                 />
               </svg>
             </div>
-            <h4 className="text-xl font-semibold mb-3 text-center text-gray-800 dark:text-gray-100">
+            <h4 className="text-xl font-semibold mb-3 text-center text-gray-100 dark:text-gray-800">
               Secondary
             </h4>
-            <p className="text-gray-600 dark:text-gray-300 text-center">
+            <p className="text-gray-300 dark:text-gray-600 text-center">
               Students retaking secondary-level examinations 🔄
             </p>
           </div>
@@ -517,10 +517,10 @@ export default function HomePage() {
                 />
               </svg>
             </div>
-            <h4 className="text-xl font-semibold mb-3 text-center text-gray-800 dark:text-gray-100">
+            <h4 className="text-xl font-semibold mb-3 text-center text-gray-100 dark:text-gray-800">
               Tertiary
             </h4>
-            <p className="text-gray-600 dark:text-gray-300 text-center">
+            <p className="text-gray-300 dark:text-gray-600 text-center">
               Parents and teachers seeking complementary study tools for their
               children or students 👨‍🏫
             </p>
@@ -545,7 +545,7 @@ export default function HomePage() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
           <div className="bg-gray-800 dark:bg-white rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl">
-            <h4 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-100 flex items-center">
+            <h4 className="text-xl font-semibold mb-4 text-gray-100 dark:text-gray-800 flex items-center">
               <span className="bg-indigo-100 dark:bg-indigo-900/30 p-2 rounded-full mr-3">
                 <svg
                   className="h-6 w-6 text-indigo-600 dark:text-indigo-400"
@@ -641,7 +641,7 @@ export default function HomePage() {
           </div>
 
           <div className="bg-gray-800 dark:bg-white rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-xl">
-            <h4 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-100 flex items-center">
+            <h4 className="text-xl font-semibold mb-4 text-gray-100 dark:text-gray-800 flex items-center">
               <span className="bg-teal-100 dark:bg-teal-900/30 p-2 rounded-full mr-3">
                 <svg
                   className="h-6 w-6 text-teal-600 dark:text-teal-400"
@@ -767,13 +767,13 @@ export default function HomePage() {
                     1
                   </span>
                 </div>
-                <h4 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+                <h4 className="text-xl font-bold text-gray-100 dark:text-gray-800 mb-2">
                   MVP Development{' '}
                   <span className="text-sm text-gray-400 dark:text-gray-500 font-normal">
                     (0-4 months)
                   </span>
                 </h4>
-                <p className="text-gray-600 dark:text-gray-300">
+                <p className="text-gray-300 dark:text-gray-600">
                   Bahasa Melayu and Sejarah modules, XP system, streak
                   mechanics, leaderboard functionality. Pilot version tested
                   internally 🧪
@@ -787,13 +787,13 @@ export default function HomePage() {
                     2
                   </span>
                 </div>
-                <h4 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+                <h4 className="text-xl font-bold text-gray-100 dark:text-gray-800 mb-2">
                   Pilot Testing{' '}
                   <span className="text-sm text-gray-400 dark:text-gray-500 font-normal">
                     (4-6 months)
                   </span>
                 </h4>
-                <p className="text-gray-600 dark:text-gray-300">
+                <p className="text-gray-300 dark:text-gray-600">
                   Soft-launch with 2–3 schools 🏫, Target 100–500 students 🎯,
                   Measure Day-2 retention and weekly engagement metrics 📊
                 </p>
@@ -806,13 +806,13 @@ export default function HomePage() {
                     3
                   </span>
                 </div>
-                <h4 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+                <h4 className="text-xl font-bold text-gray-100 dark:text-gray-800 mb-2">
                   Expansion{' '}
                   <span className="text-sm text-gray-400 dark:text-gray-500 font-normal">
                     (6-9 months)
                   </span>
                 </h4>
-                <p className="text-gray-600 dark:text-gray-300">
+                <p className="text-gray-300 dark:text-gray-600">
                   Add new subjects (Mathematics, Science) ➕, Improve user
                   experience based on pilot feedback 🔄
                 </p>
@@ -825,13 +825,13 @@ export default function HomePage() {
                     4
                   </span>
                 </div>
-                <h4 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+                <h4 className="text-xl font-bold text-gray-100 dark:text-gray-800 mb-2">
                   Malaysia-Wide Launch{' '}
                   <span className="text-sm text-gray-400 dark:text-gray-500 font-normal">
                     (9-15 months)
                   </span>
                 </h4>
-                <p className="text-gray-600 dark:text-gray-300">
+                <p className="text-gray-300 dark:text-gray-600">
                   Regional marketing efforts 📣, Introduce first formal
                   sponsorship programs 🤝
                 </p>
@@ -844,13 +844,13 @@ export default function HomePage() {
                     5
                   </span>
                 </div>
-                <h4 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+                <h4 className="text-xl font-bold text-gray-100 dark:text-gray-800 mb-2">
                   Optional Regional Expansion{' '}
                   <span className="text-sm text-gray-400 dark:text-gray-500 font-normal">
                     (15+ months)
                   </span>
                 </h4>
-                <p className="text-gray-600 dark:text-gray-300">
+                <p className="text-gray-300 dark:text-gray-600">
                   Launch "Global Skills Track" (basic English, Math, Science
                   quizzes) 🌍, Offer flexible onboarding for regional markets 🛫
                 </p>
@@ -885,7 +885,7 @@ export default function HomePage() {
                   />
                 </svg>
               </div>
-              <h4 className="text-xl font-semibold ml-3 text-gray-800 dark:text-gray-100">
+              <h4 className="text-xl font-semibold ml-3 text-gray-100 dark:text-gray-800">
                 Revenue Streams
               </h4>
             </div>
@@ -963,7 +963,7 @@ export default function HomePage() {
                   />
                 </svg>
               </div>
-              <h4 className="text-xl font-semibold ml-3 text-gray-800 dark:text-gray-100">
+              <h4 className="text-xl font-semibold ml-3 text-gray-100 dark:text-gray-800">
                 Partnership Models
               </h4>
             </div>
@@ -1032,7 +1032,7 @@ export default function HomePage() {
         </div>
         <div className="bg-gray-800 dark:bg-white rounded-xl shadow-lg p-8 border border-gray-100 dark:border-gray-700 mb-16">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-5 border border-gray-100 dark:border-gray-600">
+            <div className="bg-gray-700/50 dark:bg-gray-50 rounded-lg p-5 border border-gray-600 dark:border-gray-100">
               <div className="flex items-center mb-3">
                 <div className="bg-red-100 dark:bg-red-900/30 p-2 rounded-full">
                   <svg
@@ -1049,7 +1049,7 @@ export default function HomePage() {
                     />
                   </svg>
                 </div>
-                <h4 className="text-lg font-bold ml-3 text-gray-800 dark:text-gray-100">
+                <h4 className="text-lg font-bold ml-3 text-gray-100 dark:text-gray-800">
                   Competition Risk
                 </h4>
               </div>
@@ -1058,7 +1058,7 @@ export default function HomePage() {
                   <strong>Risk:</strong> Competition from existing education
                   apps.
                 </p>
-                <p className="text-gray-400 dark:text-gray-600 text-sm bg-green-50 dark:bg-green-900/20 p-2 rounded-md border-l-4 border-green-500">
+                <p className="text-gray-400 dark:text-gray-600 text-sm bg-green-900/20 dark:bg-green-50 p-2 rounded-md border-l-4 border-green-500">
                   <strong>Mitigation:</strong> Focus on gamification and rewards
                   system, not static content. Unique selling proposition through
                   engagement loops.
@@ -1066,7 +1066,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-5 border border-gray-100 dark:border-gray-600">
+            <div className="bg-gray-700/50 dark:bg-gray-50 rounded-lg p-5 border border-gray-600 dark:border-gray-100">
               <div className="flex items-center mb-3">
                 <div className="bg-red-100 dark:bg-red-900/30 p-2 rounded-full">
                   <svg
@@ -1083,7 +1083,7 @@ export default function HomePage() {
                     />
                   </svg>
                 </div>
-                <h4 className="text-lg font-bold ml-3 text-gray-800 dark:text-gray-100">
+                <h4 className="text-lg font-bold ml-3 text-gray-100 dark:text-gray-800">
                   Retention Risk
                 </h4>
               </div>
@@ -1091,7 +1091,7 @@ export default function HomePage() {
                 <p className="text-gray-300 dark:text-gray-700 mb-2">
                   <strong>Risk:</strong> Low user retention rates.
                 </p>
-                <p className="text-gray-400 dark:text-gray-600 text-sm bg-green-50 dark:bg-green-900/20 p-2 rounded-md border-l-4 border-green-500">
+                <p className="text-gray-400 dark:text-gray-600 text-sm bg-green-900/20 dark:bg-green-50 p-2 rounded-md border-l-4 border-green-500">
                   <strong>Mitigation:</strong> Implement gamified loops, cash
                   incentives, and social recognition features to enhance user
                   engagement.
@@ -1099,7 +1099,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-5 border border-gray-100 dark:border-gray-600">
+            <div className="bg-gray-700/50 dark:bg-gray-50 rounded-lg p-5 border border-gray-600 dark:border-gray-100">
               <div className="flex items-center mb-3">
                 <div className="bg-red-100 dark:bg-red-900/30 p-2 rounded-full">
                   <svg
@@ -1116,7 +1116,7 @@ export default function HomePage() {
                     />
                   </svg>
                 </div>
-                <h4 className="text-lg font-bold ml-3 text-gray-800 dark:text-gray-100">
+                <h4 className="text-lg font-bold ml-3 text-gray-100 dark:text-gray-800">
                   System Abuse Risk
                 </h4>
               </div>
@@ -1124,7 +1124,7 @@ export default function HomePage() {
                 <p className="text-gray-300 dark:text-gray-700 mb-2">
                   <strong>Risk:</strong> Abuse of prize system.
                 </p>
-                <p className="text-gray-400 dark:text-gray-600 text-sm bg-green-50 dark:bg-green-900/20 p-2 rounded-md border-l-4 border-green-500">
+                <p className="text-gray-400 dark:text-gray-600 text-sm bg-green-900/20 dark:bg-green-50 p-2 rounded-md border-l-4 border-green-500">
                   <strong>Mitigation:</strong> Implement fraud prevention
                   through ID verification, randomized audits, and behavior
                   pattern analysis.
@@ -1132,7 +1132,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-5 border border-gray-100 dark:border-gray-600">
+            <div className="bg-gray-700/50 dark:bg-gray-50 rounded-lg p-5 border border-gray-600 dark:border-gray-100">
               <div className="flex items-center mb-3">
                 <div className="bg-red-100 dark:bg-red-900/30 p-2 rounded-full">
                   <svg
@@ -1149,7 +1149,7 @@ export default function HomePage() {
                     />
                   </svg>
                 </div>
-                <h4 className="text-lg font-bold ml-3 text-gray-800 dark:text-gray-100">
+                <h4 className="text-lg font-bold ml-3 text-gray-100 dark:text-gray-800">
                   Financial Risk
                 </h4>
               </div>
@@ -1157,7 +1157,7 @@ export default function HomePage() {
                 <p className="text-gray-300 dark:text-gray-700 mb-2">
                   <strong>Risk:</strong> Funding shortages.
                 </p>
-                <p className="text-gray-400 dark:text-gray-600 text-sm bg-green-50 dark:bg-green-900/20 p-2 rounded-md border-l-4 border-green-500">
+                <p className="text-gray-400 dark:text-gray-600 text-sm bg-green-900/20 dark:bg-green-50 p-2 rounded-md border-l-4 border-green-500">
                   <strong>Mitigation:</strong> Secure early sponsorship deals
                   and implement low-cost serverless hosting strategies to
                   minimize burn rate.
@@ -1208,10 +1208,10 @@ export default function HomePage() {
                 />
               </svg>
             </div>
-            <h4 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+            <h4 className="text-2xl font-bold text-gray-100 dark:text-gray-800 mb-2">
               45%
             </h4>
-            <p className="text-gray-600 dark:text-gray-300">
+            <p className="text-gray-300 dark:text-gray-600">
               Day-2 retention among pilot users
             </p>
           </div>{' '}
@@ -1231,10 +1231,10 @@ export default function HomePage() {
                 />
               </svg>
             </div>
-            <h4 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+            <h4 className="text-2xl font-bold text-gray-100 dark:text-gray-800 mb-2">
               30+
             </h4>
-            <p className="text-gray-600 dark:text-gray-300">
+            <p className="text-gray-300 dark:text-gray-600">
               Quizzes per user weekly
             </p>{' '}
           </div>{' '}
@@ -1255,10 +1255,10 @@ export default function HomePage() {
                 />
               </svg>
             </div>
-            <h4 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+            <h4 className="text-2xl font-bold text-gray-100 dark:text-gray-800 mb-2">
               1,000+
             </h4>
-            <p className="text-gray-600 dark:text-gray-300">
+            <p className="text-gray-300 dark:text-gray-600">
               Monthly active users by Month 4
             </p>{' '}
           </div>{' '}
@@ -1279,10 +1279,10 @@ export default function HomePage() {
                 />
               </svg>
             </div>
-            <h4 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+            <h4 className="text-2xl font-bold text-gray-100 dark:text-gray-800 mb-2">
               70%
             </h4>
-            <p className="text-gray-600 dark:text-gray-300">
+            <p className="text-gray-300 dark:text-gray-600">
               Users showing academic improvement
             </p>
           </div>
@@ -1313,17 +1313,17 @@ export default function HomePage() {
           <h3 className="text-3xl font-bold mb-6">Next Steps ➡️</h3>
           <div className="h-1 w-20 bg-yellow-400 mx-auto mb-8"></div>
         </div>
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 rounded-xl shadow-lg p-8 border border-blue-100 dark:border-gray-700 mb-16">
+        <div className="bg-gradient-to-br from-gray-800 to-gray-900 dark:from-blue-50 dark:to-indigo-50 rounded-xl shadow-lg p-8 border border-gray-700 dark:border-blue-100 mb-16">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="flex items-start">
               <div className="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1">
                 <span className="font-bold">1</span>
               </div>
               <div className="ml-4">
-                <h4 className="text-lg font-bold mb-2 text-gray-800 dark:text-gray-100">
+                <h4 className="text-lg font-bold mb-2 text-gray-100 dark:text-gray-800">
                   Finalize MVP Specifications
                 </h4>
-                <p className="text-gray-600 dark:text-gray-300">
+                <p className="text-gray-300 dark:text-gray-600">
                   Complete technical requirements and feature prioritization for
                   the minimum viable product.
                 </p>
@@ -1335,10 +1335,10 @@ export default function HomePage() {
                 <span className="font-bold">2</span>
               </div>
               <div className="ml-4">
-                <h4 className="text-lg font-bold mb-2 text-gray-800 dark:text-gray-100">
+                <h4 className="text-lg font-bold mb-2 text-gray-100 dark:text-gray-800">
                   Build Minimum Content
                 </h4>
-                <p className="text-gray-600 dark:text-gray-300">
+                <p className="text-gray-300 dark:text-gray-600">
                   Develop initial quiz sets for Bahasa Melayu and Sejarah
                   modules to support launch.
                 </p>
@@ -1350,10 +1350,10 @@ export default function HomePage() {
                 <span className="font-bold">3</span>
               </div>
               <div className="ml-4">
-                <h4 className="text-lg font-bold mb-2 text-gray-800 dark:text-gray-100">
+                <h4 className="text-lg font-bold mb-2 text-gray-100 dark:text-gray-800">
                   Prepare Reward Pool
                 </h4>
-                <p className="text-gray-600 dark:text-gray-300">
+                <p className="text-gray-300 dark:text-gray-600">
                   Establish initial funding for the early reward pool to
                   incentivize user participation.
                 </p>
@@ -1365,10 +1365,10 @@ export default function HomePage() {
                 <span className="font-bold">4</span>
               </div>
               <div className="ml-4">
-                <h4 className="text-lg font-bold mb-2 text-gray-800 dark:text-gray-100">
+                <h4 className="text-lg font-bold mb-2 text-gray-100 dark:text-gray-800">
                   Begin Pilot Outreach
                 </h4>
-                <p className="text-gray-600 dark:text-gray-300">
+                <p className="text-gray-300 dark:text-gray-600">
                   Contact potential school partners for initial testing phase
                   and feedback collection.
                 </p>

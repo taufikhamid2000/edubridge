@@ -25,7 +25,7 @@ export default function StaticAboutPage() {
         <div className="bg-gray-800 dark:bg-white rounded-xl p-8 shadow-lg">
           <h1 className="text-3xl font-bold mb-6">About EduBridge</h1>
 
-          <div className="space-y-6 text-gray-600 dark:text-gray-300">
+          <div className="space-y-6 text-gray-300 dark:text-gray-600">
             <p>
               EduBridge is an innovative educational platform designed to bridge
               the gap between traditional learning and modern technology. Our

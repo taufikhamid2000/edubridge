@@ -129,7 +129,7 @@ function ProfileContent() {
             <h2 className="text-2xl font-bold text-red-600 dark:text-red-500 mb-4">
               Error
             </h2>
-            <p className="text-gray-600 dark:text-gray-300">
+            <p className="text-gray-300 dark:text-gray-600">
               {(userError || achievementsError || quizzesError)?.message ||
                 'Failed to load profile. Please try again.'}
             </p>

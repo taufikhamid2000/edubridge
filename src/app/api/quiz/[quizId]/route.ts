@@ -4,10 +4,10 @@ import { logger } from '@/lib/logger';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { quizId: string } }
+  { params }: { params: Promise<{ quizId: string }> }
 ) {
   try {
-    const { quizId } = params;
+    const { quizId } = await params;
 
     if (!quizId) {
       return NextResponse.json(
@@ -24,20 +24,20 @@ export async function GET(
       .select(
         `
         *,
-        questions:questions!inner (
+        questions:questions (
           *,
           answers:answers (
             *
           )
         ),
-        topics:topics!inner (
+        topics:topics (
           id,
           name,
-          chapters:chapters!inner (
+          chapters:chapters (
             id,
             name,
             form,
-            subjects:subjects!inner (
+            subjects:subjects (
               id,
               name
             )
@@ -46,8 +46,6 @@ export async function GET(
       `
       )
       .eq('id', quizId)
-      .order('questions.order_index', { ascending: true })
-      .order('questions.answers.order_index', { ascending: true })
       .single();
 
     if (quizError) {
@@ -62,20 +60,24 @@ export async function GET(
       return NextResponse.json({ error: 'Quiz not found' }, { status: 404 });
     }
 
-    // Extract topic context
+    // Extract topic context with null checks
     const topic = quizData.topics;
-    const chapter = Array.isArray(topic.chapters)
-      ? topic.chapters[0]
-      : topic.chapters;
-    const subject = Array.isArray(chapter.subjects)
-      ? chapter.subjects[0]
-      : chapter.subjects;
+    const chapter = topic?.chapters
+      ? Array.isArray(topic.chapters)
+        ? topic.chapters[0]
+        : topic.chapters
+      : null;
+    const subject = chapter?.subjects
+      ? Array.isArray(chapter.subjects)
+        ? chapter.subjects[0]
+        : chapter.subjects
+      : null;
 
     const topicContext = {
-      topicTitle: topic.name,
-      chapterTitle: chapter.name,
-      subjectName: subject.name,
-      form: chapter.form,
+      topicTitle: topic?.name || 'Unknown Topic',
+      chapterTitle: chapter?.name || 'Unknown Chapter',
+      subjectName: subject?.name || 'Unknown Subject',
+      form: chapter?.form || 'Unknown Form',
     };
 
     // Structure the response

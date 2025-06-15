@@ -5,7 +5,7 @@ import QuizQuestion from './QuizQuestion';
 import QuizProgress from './QuizProgress';
 import QuizResults from './QuizResults';
 import { useRouter } from 'next/navigation';
-import { submitQuizAttempt } from '@/lib/quiz';
+import { submitQuizAttempt } from '@/services/quizService';
 import { logger } from '@/lib/logger';
 
 // Fisher-Yates shuffle algorithm
@@ -254,7 +254,7 @@ export default function QuizPlayer({
         )}
 
         {topicContext && (
-          <div className="mb-4 text-gray-600 dark:text-gray-300">
+          <div className="mb-4 text-gray-300 dark:text-gray-600">
             <p className="mb-1">
               <strong>Topic:</strong> {topicContext.topicTitle}
             </p>
@@ -268,15 +268,15 @@ export default function QuizPlayer({
           </div>
         )}
         <div className="mb-6">
-          <p className="text-gray-600 dark:text-gray-300 mb-2">
+          <p className="text-gray-300 dark:text-gray-600 mb-2">
             This quiz contains {shuffledQuestions.length} questions.
           </p>
           {timeLimit && (
-            <p className="text-gray-600 dark:text-gray-300 mb-2">
+            <p className="text-gray-300 dark:text-gray-600 mb-2">
               You will have {timeLimit} minutes to complete this quiz.
             </p>
           )}
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="text-gray-300 dark:text-gray-600">
             Click the button below to start the quiz.
           </p>
         </div>

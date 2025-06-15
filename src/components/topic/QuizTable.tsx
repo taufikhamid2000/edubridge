@@ -147,7 +147,7 @@ export default function QuizTable({
         <div className="flex flex-wrap gap-2">
           <span
             id="status-filter-label"
-            className="text-sm text-gray-600 dark:text-gray-300 self-center"
+            className="text-sm text-gray-300 dark:text-gray-600 self-center"
           >
             Status:
           </span>
@@ -205,7 +205,6 @@ export default function QuizTable({
       <div className="overflow-x-auto rounded-lg shadow">
         <table className="table-auto w-full">
           <thead>
-            {' '}
             <tr className="bg-gray-800 dark:bg-gray-100">
               <th className="px-4 py-2 text-left">Quiz Code</th>
               {showCreator && (
@@ -243,7 +242,6 @@ export default function QuizTable({
           <tbody className="divide-y divide-gray-700 dark:divide-gray-200">
             {paginatedQuizzes.length === 0 ? (
               <tr>
-                {' '}
                 <td
                   colSpan={showCreator ? 4 : 3}
                   className="text-center py-8 text-gray-400 dark:text-gray-500"
@@ -323,7 +321,7 @@ export default function QuizTable({
                         </span>
                       )}
                     </td>
-                  )}{' '}
+                  )}
                   <td className="px-4 py-3">
                     {new Date(quiz.created_at).toLocaleDateString('en-GB', {
                       day: '2-digit',

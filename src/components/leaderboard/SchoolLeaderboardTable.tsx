@@ -47,7 +47,7 @@ export default function SchoolLeaderboardTable({
           <h3 className="text-sm font-medium text-gray-400 dark:text-gray-500">
             Total Schools
           </h3>
-          <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          <p className="text-2xl font-bold text-gray-100 dark:text-gray-900">
             {data.length}
           </p>
         </div>
@@ -55,8 +55,7 @@ export default function SchoolLeaderboardTable({
           <h3 className="text-sm font-medium text-gray-400 dark:text-gray-500">
             Average Score
           </h3>
-          <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-            {' '}
+          <p className="text-2xl font-bold text-gray-100 dark:text-gray-900">
             {data.length > 0
               ? (
                   data.reduce((acc, school) => acc + school.averageScore, 0) /
@@ -69,8 +68,7 @@ export default function SchoolLeaderboardTable({
           <h3 className="text-sm font-medium text-gray-400 dark:text-gray-500">
             Participation Rate
           </h3>
-          <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-            {' '}
+          <p className="text-2xl font-bold text-gray-100 dark:text-gray-900">
             {data.length > 0
               ? (
                   data.reduce(
@@ -127,7 +125,7 @@ export default function SchoolLeaderboardTable({
           <div>
             <label className="text-sm text-gray-400 dark:text-gray-500">
               District
-            </label>{' '}
+            </label>
             <select
               value={selectedDistrict}
               onChange={(e) => setSelectedDistrict(e.target.value)}
@@ -176,7 +174,7 @@ export default function SchoolLeaderboardTable({
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
+          <tbody className="bg-gray-800 divide-y divide-gray-700 dark:bg-white dark:divide-gray-200">
             {filteredData.map((school, index) => {
               const rowClass =
                 index < 3
@@ -211,7 +209,7 @@ export default function SchoolLeaderboardTable({
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                    <div className="text-sm font-medium text-gray-100 dark:text-gray-900">
                       <Link
                         href={`/schools/${school.id}`}
                         className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
@@ -226,7 +224,7 @@ export default function SchoolLeaderboardTable({
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900 dark:text-gray-100">
+                    <div className="text-sm text-gray-100 dark:text-gray-900">
                       {school.district}
                     </div>
                     <div className="text-xs text-gray-400 dark:text-gray-500">

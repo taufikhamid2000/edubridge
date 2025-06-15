@@ -117,13 +117,13 @@ export default function QuizResults({
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-        <div className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg text-center">
+        <div className="bg-gray-700/50 dark:bg-gray-50 p-4 rounded-lg text-center">
           <span className="block text-xl font-semibold">{totalQuestions}</span>
           <span className="text-sm text-gray-400 dark:text-gray-500">
             Questions
           </span>
         </div>
-        <div className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg text-center">
+        <div className="bg-gray-700/50 dark:bg-gray-50 p-4 rounded-lg text-center">
           <span className="block text-xl font-semibold">
             {score >= 60 ? 'Passed' : 'Try Again'}
           </span>
@@ -165,7 +165,7 @@ export default function QuizResults({
               key={question.id}
               className={`p-3 rounded-md ${
                 isCorrect
-                  ? 'bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500'
+                  ? 'bg-green-900/20 dark:bg-green-50 border-l-4 border-green-500'
                   : 'bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500'
               }`}
             >

@@ -25,7 +25,7 @@ export default function LeaderboardNav({
             }`}
           >
             Student Rankings
-          </Link>{' '}
+          </Link>
           <Link
             href={
               isStatic ? '/static/leaderboard/schools' : '/leaderboard/schools'
