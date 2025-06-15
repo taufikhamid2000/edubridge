@@ -18,6 +18,67 @@ function shuffleArray<T>(array: T[]): T[] {
   return shuffled;
 }
 
+// Define interfaces for flexible question & answer formats from different sources
+interface QuestionLike {
+  id: string;
+  quiz_id: string;
+  text?: string;
+  question_text?: string;
+  type?: string;
+  order_index?: number;
+  created_at: string;
+  updated_at?: string;
+  answers?: AnswerLike[];
+}
+
+interface AnswerLike {
+  id: string;
+  question_id: string;
+  text?: string;
+  answer_text?: string;
+  is_correct: boolean;
+  order_index?: number;
+  created_at: string;
+  updated_at?: string;
+}
+
+// Helper to normalize questions that might have different structures
+function normalizeQuestions(questions: QuestionLike[]): Question[] {
+  if (!Array.isArray(questions) || questions.length === 0) {
+    console.warn('No questions to normalize');
+    return [];
+  }
+
+  return questions.map((q) => {
+    // Create normalized question object
+    const normalizedQuestion: Question = {
+      id: q.id,
+      quiz_id: q.quiz_id,
+      text: q.text || q.question_text || '', // Handle different field names
+      type: (q.type as 'radio' | 'checkbox') || 'radio',
+      order_index: q.order_index || 0,
+      created_at: q.created_at,
+      updated_at: q.updated_at || q.created_at,
+      answers: [],
+    };
+
+    // Handle answers if present
+    if (Array.isArray(q.answers)) {
+      normalizedQuestion.answers = q.answers.map((a: AnswerLike) => ({
+        id: a.id,
+        question_id: a.question_id,
+        text: a.text || a.answer_text || '',
+        is_correct: a.is_correct === true, // Ensure boolean
+        order_index: a.order_index || 0,
+        created_at: a.created_at,
+        updated_at: a.updated_at || a.created_at,
+      }));
+    }
+
+    return normalizedQuestion;
+  });
+}
+
 interface TopicContext {
   topicTitle: string;
   chapterTitle: string;
@@ -59,17 +120,72 @@ export default function QuizPlayer({
   );
   const [quizStarted, setQuizStarted] = useState(false);
   const [shuffledQuestions, setShuffledQuestions] = useState<Question[]>([]);
+  const [loadingTimeout, setLoadingTimeout] = useState(false);
   const router = useRouter();
   // Initialize shuffled questions when component mounts or questions change
   useEffect(() => {
-    if (questions.length > 0) {
-      const shuffled = shuffleArray(questions);
+    console.log('QuizPlayer: questions prop changed', {
+      questionsLength: questions.length,
+      quizId: quizId,
+      quizName: quizName,
+      questionsSample: questions.slice(0, Math.min(3, questions.length)),
+    });
+
+    // Normalize questions to handle potential field name differences
+    const normalizedQuestions = normalizeQuestions(questions);
+    console.log('QuizPlayer: normalized questions', {
+      normalizedCount: normalizedQuestions.length,
+      firstNormalized:
+        normalizedQuestions.length > 0
+          ? {
+              id: normalizedQuestions[0].id,
+              text: normalizedQuestions[0].text,
+              answerCount: normalizedQuestions[0].answers?.length || 0,
+            }
+          : null,
+    });
+
+    // Check if questions have the required fields
+    const validQuestions = normalizedQuestions.filter(
+      (q) => q.id && q.text && Array.isArray(q.answers) && q.answers.length > 0
+    );
+
+    if (validQuestions.length !== normalizedQuestions.length) {
+      console.warn('QuizPlayer: Some questions are missing required fields', {
+        totalQuestions: normalizedQuestions.length,
+        validQuestions: validQuestions.length,
+        invalidQuestions: normalizedQuestions.filter(
+          (q) =>
+            !q.id ||
+            !q.text ||
+            !Array.isArray(q.answers) ||
+            q.answers.length === 0
+        ),
+      });
+    }
+
+    if (validQuestions.length > 0) {
+      const shuffled = shuffleArray(validQuestions);
+      console.log('QuizPlayer: shuffling complete', {
+        shuffledLength: shuffled.length,
+        firstQuestion:
+          shuffled.length > 0
+            ? {
+                id: shuffled[0].id,
+                text: shuffled[0].text,
+                answerCount: shuffled[0].answers?.length || 0,
+              }
+            : null,
+      });
+
       setShuffledQuestions(shuffled);
       // Log the randomization for verification
       logger.log('Quiz questions shuffled:', {
-        originalOrder: questions.map((q) => q.id.slice(-8)),
+        originalOrder: validQuestions.map((q) => q.id.slice(-8)),
         shuffledOrder: shuffled.map((q) => q.id.slice(-8)),
       });
+    } else {
+      console.warn('QuizPlayer: No valid questions available to shuffle');
     }
   }, [questions]);
   // Function to reset quiz state for retaking
@@ -80,8 +196,12 @@ export default function QuizPlayer({
     setScore(0);
     setTimeRemaining(timeLimit ? timeLimit * 60 : 0);
     setQuizStarted(false);
-    // Re-shuffle questions for a fresh experience on retake
-    const reshuffled = shuffleArray(questions);
+    // Normalize and re-shuffle questions for a fresh experience on retake
+    const normalizedQuestions = normalizeQuestions(questions);
+    const validQuestions = normalizedQuestions.filter(
+      (q) => q.id && q.text && Array.isArray(q.answers) && q.answers.length > 0
+    );
+    const reshuffled = shuffleArray(validQuestions);
     setShuffledQuestions(reshuffled);
     logger.log('Quiz questions re-shuffled on retake:', {
       newOrder: reshuffled.map((q) => q.id.slice(-8)),
@@ -105,6 +225,40 @@ export default function QuizPlayer({
 
     return () => clearInterval(timer);
   }, [quizStarted, timeLimit, quizCompleted]);
+
+  // Add timeout detection for the loading state
+  useEffect(() => {
+    // If we're still in loading state after 10 seconds, show a timeout message
+    let timeoutId: NodeJS.Timeout;
+
+    if (shuffledQuestions.length === 0 && questions.length > 0) {
+      timeoutId = setTimeout(() => {
+        console.warn('QuizPlayer: Loading timeout reached');
+        setLoadingTimeout(true);
+      }, 10000); // 10 second timeout
+    }
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [shuffledQuestions.length, questions.length]);
+
+  // Force shuffle if we hit the timeout but have questions available
+  useEffect(() => {
+    if (
+      loadingTimeout &&
+      questions.length > 0 &&
+      shuffledQuestions.length === 0
+    ) {
+      console.log('QuizPlayer: Forcing shuffle after timeout');
+      try {
+        const forceShuffle = [...questions].sort(() => Math.random() - 0.5);
+        setShuffledQuestions(forceShuffle);
+      } catch (err) {
+        console.error('QuizPlayer: Force shuffle error', err);
+      }
+    }
+  }, [loadingTimeout, questions, shuffledQuestions.length]);
 
   const handleStartQuiz = () => {
     setQuizStarted(true);
@@ -311,13 +465,59 @@ export default function QuizPlayer({
 
   // Don't render if shuffledQuestions is not ready
   if (shuffledQuestions.length === 0) {
+    console.log('QuizPlayer: In loading state', {
+      shuffledQuestionsLength: shuffledQuestions.length,
+      originalQuestionsLength: questions.length,
+    });
+
     return (
       <div className="bg-gray-800 dark:bg-white rounded-lg shadow-md p-6">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-t-blue-500 border-r-transparent border-b-blue-500 border-l-transparent"></div>
-          <p className="mt-4 text-gray-400 dark:text-gray-600">
-            Preparing quiz questions...
-          </p>
+          {!loadingTimeout ? (
+            <>
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-t-blue-500 border-r-transparent border-b-blue-500 border-l-transparent"></div>
+              <p className="mt-4 text-gray-400 dark:text-gray-600">
+                Preparing quiz questions...
+              </p>
+              <p className="mt-2 text-sm text-gray-500 dark:text-gray-500">
+                {questions.length > 0
+                  ? `Found ${questions.length} questions, shuffling...`
+                  : 'Waiting for questions...'}
+              </p>
+            </>
+          ) : (
+            <>
+              <div className="text-yellow-500 mb-2">⚠️</div>
+              <p className="text-gray-300 dark:text-gray-700 font-medium">
+                Taking longer than expected
+              </p>
+              <p className="mt-2 text-sm text-gray-400 dark:text-gray-600">
+                {questions.length > 0
+                  ? `Found ${questions.length} questions, but having trouble shuffling them.`
+                  : 'There was a problem loading the quiz questions.'}
+              </p>
+
+              <div className="mt-4">
+                <button
+                  onClick={() => {
+                    if (questions.length > 0) {
+                      // Try forcing a shuffle again
+                      const forceShuffle = [...questions].sort(
+                        () => Math.random() - 0.5
+                      );
+                      setShuffledQuestions(forceShuffle);
+                    } else {
+                      // If no questions, refresh the page
+                      window.location.reload();
+                    }
+                  }}
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm transition-colors"
+                >
+                  {questions.length > 0 ? 'Try Again' : 'Reload Quiz'}
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </div>
     );

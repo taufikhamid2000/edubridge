@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import EnhancedWelcomeBanner from '@/components/dashboard/EnhancedWelcomeBanner';
 import SubjectSearch from '@/components/dashboard/SubjectSearch';
 import SubjectGrid from '@/components/dashboard/SubjectGrid';
-import WeeklyProgress from '@/components/dashboard/WeeklyProgress';
+import EnhancedWeeklyProgress from '@/components/dashboard/EnhancedWeeklyProgress';
 import Achievements from '@/components/dashboard/Achievements';
 import { Subject } from '@/types/subject';
 
@@ -152,10 +152,13 @@ export default function StaticDashboardPage() {
         </section>
 
         {/* Weekly Progress Section */}
-        <WeeklyProgress
-          quizzesCompleted={7}
-          quizzesTotal={10}
-          averageScore={85}
+        <EnhancedWeeklyProgress
+          initialData={{
+            quizzesCompleted: 7,
+            quizzesTotal: 10,
+            averageScore: 85,
+          }}
+          isStatic={true}
         />
 
         {/* Recent Achievements Section */}

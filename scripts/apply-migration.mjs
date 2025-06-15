@@ -23,7 +23,7 @@ if (!supabaseUrl || !supabaseKey) {
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 const migrationFile =
-  'supabase/migrations/20250614_dashboard_performance_optimization.sql';
+  'supabase/migrations/20250615001000_fix_questions_and_answers_rls.sql';
 
 async function applyMigration() {
   try {
@@ -51,10 +51,9 @@ async function applyMigration() {
       if (statement.trim()) {
         console.log(
           `  ⏳ Executing statement ${i + 1}/${statements.length}...`
-        );
-
-        const { error } = await supabase.rpc('exec_sql', {
-          sql: statement + ';',
+        ); // Execute SQL statement directly
+        const { error } = await supabase.from('_exec_sql').rpc('run_sql', {
+          query: statement + ';',
         });
 
         if (error) {

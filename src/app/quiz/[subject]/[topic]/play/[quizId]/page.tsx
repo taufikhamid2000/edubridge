@@ -84,8 +84,42 @@ export default function PlayQuizPage() {
           return;
         }
 
+        console.log('Quiz Page: Fetched quiz data', {
+          quizName: result.quiz.name,
+          questionsCount: result.questions?.length || 0,
+          questionsValid: Array.isArray(result.questions),
+          questionsSample: result.questions?.slice(0, 1),
+        });
+
+        // Detailed inspection of questions
+        if (Array.isArray(result.questions) && result.questions.length > 0) {
+          console.log('Quiz Page: First question details:', {
+            id: result.questions[0].id,
+            text: result.questions[0].text,
+            type: result.questions[0].type,
+            hasAnswers: Array.isArray(result.questions[0].answers),
+            answerCount: result.questions[0].answers?.length || 0,
+            answersValid: result.questions[0].answers?.every(
+              (a) => a.id && a.text && typeof a.is_correct === 'boolean'
+            ),
+          });
+
+          // Check if questions match expected types
+          const questionKeys = Object.keys(result.questions[0]);
+          const expectedKeys = ['id', 'quiz_id', 'text', 'type', 'answers'];
+          const missingKeys = expectedKeys.filter(
+            (k) => !questionKeys.includes(k)
+          );
+          if (missingKeys.length > 0) {
+            console.warn(
+              'Quiz Page: Questions missing expected fields:',
+              missingKeys
+            );
+          }
+        }
+
         setQuiz(result.quiz);
-        setQuestions(result.questions);
+        setQuestions(result.questions || []);
         setTopicContext(result.topicContext);
       } catch (err) {
         logger.error('Error fetching quiz:', err);

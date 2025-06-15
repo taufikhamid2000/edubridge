@@ -1,19 +1,16 @@
 'use server';
 
-import { NextResponse } from 'next/server';
-import { cookies, headers } from 'next/headers';
+import { NextRequest, NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 import { supabase } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
     console.log('User API route called');
 
     const cookieStore = await cookies();
-    const headersList = headers();
-
-    // Check for both cookie and bearer token auth
     let session = null;
     let userId = null;
 
@@ -45,7 +42,7 @@ export async function GET(request: Request) {
       console.log('Cookie auth failed:', sessionError?.message);
 
       // 2. Try bearer token auth as fallback
-      const authHeader = headersList.get('authorization');
+      const authHeader = request.headers.get('authorization');
       if (authHeader?.startsWith('Bearer ')) {
         const token = authHeader.substring(7);
         console.log('Found bearer token, attempting auth');

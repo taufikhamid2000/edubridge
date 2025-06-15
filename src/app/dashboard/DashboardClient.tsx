@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import EnhancedWelcomeBanner from '@/components/dashboard/EnhancedWelcomeBanner';
 import SubjectSearch from '@/components/dashboard/SubjectSearch';
 import SubjectGrid from '@/components/dashboard/SubjectGrid';
-import WeeklyProgress from '@/components/dashboard/WeeklyProgress';
+import EnhancedWeeklyProgress from '@/components/dashboard/EnhancedWeeklyProgress';
 import Achievements from '@/components/dashboard/Achievements';
 
 interface Subject {
@@ -142,7 +142,6 @@ export default function DashboardClient({
               Subjects
             </h2>
           </div>
-
           <SubjectSearch
             searchTerm={searchQuery}
             selectedCategory={selectedCategory}
@@ -150,7 +149,6 @@ export default function DashboardClient({
             handleSearchChange={handleSearchChange}
             handleCategoryChange={handleCategoryChange}
           />
-
           {/* Subjects Grid with Results Count */}
           <div className="mb-4">
             <p className="text-sm text-gray-400 dark:text-gray-500">
@@ -160,7 +158,6 @@ export default function DashboardClient({
               {selectedCategory !== 'all' && ` in ${selectedCategory}`}
             </p>
           </div>
-
           <SubjectGrid
             subjects={currentSubjects}
             error={null}
@@ -168,13 +165,15 @@ export default function DashboardClient({
             totalPages={totalPages}
             handleSubjectClick={handleSubjectClick}
             handlePageChange={handlePageChange}
-          />
+          />{' '}
         </section>{' '}
         {/* Weekly Progress Section */}
-        <WeeklyProgress
-          quizzesCompleted={weeklyProgress.quizzesCompleted}
-          quizzesTotal={weeklyProgress.quizzesTotal}
-          averageScore={weeklyProgress.averageScore}
+        <EnhancedWeeklyProgress
+          initialData={{
+            quizzesCompleted: weeklyProgress.quizzesCompleted,
+            quizzesTotal: weeklyProgress.quizzesTotal,
+            averageScore: weeklyProgress.averageScore,
+          }}
         />
         {/* Recent Achievements Section */}
         <Achievements achievements={achievements} />
