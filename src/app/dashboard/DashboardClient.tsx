@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import WelcomeBanner from '@/components/dashboard/WelcomeBanner';
+import EnhancedWelcomeBanner from '@/components/dashboard/EnhancedWelcomeBanner';
 import SubjectSearch from '@/components/dashboard/SubjectSearch';
 import SubjectGrid from '@/components/dashboard/SubjectGrid';
 import WeeklyProgress from '@/components/dashboard/WeeklyProgress';
@@ -130,12 +130,11 @@ export default function DashboardClient({
     quizzesTotal: 10,
     averageScore: 85,
   };
-
   return (
     <main className="container mx-auto py-6 px-4 sm:px-6 md:px-8">
       <div className="flex flex-col gap-8 sm:gap-10 md:gap-12">
         {/* Welcome Section */}
-        <WelcomeBanner user={initialUser} />
+        <EnhancedWelcomeBanner initialUser={initialUser} />
         {/* Subjects Section */}
         <section id="subjects-section">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 sm:mb-6">

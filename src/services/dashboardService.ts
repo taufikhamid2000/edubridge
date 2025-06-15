@@ -38,6 +38,7 @@ export interface DashboardData {
  */
 export async function fetchDashboardData(): Promise<DashboardData> {
   try {
+    console.log('Client: Fetching dashboard data from API...');
     const response = await fetch('/api/dashboard', {
       method: 'GET',
       headers: {
@@ -45,6 +46,8 @@ export async function fetchDashboardData(): Promise<DashboardData> {
       },
       credentials: 'include',
     });
+
+    console.log('Client: Dashboard API response status:', response.status);
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
@@ -176,5 +179,66 @@ export async function fetchUserStats(): Promise<{
         },
       ],
     };
+  }
+}
+
+/**
+ * Gets the current user data with additional authentication fallback
+ * Uses both cookie-based auth and manual token passing to ensure reliability
+ */
+export async function getUserData(): Promise<DashboardUser | null> {
+  try {
+    // First, try to get from local storage as a fallback
+    let accessToken = null;
+    let userId = null;
+
+    // Try to get token from localStorage (client-side only)
+    if (typeof window !== 'undefined') {
+      try {
+        const supabaseKey = Object.keys(localStorage).find(
+          (key) => key.startsWith('sb-') && key.endsWith('-auth-token')
+        );
+
+        if (supabaseKey) {
+          const authData = JSON.parse(
+            localStorage.getItem(supabaseKey) || '{}'
+          );
+          accessToken = authData?.access_token;
+          userId = authData?.user?.id;
+          console.log('Found local auth data:', {
+            hasToken: !!accessToken,
+            hasUserId: !!userId,
+          });
+        }
+      } catch (e) {
+        console.warn('Error accessing localStorage:', e);
+      }
+    }
+
+    // Get user data with additional auth headers
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+
+    // Add token as Authorization header if available
+    if (accessToken) {
+      headers['Authorization'] = `Bearer ${accessToken}`;
+    }
+
+    const response = await fetch('/api/user', {
+      method: 'GET',
+      headers,
+      credentials: 'include', // Always include credentials
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to get user data: ${response.status}`);
+    }
+
+    const userData = await response.json();
+    return userData.user;
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    return null;
   }
 }

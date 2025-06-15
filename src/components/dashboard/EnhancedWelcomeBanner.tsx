@@ -1,24 +1,57 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { getUserData, DashboardUser } from '@/services/dashboardService';
 
-interface User {
-  email: string;
-  display_name?: string;
-  streak: number;
-  xp: number;
-  level: number;
-  lastQuizDate: string;
-}
-
 interface WelcomeBannerProps {
-  user: User | null;
+  initialUser?: DashboardUser | null;
   isStatic?: boolean;
 }
 
-const WelcomeBanner = ({ user, isStatic = false }: WelcomeBannerProps) => {
+const EnhancedWelcomeBanner = ({
+  initialUser,
+  isStatic = false,
+}: WelcomeBannerProps) => {
   const router = useRouter();
+  const [user, setUser] = useState<DashboardUser | null>(initialUser || null);
+  const [isLoading, setIsLoading] = useState(!initialUser);
+
+  // Fetch user data directly if not provided or if it's Guest User
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (!initialUser || initialUser.display_name === 'Guest User') {
+        console.log('EnhancedWelcomeBanner: Fetching user data directly');
+        try {
+          const userData = await getUserData();
+          if (userData) {
+            console.log('EnhancedWelcomeBanner: Got user data:', {
+              isGuest: userData.display_name === 'Guest User',
+              displayName: userData.display_name,
+            });
+            setUser(userData);
+          }
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchUserData();
+  }, [initialUser]);
+
+  if (isLoading) {
+    return (
+      <section className="dashboard-section welcome bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 sm:p-6 md:p-8 rounded-lg shadow-md dark:bg-gradient-to-r dark:from-gray-800 dark:to-gray-900">
+        <div>
+          <p className="text-3xl sm:text-4xl font-bold mb-2">Loading...</p>
+        </div>
+      </section>
+    );
+  }
 
   if (!user) return null;
 
@@ -101,7 +134,7 @@ const WelcomeBanner = ({ user, isStatic = false }: WelcomeBannerProps) => {
             onClick={handleRandomTopic}
             className="inline-flex items-center justify-center px-4 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 transition-all rounded-lg text-sm font-medium"
           >
-            <span className="mr-2">🎲</span>
+            <span className="mr-2">🔄</span>
             Explore Random Topic
           </button>
         </div>
@@ -110,4 +143,4 @@ const WelcomeBanner = ({ user, isStatic = false }: WelcomeBannerProps) => {
   );
 };
 
-export default WelcomeBanner;
+export default EnhancedWelcomeBanner;

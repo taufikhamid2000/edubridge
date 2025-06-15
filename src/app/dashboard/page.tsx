@@ -20,6 +20,17 @@ export default function DashboardPage() {
     refetchOnWindowFocus: false,
   });
 
+  // Log dashboard data when it changes
+  useEffect(() => {
+    if (dashboardData) {
+      console.log('Dashboard data received:', {
+        isGuest: dashboardData.user?.display_name === 'Guest User',
+        displayName: dashboardData.user?.display_name,
+        email: dashboardData.user?.email,
+      });
+    }
+  }, [dashboardData]);
+
   // Fetch user stats with React Query - progressive enhancement
   const {
     data: userStats,

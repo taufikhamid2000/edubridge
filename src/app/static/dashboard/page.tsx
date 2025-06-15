@@ -2,7 +2,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import WelcomeBanner from '@/components/dashboard/WelcomeBanner';
+import EnhancedWelcomeBanner from '@/components/dashboard/EnhancedWelcomeBanner';
 import SubjectSearch from '@/components/dashboard/SubjectSearch';
 import SubjectGrid from '@/components/dashboard/SubjectGrid';
 import WeeklyProgress from '@/components/dashboard/WeeklyProgress';
@@ -116,7 +116,7 @@ export default function StaticDashboardPage() {
 
       <div className="flex flex-col gap-8 sm:gap-10 md:gap-12">
         {/* Welcome Section */}
-        <WelcomeBanner user={staticUser} isStatic={true} />
+        <EnhancedWelcomeBanner initialUser={staticUser} isStatic={true} />
 
         {/* Subjects Section */}
         <section id="subjects-section">

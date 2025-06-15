@@ -40,14 +40,40 @@ interface DashboardResponse {
 
 export async function GET() {
   try {
+    console.log('Server: Dashboard API route called');
+    logger.info('Dashboard API route called');
+
     // Get authenticated user (optional for dashboard)
     const cookieStore = await cookies();
+
+    // Debug - Log all available cookies
+    const allCookies = cookieStore.getAll();
+    console.log(
+      'All available cookies:',
+      allCookies.map((c) => c.name)
+    );
+
+    // Check for specific auth cookies
+    const accessToken = cookieStore.get('sb-access-token')?.value;
+    const refreshToken = cookieStore.get('sb-refresh-token')?.value;
+    console.log('Auth tokens present:', {
+      hasAccessToken: !!accessToken,
+      hasRefreshToken: !!refreshToken,
+    });
+
     const supabaseServer = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
         cookies: {
-          get: (name) => cookieStore.get(name)?.value,
+          get: (name) => {
+            const cookie = cookieStore.get(name);
+            console.log(
+              `Server: Cookie ${name}:`,
+              cookie ? 'exists' : 'missing'
+            );
+            return cookie?.value;
+          },
           set: () => {},
           remove: () => {},
         },
@@ -64,6 +90,11 @@ export async function GET() {
       // Don't return error, continue without authentication
     } // Continue without requiring authentication
     const isAuthenticated = !!session?.user?.id;
+    console.log('Dashboard API - Authentication status:', {
+      isAuthenticated,
+      userId: session?.user?.id,
+      email: session?.user?.email,
+    });
 
     // Fetch data in parallel for optimal performance using materialized views
     const [
