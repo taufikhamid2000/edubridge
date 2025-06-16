@@ -59,15 +59,16 @@ We've created a script that can run all migrations in order.
 npm install @supabase/supabase-js pg dotenv
 ```
 
-2. Create a `.env` file in the project root with your connection details:
+2. Make sure your `.env` file in the project root has the following variables (you already have these):
 
 ```
-# Option 1: Supabase URL and service role key
-SUPABASE_URL=https://your-project-id.supabase.co
-SUPABASE_SERVICE_KEY=your-service-role-key
+# Supabase URL and keys
+NEXT_PUBLIC_SUPABASE_URL=https://fbxcmlrwydbguzjnktag.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 
-# OR Option 2: Direct database connection string
-SUPABASE_DB_URL=postgres://postgres:password@db.your-project-id.supabase.co:5432/postgres
+# Optional: Direct database connection string (only if you have direct access)
+# SUPABASE_DB_URL=postgres://postgres:password@db.fbxcmlrwydbguzjnktag.supabase.co:5432/postgres
 ```
 
 ### Running the Script

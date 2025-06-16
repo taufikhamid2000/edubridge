@@ -16,14 +16,19 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { createClient } from '@supabase/supabase-js';
 import pg from 'pg';
+import dotenv from 'dotenv';
+
+// Load environment variables from .env file
+dotenv.config();
+
 const { Pool } = pg;
 
 // Get the directory name
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Get configuration from environment variables or .env file
-const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const SUPABASE_DB_URL = process.env.SUPABASE_DB_URL; // Format: postgres://user:password@host:port/database
 
 // Validate the connection info
@@ -44,7 +49,7 @@ if (SUPABASE_URL && !SUPABASE_SERVICE_KEY) {
 // Function to get migration files from the migrations directory
 async function getMigrationFiles() {
   // Define migrations directory
-  const migrationsDir = path.join(__dirname, 'migrations');
+  const migrationsDir = path.join(__dirname, '..', 'supabase', 'migrations');
 
   // Read all files in the migrations directory
   const files = await fs.promises.readdir(migrationsDir);
