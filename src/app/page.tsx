@@ -170,6 +170,14 @@ export default function HomePage() {
               Access your dashboard
             </button>{' '}
             <button
+              className="inline-block uppercase tracking-wide rounded-full shadow-lg transition-all duration-300 ease-in-out px-8 py-4 bg-yellow-400 text-blue-800 font-medium hover:bg-yellow-300 hover:scale-105 transform"
+              onClick={() => {
+                router.push('/career-guidance');
+              }}
+            >
+              Explore Career Paths 🧭
+            </button>{' '}
+            <button
               className="inline-block uppercase tracking-wide rounded-full shadow-lg transition-all duration-300 ease-in-out px-8 py-4 bg-transparent border-2 border-white text-white font-medium hover:bg-white/10 hover:scale-105 transform"
               onClick={() => {
                 window.open('/docs/EduBridge%20Research.pdf', '_blank');
