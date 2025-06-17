@@ -11,7 +11,36 @@ export default function HomePage() {
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading] = useState(false); // Set to false since we're not doing initial auth check
-  const [isParallaxEnabled, setIsParallaxEnabled] = useState(false); // Authentication effect - SIMPLIFIED to avoid repeated getSession calls
+  const [isParallaxEnabled, setIsParallaxEnabled] = useState(false);
+
+  // Force 3 refreshes every time user navigates to the index page
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      // Use URL path as part of the key to track distinct navigations
+      // Add a timestamp parameter to URL if not already present
+      const url = new URL(window.location.href);
+      let visitTimestamp = url.searchParams.get('visit');
+
+      // If no timestamp parameter, this is a fresh navigation - add one and reload
+      if (!visitTimestamp) {
+        visitTimestamp = Date.now().toString();
+        url.searchParams.set('visit', visitTimestamp);
+        window.history.replaceState({}, '', url.toString());
+        return; // Exit early - this counts as the first refresh
+      }
+
+      // Use the timestamp from URL as our session storage key
+      const visitKey = 'visit_' + visitTimestamp;
+      const refreshCount = parseInt(sessionStorage.getItem(visitKey) || '1'); // Start at 1 since first load already happened
+
+      if (refreshCount < 3) {
+        sessionStorage.setItem(visitKey, (refreshCount + 1).toString());
+        window.location.reload();
+      }
+    }
+  }, []);
+
+  // Authentication effect - SIMPLIFIED to avoid repeated getSession calls
   useEffect(() => {
     // DISABLED: Initial auth check that was causing repeated requests
     // const checkAuthStatus = async () => {
