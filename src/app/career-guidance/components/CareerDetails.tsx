@@ -4,7 +4,8 @@ import { FC } from 'react';
 import { useRouter } from 'next/navigation';
 import { CareerPathway, EnhancedSubject } from '../types';
 import { PublicSubject } from '@/services/subjectService';
-import SubjectCard from './SubjectCard';
+import SubjectCategory from './SubjectCategory';
+import { subjectMapping } from '../data';
 
 interface CareerDetailsProps {
   career: CareerPathway;
@@ -20,108 +21,77 @@ const CareerDetails: FC<CareerDetailsProps> = ({
 }) => {
   const router = useRouter();
 
+  // Filter subjects to only include SPM subjects using our subject mapping
+  const isSpmSubject = (subject: EnhancedSubject): boolean => {
+    // Check if this subject ID exists in our subjectMapping
+    // This ensures we only show subjects that are in our actual SPM subject list
+    return !!subjectMapping[subject.id];
+  };
+
+  // Get filtered subjects for each category
+  const getMustLearnSubjects = () => {
+    const subjects = getSubjectsByIds(career.mustLearnIds);
+    return subjects.filter(isSpmSubject);
+  };
+
+  const getShouldLearnSubjects = () => {
+    const subjects = getSubjectsByIds(career.shouldLearnIds);
+    return subjects.filter(isSpmSubject);
+  };
+
+  const getCanLearnSubjects = () => {
+    const subjects = getSubjectsByIds(career.canLearnIds);
+    return subjects.filter(isSpmSubject);
+  };
+
+  const mustLearnSubjects = getMustLearnSubjects();
+  const shouldLearnSubjects = getShouldLearnSubjects();
+  const canLearnSubjects = getCanLearnSubjects();
+
   return (
     <div id="career-details" className="mt-12 pt-4">
       {' '}
       <div className="text-center mb-10">
-        <h2 className="text-3xl font-bold text-white">{career.title}</h2>
-        <p className="mt-3 max-w-2xl mx-auto text-xl text-gray-300">
+        <h2 className="text-3xl font-bold text-white dark:text-gray-900">
+          {career.title}
+        </h2>
+        <p className="mt-3 max-w-2xl mx-auto text-xl text-gray-300 dark:text-gray-600">
           {career.description}
         </p>
+
+        <div className="mt-4 bg-blue-950/30 dark:bg-blue-100/30 rounded-lg px-4 py-3 max-w-2xl mx-auto">
+          <p className="text-sm text-blue-300 dark:text-blue-800">
+            <span className="font-semibold">SPM Context:</span> The subjects
+            shown below are relevant to your SPM studies and will help prepare
+            you for this career path.
+          </p>
+        </div>
       </div>
       <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-        {' '}
-        {/* Must Learn Section */}
-        <div className="bg-red-950/30 rounded-lg shadow-lg overflow-hidden border border-red-900/30">
-          <div className="px-6 py-4 bg-red-500/80">
-            <h3 className="text-lg font-bold text-white">Must Learn</h3>
-            <p className="text-red-100 text-sm">
-              Essential subjects for this career
-            </p>
-          </div>
-          <div className="px-6 py-4">
-            {isLoading ? (
-              <div className="flex justify-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-400"></div>
-              </div>
-            ) : (
-              <ul className="divide-y divide-red-900/50">
-                {career.mustLearnIds.map((subjectId) => {
-                  const subjects = getSubjectsByIds([subjectId]);
-                  const subject = subjects[0];
-                  return subject ? (
-                    <SubjectCard
-                      key={subjectId}
-                      subject={subject}
-                      colorScheme="red"
-                    />
-                  ) : null;
-                })}
-              </ul>
-            )}
-          </div>
-        </div>{' '}
-        {/* Should Learn Section */}
-        <div className="bg-amber-950/30 rounded-lg shadow-lg overflow-hidden border border-amber-900/30">
-          <div className="px-6 py-4 bg-amber-500/80">
-            <h3 className="text-lg font-bold text-white">Should Learn</h3>
-            <p className="text-amber-100 text-sm">
-              Recommended subjects for proficiency
-            </p>
-          </div>
-          <div className="px-6 py-4">
-            {isLoading ? (
-              <div className="flex justify-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-400"></div>
-              </div>
-            ) : (
-              <ul className="divide-y divide-amber-900/50">
-                {career.shouldLearnIds.map((subjectId) => {
-                  const subjects = getSubjectsByIds([subjectId]);
-                  const subject = subjects[0];
-                  return subject ? (
-                    <SubjectCard
-                      key={subjectId}
-                      subject={subject}
-                      colorScheme="amber"
-                    />
-                  ) : null;
-                })}
-              </ul>
-            )}
-          </div>
-        </div>{' '}
-        {/* Can Learn Section */}
-        <div className="bg-green-950/30 rounded-lg shadow-lg overflow-hidden border border-green-900/30">
-          <div className="px-6 py-4 bg-green-500/80">
-            <h3 className="text-lg font-bold text-white">Can Learn</h3>
-            <p className="text-green-100 text-sm">
-              Additional subjects for specialization
-            </p>
-          </div>
-          <div className="px-6 py-4">
-            {isLoading ? (
-              <div className="flex justify-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-400"></div>
-              </div>
-            ) : (
-              <ul className="divide-y divide-green-900/50">
-                {career.canLearnIds.map((subjectId) => {
-                  const subjects = getSubjectsByIds([subjectId]);
-                  const subject = subjects[0];
-                  return subject ? (
-                    <SubjectCard
-                      key={subjectId}
-                      subject={subject}
-                      colorScheme="green"
-                    />
-                  ) : null;
-                })}
-              </ul>
-            )}
-          </div>
-        </div>
-      </div>{' '}
+        <SubjectCategory
+          title="Must Learn"
+          description="Essential SPM subjects for this career"
+          colorScheme="red"
+          subjects={mustLearnSubjects}
+          isLoading={isLoading}
+        />
+
+        <SubjectCategory
+          title="Should Learn"
+          description="Recommended SPM subjects for proficiency"
+          colorScheme="amber"
+          subjects={shouldLearnSubjects}
+          isLoading={isLoading}
+        />
+
+        <SubjectCategory
+          title="Can Learn"
+          description="Additional SPM subjects that may help"
+          colorScheme="green"
+          subjects={canLearnSubjects}
+          isLoading={isLoading}
+        />
+      </div>
       <div className="mt-8 text-center space-x-4">
         <button
           type="button"
