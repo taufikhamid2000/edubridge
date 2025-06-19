@@ -33,14 +33,38 @@ export interface EducationOption {
   link?: string;
 }
 
+export interface CareerOutlook {
+  demand: 'high' | 'medium' | 'low';
+  salaryRange: {
+    min: number;
+    max: number;
+  };
+  growthOutlook: string;
+}
+
+export interface PathwayOptions {
+  preUniversity: PathwayOptionDetail[];
+  bachelor: PathwayOptionDetail[];
+  advanced?: PathwayOptionDetail[];
+  certifications?: PathwayOptionDetail[];
+}
+
 export interface PathwayContribution {
   career: string;
   description: string;
-  preUniversityOptions: string[];
-  bachelorOptions: string[];
-  advancedOptions?: string[];
-  certifications?: string[];
+  careerOutlook: CareerOutlook;
+  pathwayOptions: PathwayOptions;
   additionalNotes?: string;
   submitterName: string;
   submitterEmail: string;
+}
+
+export interface PathwayOptionDetail {
+  name: string;
+  description: string;
+  institutions?: string[];
+  advantages: string[];
+  challenges: string[];
+  requirements?: string[];
+  duration?: string;
 }

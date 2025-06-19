@@ -2,12 +2,104 @@
 
 import { FC } from 'react';
 import { EducationPathway, EducationOption } from '../types';
+import PathwayComments from './PathwayComments';
 
 interface PathwayDetailsProps {
   pathway: EducationPathway;
 }
 
 const PathwayDetails: FC<PathwayDetailsProps> = ({ pathway }) => {
+  // Helper function to render individual education option
+  const renderEducationOption = (option: EducationOption) => {
+    return (
+      <div className="bg-gray-700 dark:bg-gray-50 rounded-md p-4">
+        <h5 className="text-sm font-medium text-white dark:text-gray-900">
+          {option.name}
+        </h5>
+        <p className="mt-1 text-sm text-gray-300 dark:text-gray-600">
+          {option.description}
+        </p>
+        {option.institutions && option.institutions.length > 0 && (
+          <div className="mt-3">
+            <h6 className="text-xs font-medium text-gray-400 dark:text-gray-500">
+              Example Institutions
+            </h6>
+            <div className="mt-1 flex flex-wrap gap-1">
+              {option.institutions.map((institution, i) => (
+                <span
+                  key={i}
+                  className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-600 text-gray-200 dark:bg-gray-100 dark:text-gray-800"
+                >
+                  {institution}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+        <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div>
+            <h6 className="text-xs font-medium text-gray-400 dark:text-gray-500">
+              Advantages
+            </h6>
+            <ul className="mt-1 text-xs text-gray-300 dark:text-gray-600 list-disc list-inside space-y-1">
+              {option.advantages.map((adv, i) => (
+                <li key={i}>{adv}</li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h6 className="text-xs font-medium text-gray-400 dark:text-gray-500">
+              Challenges
+            </h6>
+            <ul className="mt-1 text-xs text-gray-300 dark:text-gray-600 list-disc list-inside space-y-1">
+              {option.challenges.map((challenge, i) => (
+                <li key={i}>{challenge}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+        {option.requirements && (
+          <div className="mt-3">
+            <h6 className="text-xs font-medium text-gray-400 dark:text-gray-500">
+              Requirements
+            </h6>
+            <ul className="mt-1 text-xs text-gray-300 dark:text-gray-600 list-disc list-inside space-y-1">
+              {option.requirements.map((req, i) => (
+                <li key={i}>{req}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+        {option.link && (
+          <div className="mt-3">
+            <a
+              href={option.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs font-medium text-indigo-400 dark:text-indigo-600 hover:text-indigo-300 dark:hover:text-indigo-500"
+            >
+              Learn more about this option
+              <svg
+                className="inline-block ml-1 h-4 w-4"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                />
+              </svg>
+            </a>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="bg-gray-800 dark:bg-white shadow overflow-hidden rounded-md">
       <div className="px-4 py-5 border-b border-gray-700 dark:border-gray-200 sm:px-6">
@@ -51,7 +143,7 @@ const PathwayDetails: FC<PathwayDetailsProps> = ({ pathway }) => {
             </dd>
           </div>
         </div>
-      </div>{' '}
+      </div>
       <div className="px-4 py-5 sm:p-6">
         <div className="space-y-8">
           {pathway.pathways.map((step, index) => (
@@ -71,107 +163,15 @@ const PathwayDetails: FC<PathwayDetailsProps> = ({ pathway }) => {
 
               <div className="mt-4 space-y-4">
                 {step.options.map((option, optionIndex) => (
-                  <EducationOptionCard key={optionIndex} option={option} />
+                  <div key={optionIndex}>{renderEducationOption(option)}</div>
                 ))}
               </div>
             </div>
           ))}
         </div>
-      </div>
-    </div>
-  );
-};
-
-interface EducationOptionCardProps {
-  option: EducationOption;
-}
-
-const EducationOptionCard: FC<EducationOptionCardProps> = ({ option }) => {
-  return (
-    <div className="bg-gray-700 dark:bg-gray-50 rounded-md p-4">
-      <h5 className="text-sm font-medium text-white dark:text-gray-900">
-        {option.name}
-      </h5>
-      <p className="mt-1 text-sm text-gray-300 dark:text-gray-600">
-        {option.description}
-      </p>
-      {option.institutions && option.institutions.length > 0 && (
-        <div className="mt-3">
-          <h6 className="text-xs font-medium text-gray-400 dark:text-gray-500">
-            Example Institutions
-          </h6>
-          <div className="mt-1 flex flex-wrap gap-1">
-            {option.institutions.map((institution, i) => (
-              <span
-                key={i}
-                className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-600 text-gray-200 dark:bg-gray-100 dark:text-gray-800"
-              >
-                {institution}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-      <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div>
-          <h6 className="text-xs font-medium text-gray-400 dark:text-gray-500">
-            Advantages
-          </h6>
-          <ul className="mt-1 text-xs text-gray-300 dark:text-gray-600 list-disc list-inside space-y-1">
-            {option.advantages.map((adv, i) => (
-              <li key={i}>{adv}</li>
-            ))}
-          </ul>
-        </div>
-        <div>
-          <h6 className="text-xs font-medium text-gray-400 dark:text-gray-500">
-            Challenges
-          </h6>
-          <ul className="mt-1 text-xs text-gray-300 dark:text-gray-600 list-disc list-inside space-y-1">
-            {option.challenges.map((challenge, i) => (
-              <li key={i}>{challenge}</li>
-            ))}
-          </ul>
-        </div>
-      </div>
-      {option.requirements && (
-        <div className="mt-3">
-          <h6 className="text-xs font-medium text-gray-400 dark:text-gray-500">
-            Requirements
-          </h6>
-          <ul className="mt-1 text-xs text-gray-300 dark:text-gray-600 list-disc list-inside space-y-1">
-            {option.requirements.map((req, i) => (
-              <li key={i}>{req}</li>
-            ))}
-          </ul>
-        </div>
-      )}{' '}
-      {option.link && (
-        <div className="mt-3">
-          <a
-            href={option.link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs font-medium text-indigo-400 dark:text-indigo-600 hover:text-indigo-300 dark:hover:text-indigo-500"
-          >
-            Learn more about this option
-            <svg
-              className="inline-block ml-1 h-4 w-4"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-              />
-            </svg>
-          </a>
-        </div>
-      )}
+      </div>{' '}
+      {/* Add Comments section */}
+      <PathwayComments pathwayId={pathway.id} />
     </div>
   );
 };

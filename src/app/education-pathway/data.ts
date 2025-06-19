@@ -214,7 +214,7 @@ export const pathwayData: EducationPathway[] = [
               'Intense academic pressure',
             ],
             requirements: [
-              "Minimum 5A's in SPM including Biology, Chemistry, Physics, Mathematics/Additional Mathematics, and Bahasa Malaysia/English",
+              "Minimum 20A's in SPM including Biology, Chemistry, Physics, Mathematics/Additional Mathematics, and Bahasa Malaysia/English",
             ],
           },
           {

@@ -457,14 +457,15 @@ const ContributionForm: FC<ContributionFormProps> = ({
   return (
     <div className="dark:bg-white bg-gray-800 shadow-lg rounded-lg p-6 max-w-3xl mx-auto border border-gray-200 dark:border-gray-700">
       <h2 className="text-2xl font-bold dark:text-gray-900 text-white mb-6">
-        Contribute a Career Pathway
+        Contribute Subject Guidance
       </h2>{' '}
       {success ? (
         <div className="bg-green-950 border border-green-900 text-green-300 p-4 rounded-md mb-6">
           <p className="font-medium">Thank you for your contribution!</p>
           <p className="mt-1">
-            Our team will review your submission and add it to our career
-            pathways if approved. You&apos;ll receive an email notification when
+            {' '}
+            Our team will review your submission and add it to our subject
+            guidance if approved. You&apos;ll receive an email notification when
             the review is complete.
           </p>
           <button
@@ -501,7 +502,7 @@ const ContributionForm: FC<ContributionFormProps> = ({
           <div className="space-y-4">
             {' '}
             <h3 className="text-lg font-medium text-white dark:text-gray-900">
-              Career Information
+              Career Details
             </h3>
             <div>
               <label
@@ -778,7 +779,7 @@ const ContributionForm: FC<ContributionFormProps> = ({
                 onChange={handleChange}
                 rows={3}
                 className="mt-1 block w-full rounded-md border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-700 dark:bg-white text-white dark:text-gray-900 sm:text-sm"
-                placeholder="Any additional information about this career pathway"
+                placeholder="Any additional information about this subject guidance"
               />
             </div>
           </div>

@@ -1,8 +1,9 @@
 'use client';
 
 import { FC, useState, useEffect } from 'react';
-import { PathwayContribution } from '../types';
+import { PathwayContribution, PathwayOptionDetail } from '../types';
 import { supabase } from '@/lib/supabase';
+import PathwayOptionInput from './PathwayOptionInput';
 
 // Mock submission function (to be implemented with real API later)
 const submitPathwayContribution = async (
@@ -31,10 +32,20 @@ const ContributionForm: FC<ContributionFormProps> = ({
   const [formData, setFormData] = useState<Partial<PathwayContribution>>({
     career: '',
     description: '',
-    preUniversityOptions: [],
-    bachelorOptions: [],
-    advancedOptions: [],
-    certifications: [],
+    careerOutlook: {
+      demand: 'medium',
+      salaryRange: {
+        min: 0,
+        max: 0,
+      },
+      growthOutlook: '',
+    },
+    pathwayOptions: {
+      preUniversity: [],
+      bachelor: [],
+      advanced: [],
+      certifications: [],
+    },
     additionalNotes: '',
     submitterName: '',
     submitterEmail: '',
@@ -50,12 +61,6 @@ const ContributionForm: FC<ContributionFormProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-
-  // Dynamic input fields
-  const [preUInput, setPreUInput] = useState('');
-  const [bachelorInput, setBachelorInput] = useState('');
-  const [advancedInput, setAdvancedInput] = useState('');
-  const [certInput, setCertInput] = useState('');
 
   // Check if user is logged in
   useEffect(() => {
@@ -135,103 +140,218 @@ const ContributionForm: FC<ContributionFormProps> = ({
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
-
-  // Handle adding an item to a string array in form data
-  const handleAddItem = (
-    field:
-      | 'preUniversityOptions'
-      | 'bachelorOptions'
-      | 'advancedOptions'
-      | 'certifications',
-    value: string,
-    setValue: React.Dispatch<React.SetStateAction<string>>
+  }, []); // Handle adding a new pathway option
+  const handleAddPathwayOption = (
+    pathway: 'preUniversity' | 'bachelor' | 'advanced' | 'certifications'
   ) => {
-    if (value.trim()) {
-      setFormData((prev) => ({
+    setFormData((prev) => {
+      // Ensure we have an existing pathwayOptions object or create a new one
+      const pathwayOptions = prev.pathwayOptions || {
+        preUniversity: [],
+        bachelor: [],
+        advanced: [],
+        certifications: [],
+      };
+
+      // Get current options for this pathway or default to empty array
+      const currentOptions = pathwayOptions[pathway] || [];
+
+      return {
         ...prev,
-        [field]: [...(prev[field] || []), value.trim()],
-      }));
-      setValue(''); // Clear input field
-    }
+        pathwayOptions: {
+          ...pathwayOptions,
+          [pathway]: [
+            ...currentOptions,
+            {
+              name: '',
+              description: '',
+              advantages: [],
+              challenges: [],
+              institutions: [],
+              requirements: [],
+              duration: '',
+            },
+          ],
+        },
+      };
+    });
+  };
+  // Handle updating a pathway option
+  const handleUpdatePathwayOption = (
+    pathway: 'preUniversity' | 'bachelor' | 'advanced' | 'certifications',
+    index: number,
+    updatedOption: PathwayOptionDetail
+  ) => {
+    setFormData((prev) => {
+      // Ensure we have an existing pathwayOptions object
+      const pathwayOptions = prev.pathwayOptions || {
+        preUniversity: [],
+        bachelor: [],
+        advanced: [],
+        certifications: [],
+      };
+
+      // Get current options for this pathway
+      const currentOptions = [...(pathwayOptions[pathway] || [])];
+      currentOptions[index] = updatedOption;
+
+      return {
+        ...prev,
+        pathwayOptions: {
+          ...pathwayOptions,
+          [pathway]: currentOptions,
+        },
+      };
+    });
   };
 
-  // Handle removing an item from a string array in form data
-  const handleRemoveItem = (
-    field:
-      | 'preUniversityOptions'
-      | 'bachelorOptions'
-      | 'advancedOptions'
-      | 'certifications',
+  // Handle deleting a pathway option
+  const handleDeletePathwayOption = (
+    pathway: 'preUniversity' | 'bachelor' | 'advanced' | 'certifications',
     index: number
   ) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: (prev[field] || []).filter((_, i) => i !== index),
-    }));
+    setFormData((prev) => {
+      // Ensure we have an existing pathwayOptions object
+      const pathwayOptions = prev.pathwayOptions || {
+        preUniversity: [],
+        bachelor: [],
+        advanced: [],
+        certifications: [],
+      };
+
+      // Get current options for this pathway
+      const currentOptions = [...(pathwayOptions[pathway] || [])];
+      currentOptions.splice(index, 1);
+
+      return {
+        ...prev,
+        pathwayOptions: {
+          ...pathwayOptions,
+          [pathway]: currentOptions,
+        },
+      };
+    });
   };
 
   // Handle form field changes
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    // Handle nested properties (e.g., careerOutlook.demand)
+    if (name.includes('.')) {
+      const [parent, child] = name.split('.');
+
+      if (parent === 'careerOutlook') {
+        setFormData((prev) => {
+          // Ensure we have an existing careerOutlook object
+          const careerOutlook = prev.careerOutlook || {
+            demand: 'medium',
+            salaryRange: { min: 0, max: 0 },
+            growthOutlook: '',
+          };
+
+          return {
+            ...prev,
+            careerOutlook: {
+              ...careerOutlook,
+              [child]: value,
+            },
+          };
+        });
+      }
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
+  // Handle salary range changes specifically
+  const handleSalaryChange = (field: 'min' | 'max', value: string) => {
+    const numValue = parseInt(value, 10) || 0;
+    setFormData((prev) => {
+      // Ensure we have an existing careerOutlook and salaryRange object
+      const careerOutlook = prev.careerOutlook || {
+        demand: 'medium',
+        salaryRange: { min: 0, max: 0 },
+        growthOutlook: '',
+      };
+
+      return {
+        ...prev,
+        careerOutlook: {
+          ...careerOutlook,
+          salaryRange: {
+            ...careerOutlook.salaryRange,
+            [field]: numValue,
+          },
+        },
+      };
+    });
+  };
   // Form submission handler
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setError(null);
     try {
-      const updatedFormData = { ...formData };
-
-      // Handle anonymous contributions
+      const updatedFormData = { ...formData }; // Handle submitter information
       if (isAnonymous) {
         // For anonymous contributions, store a placeholder name
         updatedFormData.submitterName = 'Anonymous Contributor';
 
-        // If logged in, still store their email for admin purposes
+        // If logged in, store email for admin purposes but mark as anonymous
         if (isLoggedIn && userEmail) {
           updatedFormData.submitterEmail = userEmail;
+        } else {
+          // For non-logged in anonymous users, use a placeholder if not provided
+          updatedFormData.submitterEmail =
+            formData.submitterEmail || 'anonymous@example.com';
         }
-      } else {
-        // For non-anonymous contributions from logged-in users, use their account info
-        if (isLoggedIn) {
-          if (userName) {
-            updatedFormData.submitterName = userName;
-          }
-          if (userEmail) {
-            updatedFormData.submitterEmail = userEmail;
-          }
-        }
+      } else if (isLoggedIn) {
+        // For logged-in non-anonymous users, use their account info
+        updatedFormData.submitterName = userName || 'Authenticated User';
+        updatedFormData.submitterEmail = userEmail || '';
       }
+      // For non-logged in, non-anonymous users, the form data already has the submitted values
 
       setFormData(updatedFormData);
 
       // Basic validation
       if (!formData.career || !formData.description) {
         throw new Error('Please provide a career title and description.');
-      }
-
-      // Check for submitter info only if not logged in and not anonymous
+      } // Check for submitter info only if not logged in and not anonymous
       if (
         !isLoggedIn &&
         !isAnonymous &&
         (!formData.submitterName || !formData.submitterEmail)
       ) {
         throw new Error(
-          'Please provide your name and email or choose to contribute anonymously.'
+          'Please provide your name and email or check "Contribute anonymously".'
         );
       }
 
-      if ((formData.preUniversityOptions?.length || 0) === 0) {
+      // Check for required pathway options
+      if ((formData.pathwayOptions?.preUniversity?.length || 0) === 0) {
         throw new Error('Please provide at least one pre-university option.');
       }
 
-      if ((formData.bachelorOptions?.length || 0) === 0) {
+      if ((formData.pathwayOptions?.bachelor?.length || 0) === 0) {
         throw new Error('Please provide at least one bachelor degree option.');
+      }
+
+      // Validate salary range
+      const minSalary = formData.careerOutlook?.salaryRange?.min || 0;
+      const maxSalary = formData.careerOutlook?.salaryRange?.max || 0;
+
+      if (minSalary < 0 || maxSalary < 0) {
+        throw new Error('Salary values cannot be negative');
+      }
+
+      if (maxSalary > 0 && minSalary > maxSalary) {
+        throw new Error('Minimum salary cannot be greater than maximum salary');
       }
 
       // Submit the form data
@@ -257,58 +377,6 @@ const ContributionForm: FC<ContributionFormProps> = ({
     }
   };
 
-  // Component to render array items with delete button
-  const ArrayItems = ({
-    items,
-    onRemove,
-    label,
-    colorClass = 'bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-200',
-  }: {
-    items: string[];
-    onRemove: (index: number) => void;
-    label: string;
-    colorClass?: string;
-  }) => (
-    <div className="mt-2">
-      {items.length > 0 ? (
-        <div className="flex flex-wrap gap-2">
-          {items.map((item, index) => (
-            <span
-              key={index}
-              className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium ${colorClass}`}
-            >
-              {item}
-              <button
-                type="button"
-                onClick={() => onRemove(index)}
-                className="ml-1.5 inline-flex items-center justify-center h-4 w-4 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none"
-              >
-                <span className="sr-only">Remove {item}</span>
-                <svg
-                  className="h-3 w-3 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-            </span>
-          ))}
-        </div>
-      ) : (
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          No {label} added yet
-        </p>
-      )}
-    </div>
-  );
   return (
     <div className="bg-gray-800 dark:bg-white shadow-lg rounded-lg p-6 max-w-3xl mx-auto border border-gray-700 dark:border-gray-200">
       <h2 className="text-2xl font-bold text-white dark:text-gray-900 mb-6">
@@ -328,10 +396,20 @@ const ContributionForm: FC<ContributionFormProps> = ({
               setFormData({
                 career: '',
                 description: '',
-                preUniversityOptions: [],
-                bachelorOptions: [],
-                advancedOptions: [],
-                certifications: [],
+                careerOutlook: {
+                  demand: 'medium',
+                  salaryRange: {
+                    min: 0,
+                    max: 0,
+                  },
+                  growthOutlook: '',
+                },
+                pathwayOptions: {
+                  preUniversity: [],
+                  bachelor: [],
+                  advanced: [],
+                  certifications: [],
+                },
                 additionalNotes: '',
                 submitterName: '',
                 submitterEmail: '',
@@ -389,6 +467,92 @@ const ContributionForm: FC<ContributionFormProps> = ({
                 required
               />
             </div>
+          </div>{' '}
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium text-white dark:text-gray-900">
+              Career Outlook
+            </h3>
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div>
+                <label
+                  htmlFor="careerOutlook.demand"
+                  className="block text-sm font-medium text-gray-300 dark:text-gray-700"
+                >
+                  Market Demand
+                </label>
+                <select
+                  id="careerOutlook.demand"
+                  name="careerOutlook.demand"
+                  value={formData.careerOutlook?.demand || 'medium'}
+                  onChange={handleChange}
+                  className="mt-1 block w-full rounded-md border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-700 dark:bg-white text-white dark:text-gray-900 sm:text-sm"
+                >
+                  <option value="high">High</option>
+                  <option value="medium">Medium</option>
+                  <option value="low">Low</option>
+                </select>
+                <p className="mt-1 text-sm text-gray-400 dark:text-gray-500">
+                  Current and projected demand for this career
+                </p>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="careerOutlook.growthOutlook"
+                  className="block text-sm font-medium text-gray-300 dark:text-gray-700"
+                >
+                  Growth Outlook
+                </label>
+                <textarea
+                  id="careerOutlook.growthOutlook"
+                  name="careerOutlook.growthOutlook"
+                  value={formData.careerOutlook?.growthOutlook || ''}
+                  onChange={handleChange}
+                  rows={2}
+                  className="mt-1 block w-full rounded-md border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-700 dark:bg-white text-white dark:text-gray-900 sm:text-sm"
+                  placeholder="Projected growth over the next 5-10 years"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label
+                  htmlFor="minSalary"
+                  className="block text-sm font-medium text-gray-300 dark:text-gray-700"
+                >
+                  Minimum Salary (RM)
+                </label>
+                <input
+                  type="number"
+                  id="minSalary"
+                  name="minSalary"
+                  min="0"
+                  value={formData.careerOutlook?.salaryRange?.min || 0}
+                  onChange={(e) => handleSalaryChange('min', e.target.value)}
+                  className="mt-1 block w-full rounded-md border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-700 dark:bg-white text-white dark:text-gray-900 sm:text-sm"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="maxSalary"
+                  className="block text-sm font-medium text-gray-300 dark:text-gray-700"
+                >
+                  Maximum Salary (RM)
+                </label>
+                <input
+                  type="number"
+                  id="maxSalary"
+                  name="maxSalary"
+                  min="0"
+                  value={formData.careerOutlook?.salaryRange?.max || 0}
+                  onChange={(e) => handleSalaryChange('max', e.target.value)}
+                  className="mt-1 block w-full rounded-md border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-700 dark:bg-white text-white dark:text-gray-900 sm:text-sm"
+                />
+              </div>
+            </div>
           </div>
           <div className="space-y-4">
             <h3 className="text-lg font-medium text-white dark:text-gray-900">
@@ -396,180 +560,319 @@ const ContributionForm: FC<ContributionFormProps> = ({
             </h3>
 
             {/* Pre-University Options */}
-            <div>
-              <label
-                htmlFor="preUniversityOptions"
-                className="block text-sm font-medium text-gray-300 dark:text-gray-700"
-              >
-                Pre-University Options*
-              </label>
-              <div className="mt-1 flex rounded-md shadow-sm">
-                <input
-                  type="text"
-                  id="preUniversityOptions"
-                  value={preUInput}
-                  onChange={(e) => setPreUInput(e.target.value)}
-                  className="flex-1 min-w-0 block w-full rounded-l-md border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-700 dark:bg-white text-white dark:text-gray-900 sm:text-sm"
-                  placeholder="e.g., STPM, Foundation in Science, A-Levels"
-                />
+            <div className="bg-gray-750 dark:bg-gray-100 border border-gray-700 dark:border-gray-300 rounded-md p-4">
+              <div className="flex justify-between items-center mb-3">
+                <h4 className="text-base font-medium text-white dark:text-gray-800">
+                  Pre-University Options*
+                </h4>
                 <button
                   type="button"
-                  onClick={() =>
-                    handleAddItem(
-                      'preUniversityOptions',
-                      preUInput,
-                      setPreUInput
-                    )
-                  }
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-r-md bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 text-white"
+                  onClick={() => handleAddPathwayOption('preUniversity')}
+                  className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-400 text-white"
                 >
-                  Add
+                  Add Option
                 </button>
               </div>
-              <p className="mt-1 text-sm text-gray-400 dark:text-gray-500">
-                Add pre-university program options for this career path
+              <p className="text-sm text-gray-400 dark:text-gray-500 mb-4">
+                Add pre-university pathways such as STPM, Foundation programs,
+                A-Levels, etc.
               </p>
-              <ArrayItems
-                items={formData.preUniversityOptions || []}
-                onRemove={(index) =>
-                  handleRemoveItem('preUniversityOptions', index)
-                }
-                label="pre-university options"
-                colorClass="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
-              />
+
+              {formData.pathwayOptions?.preUniversity &&
+              formData.pathwayOptions.preUniversity.length > 0 ? (
+                <div className="space-y-4">
+                  {formData.pathwayOptions.preUniversity.map(
+                    (option, index) => (
+                      <PathwayOptionInput
+                        key={`pre-u-${index}`}
+                        option={option}
+                        onChange={(updatedOption) =>
+                          handleUpdatePathwayOption(
+                            'preUniversity',
+                            index,
+                            updatedOption
+                          )
+                        }
+                        onDelete={() =>
+                          handleDeletePathwayOption('preUniversity', index)
+                        }
+                        index={index}
+                      />
+                    )
+                  )}
+                </div>
+              ) : (
+                <div className="text-center py-6 border border-dashed border-gray-600 dark:border-gray-400 rounded-md">
+                  <p className="text-gray-400 dark:text-gray-600">
+                    No pre-university options added yet
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => handleAddPathwayOption('preUniversity')}
+                    className="mt-2 inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-400 text-white"
+                  >
+                    Add Your First Option
+                  </button>
+                </div>
+              )}
             </div>
 
-            {/* Bachelor Options */}
-            <div>
-              <label
-                htmlFor="bachelorOptions"
-                className="block text-sm font-medium text-gray-300 dark:text-gray-700"
-              >
-                Bachelor Degree Options*
-              </label>
-              <div className="mt-1 flex rounded-md shadow-sm">
-                <input
-                  type="text"
-                  id="bachelorOptions"
-                  value={bachelorInput}
-                  onChange={(e) => setBachelorInput(e.target.value)}
-                  className="flex-1 min-w-0 block w-full rounded-l-md border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-700 dark:bg-white text-white dark:text-gray-900 sm:text-sm"
-                  placeholder="e.g., Bachelor of Computer Science, Bachelor of Medicine"
-                />
+            {/* Bachelor's Degree Options */}
+            <div className="bg-gray-750 dark:bg-gray-100 border border-gray-700 dark:border-gray-300 rounded-md p-4">
+              <div className="flex justify-between items-center mb-3">
+                <h4 className="text-base font-medium text-white dark:text-gray-800">
+                  Bachelor&apos;s Degree Options*
+                </h4>
                 <button
                   type="button"
-                  onClick={() =>
-                    handleAddItem(
-                      'bachelorOptions',
-                      bachelorInput,
-                      setBachelorInput
-                    )
-                  }
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-r-md bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 text-white"
+                  onClick={() => handleAddPathwayOption('bachelor')}
+                  className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-400 text-white"
                 >
-                  Add
+                  Add Option
                 </button>
               </div>
-              <p className="mt-1 text-sm text-gray-400 dark:text-gray-500">
-                Add bachelor degree options for this career path
+              <p className="text-sm text-gray-400 dark:text-gray-500 mb-4">
+                Add bachelor degree pathways related to this career
               </p>
-              <ArrayItems
-                items={formData.bachelorOptions || []}
-                onRemove={(index) => handleRemoveItem('bachelorOptions', index)}
-                label="bachelor options"
-                colorClass="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200"
-              />
+
+              {formData.pathwayOptions?.bachelor &&
+              formData.pathwayOptions.bachelor.length > 0 ? (
+                <div className="space-y-4">
+                  {formData.pathwayOptions.bachelor.map((option, index) => (
+                    <PathwayOptionInput
+                      key={`bachelor-${index}`}
+                      option={option}
+                      onChange={(updatedOption) =>
+                        handleUpdatePathwayOption(
+                          'bachelor',
+                          index,
+                          updatedOption
+                        )
+                      }
+                      onDelete={() =>
+                        handleDeletePathwayOption('bachelor', index)
+                      }
+                      index={index}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-6 border border-dashed border-gray-600 dark:border-gray-400 rounded-md">
+                  <p className="text-gray-400 dark:text-gray-600">
+                    No bachelor degree options added yet
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => handleAddPathwayOption('bachelor')}
+                    className="mt-2 inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-400 text-white"
+                  >
+                    Add Your First Option
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Advanced Degree Options */}
-            <div>
-              <label
-                htmlFor="advancedOptions"
-                className="block text-sm font-medium text-gray-300 dark:text-gray-700"
-              >
-                Advanced Degree Options (Optional)
-              </label>
-              <div className="mt-1 flex rounded-md shadow-sm">
-                <input
-                  type="text"
-                  id="advancedOptions"
-                  value={advancedInput}
-                  onChange={(e) => setAdvancedInput(e.target.value)}
-                  className="flex-1 min-w-0 block w-full rounded-l-md border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-700 dark:bg-white text-white dark:text-gray-900 sm:text-sm"
-                  placeholder="e.g., Master of Computer Science, PhD in AI"
-                />
+            <div className="bg-gray-750 dark:bg-gray-100 border border-gray-700 dark:border-gray-300 rounded-md p-4">
+              <div className="flex justify-between items-center mb-3">
+                <h4 className="text-base font-medium text-white dark:text-gray-800">
+                  Advanced Degree Options (Optional)
+                </h4>
                 <button
                   type="button"
-                  onClick={() =>
-                    handleAddItem(
-                      'advancedOptions',
-                      advancedInput,
-                      setAdvancedInput
-                    )
-                  }
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-r-md bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 text-white"
+                  onClick={() => handleAddPathwayOption('advanced')}
+                  className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-400 text-white"
                 >
-                  Add
+                  Add Option
                 </button>
               </div>
-              <p className="mt-1 text-sm text-gray-400 dark:text-gray-500">
-                Add any advanced degree options (Master&apos;s/PhD)
+              <p className="text-sm text-gray-400 dark:text-gray-500 mb-4">
+                Add master&apos;s, PhD or other advanced degree options
               </p>
-              <ArrayItems
-                items={formData.advancedOptions || []}
-                onRemove={(index) => handleRemoveItem('advancedOptions', index)}
-                label="advanced options"
-                colorClass="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200"
-              />
+
+              {formData.pathwayOptions?.advanced &&
+              formData.pathwayOptions.advanced.length > 0 ? (
+                <div className="space-y-4">
+                  {formData.pathwayOptions.advanced.map((option, index) => (
+                    <PathwayOptionInput
+                      key={`advanced-${index}`}
+                      option={option}
+                      onChange={(updatedOption) =>
+                        handleUpdatePathwayOption(
+                          'advanced',
+                          index,
+                          updatedOption
+                        )
+                      }
+                      onDelete={() =>
+                        handleDeletePathwayOption('advanced', index)
+                      }
+                      index={index}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-6 border border-dashed border-gray-600 dark:border-gray-400 rounded-md">
+                  <p className="text-gray-400 dark:text-gray-600">
+                    No advanced degree options added yet (optional)
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => handleAddPathwayOption('advanced')}
+                    className="mt-2 inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-400 text-white"
+                  >
+                    Add an Option
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Professional Certifications */}
-            <div>
-              <label
-                htmlFor="certifications"
-                className="block text-sm font-medium text-gray-300 dark:text-gray-700"
-              >
-                Professional Certifications (Optional)
-              </label>
-              <div className="mt-1 flex rounded-md shadow-sm">
-                <input
-                  type="text"
-                  id="certifications"
-                  value={certInput}
-                  onChange={(e) => setCertInput(e.target.value)}
-                  className="flex-1 min-w-0 block w-full rounded-l-md border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-700 dark:bg-white text-white dark:text-gray-900 sm:text-sm"
-                  placeholder="e.g., AWS Certified Solutions Architect, CFA"
-                />
+            <div className="bg-gray-750 dark:bg-gray-100 border border-gray-700 dark:border-gray-300 rounded-md p-4">
+              <div className="flex justify-between items-center mb-3">
+                <h4 className="text-base font-medium text-white dark:text-gray-800">
+                  Professional Certifications (Optional)
+                </h4>
                 <button
                   type="button"
-                  onClick={() =>
-                    handleAddItem('certifications', certInput, setCertInput)
-                  }
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-r-md bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 text-white"
+                  onClick={() => handleAddPathwayOption('certifications')}
+                  className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-400 text-white"
                 >
-                  Add
+                  Add Option
                 </button>
               </div>
-              <p className="mt-1 text-sm text-gray-400 dark:text-gray-500">
-                Add any relevant professional certifications
+              <p className="text-sm text-gray-400 dark:text-gray-500 mb-4">
+                Add relevant professional certifications for this career
               </p>
-              <ArrayItems
-                items={formData.certifications || []}
-                onRemove={(index) => handleRemoveItem('certifications', index)}
-                label="certifications"
-                colorClass="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-              />
+
+              {formData.pathwayOptions?.certifications &&
+              formData.pathwayOptions.certifications.length > 0 ? (
+                <div className="space-y-4">
+                  {formData.pathwayOptions.certifications.map(
+                    (option, index) => (
+                      <PathwayOptionInput
+                        key={`cert-${index}`}
+                        option={option}
+                        onChange={(updatedOption) =>
+                          handleUpdatePathwayOption(
+                            'certifications',
+                            index,
+                            updatedOption
+                          )
+                        }
+                        onDelete={() =>
+                          handleDeletePathwayOption('certifications', index)
+                        }
+                        index={index}
+                      />
+                    )
+                  )}
+                </div>
+              ) : (
+                <div className="text-center py-6 border border-dashed border-gray-600 dark:border-gray-400 rounded-md">
+                  <p className="text-gray-400 dark:text-gray-600">
+                    No certifications added yet (optional)
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => handleAddPathwayOption('certifications')}
+                    className="mt-2 inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-400 text-white"
+                  >
+                    Add a Certification
+                  </button>
+                </div>
+              )}
             </div>
-          </div>
-
+          </div>{' '}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium text-white dark:text-gray-900">
-              {isLoggedIn ? 'Submitter Information' : 'Your Information'}
-            </h3>
+            {/* Anonymous Contribution Option - Always visible */}
+            <div className="bg-gray-750 dark:bg-gray-100 border border-gray-700 dark:border-gray-300 rounded-md p-4 mb-4">
+              <div className="flex items-start">
+                <div className="flex items-center h-5">
+                  <input
+                    id="anonymous"
+                    name="anonymous"
+                    type="checkbox"
+                    checked={isAnonymous}
+                    onChange={(e) => setIsAnonymous(e.target.checked)}
+                    className="h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-gray-500 rounded"
+                  />
+                </div>
+                <div className="ml-3">
+                  <label
+                    htmlFor="anonymous"
+                    className="text-lg font-medium text-white dark:text-gray-900 cursor-pointer"
+                  >
+                    Contribute anonymously
+                  </label>
+                  <p className="mt-1 text-sm text-gray-400 dark:text-gray-500">
+                    Your contribution will be submitted anonymously. Your name
+                    will not be publicly associated with this contribution.
+                  </p>
+                </div>
+              </div>
+            </div>
 
-            {isLoggedIn ? (
-              // Show user info summary card when logged in
-              <div className="space-y-4">
+            {/* Only show contributor information form for non-logged in users */}
+            {!isLoggedIn && (
+              <>
+                <h3 className="text-lg font-medium text-white dark:text-gray-900">
+                  Your Information
+                </h3>
+                <div className="bg-gray-750 dark:bg-gray-100 border border-gray-700 dark:border-gray-300 rounded-md p-4">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div>
+                      <label
+                        htmlFor="submitterName"
+                        className="block text-sm font-medium text-gray-300 dark:text-gray-700"
+                      >
+                        Your Name{!isAnonymous && '*'}
+                      </label>
+                      <input
+                        type="text"
+                        id="submitterName"
+                        name="submitterName"
+                        value={formData.submitterName}
+                        onChange={handleChange}
+                        className="mt-1 block w-full rounded-md border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-700 dark:bg-white text-white dark:text-gray-900 sm:text-sm"
+                        required={!isAnonymous}
+                        disabled={isAnonymous}
+                      />
+                    </div>
+
+                    <div>
+                      <label
+                        htmlFor="submitterEmail"
+                        className="block text-sm font-medium text-gray-300 dark:text-gray-700"
+                      >
+                        Your Email{!isAnonymous && '*'}
+                      </label>
+                      <input
+                        type="email"
+                        id="submitterEmail"
+                        name="submitterEmail"
+                        value={formData.submitterEmail}
+                        onChange={handleChange}
+                        className="mt-1 block w-full rounded-md border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-700 dark:bg-white text-white dark:text-gray-900 sm:text-sm"
+                        required={!isAnonymous}
+                        disabled={isAnonymous}
+                      />
+                      <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
+                        Email is required for verification but won&apos;t be
+                        publicly displayed.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* Show logged in user info */}
+            {isLoggedIn && !isAnonymous && (
+              <>
+                <h3 className="text-lg font-medium text-white dark:text-gray-900">
+                  Submitter Information
+                </h3>
                 <div className="bg-gray-700 dark:bg-gray-100 rounded-md p-4 border border-gray-600 dark:border-gray-300">
                   <div className="flex items-center">
                     <div className="h-10 w-10 rounded-full bg-indigo-600 flex items-center justify-center">
@@ -590,100 +893,6 @@ const ContributionForm: FC<ContributionFormProps> = ({
                     Your contribution will be submitted with your account
                     information.
                   </p>
-                </div>
-
-                <div className="flex items-start mt-4">
-                  <div className="flex items-center h-5">
-                    <input
-                      id="anonymous"
-                      name="anonymous"
-                      type="checkbox"
-                      checked={isAnonymous}
-                      onChange={(e) => setIsAnonymous(e.target.checked)}
-                      className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-500 rounded"
-                    />
-                  </div>
-                  <div className="ml-3 text-sm">
-                    <label
-                      htmlFor="anonymous"
-                      className="text-gray-300 dark:text-gray-700 cursor-pointer"
-                    >
-                      Contribute anonymously
-                    </label>
-                    <p className="text-gray-400 dark:text-gray-500">
-                      Your name and email will not be publicly associated with
-                      this contribution.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              // Show input fields only for non-logged in users
-              <>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <div>
-                    <label
-                      htmlFor="submitterName"
-                      className="block text-sm font-medium text-gray-300 dark:text-gray-700"
-                    >
-                      Your Name*
-                    </label>
-                    <input
-                      type="text"
-                      id="submitterName"
-                      name="submitterName"
-                      value={formData.submitterName}
-                      onChange={handleChange}
-                      className="mt-1 block w-full rounded-md border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-700 dark:bg-white text-white dark:text-gray-900 sm:text-sm"
-                      required={!isAnonymous}
-                      disabled={isAnonymous}
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="submitterEmail"
-                      className="block text-sm font-medium text-gray-300 dark:text-gray-700"
-                    >
-                      Your Email*
-                    </label>
-                    <input
-                      type="email"
-                      id="submitterEmail"
-                      name="submitterEmail"
-                      value={formData.submitterEmail}
-                      onChange={handleChange}
-                      className="mt-1 block w-full rounded-md border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-700 dark:bg-white text-white dark:text-gray-900 sm:text-sm"
-                      required={!isAnonymous}
-                      disabled={isAnonymous}
-                    />
-                  </div>
-                </div>
-
-                <div className="flex items-start mt-3">
-                  <div className="flex items-center h-5">
-                    <input
-                      id="anonymous"
-                      name="anonymous"
-                      type="checkbox"
-                      checked={isAnonymous}
-                      onChange={(e) => setIsAnonymous(e.target.checked)}
-                      className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-500 rounded"
-                    />
-                  </div>
-                  <div className="ml-3 text-sm">
-                    <label
-                      htmlFor="anonymous"
-                      className="text-gray-300 dark:text-gray-700 cursor-pointer"
-                    >
-                      Contribute anonymously
-                    </label>
-                    <p className="text-gray-400 dark:text-gray-500">
-                      Your contribution will be submitted anonymously. We still
-                      need a contact email for moderation purposes, but it
-                      won&apos;t be publicly displayed.
-                    </p>
-                  </div>
                 </div>
               </>
             )}

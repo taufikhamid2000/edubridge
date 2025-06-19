@@ -36,6 +36,28 @@ export default function CareerGuidancePage() {
   // Use the custom hook to get the subject matcher
   const { getSubjectsByIds } = useSubjectMatcher(subjects);
 
+  // Mock contribution info for each career
+  const contributionInfo = {
+    'software-engineer': {
+      submitterName: 'Dr. Ahmad Khan',
+      submitterEmail: 'ahmad.khan@tech.edu.my',
+      additionalNotes:
+        'Software Engineering careers in Malaysia are growing rapidly. Students should focus on building practical coding skills through side projects alongside their SPM subjects. Looking ahead to university, consider programs with strong industry partnerships.',
+    },
+    'medical-doctor': {
+      submitterName: 'Dr. Mei Ling Tan',
+      submitterEmail: 'mei.tan@medschool.my',
+      additionalNotes:
+        'Medical education in Malaysia requires excellent academic credentials, particularly in biology, chemistry and physics. Students should also develop strong communication skills and consider volunteer work in healthcare settings to gain experience.',
+    },
+    'business-manager': {
+      submitterName: 'Prof. Raj Kumar',
+      submitterEmail: 'raj.kumar@business.edu.my',
+      additionalNotes:
+        'Business management students should develop analytical thinking through mathematics while also focusing on communication skills through language subjects. Practical experience through small business projects or internships will complement the theoretical knowledge gained in SPM subjects.',
+    },
+  };
+
   // Handle selecting a career
   const handleSelectCareer = (careerId: string) => {
     setSelectedCareerId(careerId);
@@ -90,12 +112,19 @@ export default function CareerGuidancePage() {
                 </div>
               </details>
             </div>
-          </div>
+          </div>{' '}
           {/* Career Search Component */}
           <CareerSearch
             careerPathways={careerPathways}
             onSelectCareer={handleSelectCareer}
           />{' '}
+          {/* Career List Grid Component */}
+          <div className="mt-6">
+            <CareerList
+              careerPathways={careerPathways}
+              onSelectCareer={handleSelectCareer}
+            />
+          </div>
           {/* Career Details Component - Only shown when a career is selected */}
           {selectedCareer && (
             <>
@@ -103,6 +132,11 @@ export default function CareerGuidancePage() {
                 career={selectedCareer}
                 isLoading={isLoading}
                 getSubjectsByIds={getSubjectsByIds}
+                contributionInfo={
+                  contributionInfo[
+                    selectedCareer.id as keyof typeof contributionInfo
+                  ]
+                }
               />
               <div className="mt-6 text-center">
                 <a
@@ -127,7 +161,7 @@ export default function CareerGuidancePage() {
                 </a>
               </div>
             </>
-          )}
+          )}{' '}
           {/* Call to action for contributions */}
           <div className="mt-12 pt-8 border-t border-gray-800 dark:border-gray-200">
             <div className="text-center">
@@ -140,7 +174,7 @@ export default function CareerGuidancePage() {
                 Share your knowledge about which subjects are most relevant for
                 specific careers and help students make better educational
                 choices.
-              </p>
+              </p>{' '}
               <div className="mt-4">
                 <button
                   onClick={() => router.push('/career-guidance/contribute')}
@@ -149,13 +183,8 @@ export default function CareerGuidancePage() {
                   Add Subject-Career Information
                 </button>
               </div>
-            </div>
+            </div>{' '}
           </div>
-          {/* Career List Grid Component */}
-          <CareerList
-            careerPathways={careerPathways}
-            onSelectCareer={handleSelectCareer}
-          />
         </div>
       </div>
     </>
