@@ -57,32 +57,38 @@ export default function CareerGuidancePage() {
               Find careers that match your favorite subjects or discover which
               subjects you need to focus on for your dream career path{' '}
             </p>
-          </div>
+          </div>{' '}
           <div className="mt-8 mb-6 max-w-3xl mx-auto">
             <div className="bg-gray-800 dark:bg-gray-100 rounded-lg p-5 shadow-lg">
-              <h2 className="text-lg font-semibold text-white dark:text-gray-900 mb-2">
-                How to Use This Tool:
-              </h2>
-              <ol className="list-decimal pl-5 text-gray-300 dark:text-gray-600 space-y-2">
-                <li>
-                  <span className="font-medium text-gray-200 dark:text-gray-700">
-                    Search for careers
-                  </span>{' '}
-                  by typing keywords in the search box or browse the list below
-                </li>
-                <li>
-                  <span className="font-medium text-gray-200 dark:text-gray-700">
-                    Click on a career
-                  </span>{' '}
-                  to see which subjects are most important for that path
-                </li>
-                <li>
-                  <span className="font-medium text-gray-200 dark:text-gray-700">
-                    Explore subject details
-                  </span>{' '}
-                  to understand their relevance to your chosen career
-                </li>
-              </ol>
+              <details>
+                <summary className="cursor-pointer text-sm font-medium text-blue-400 dark:text-blue-700 hover:text-blue-300 dark:hover:text-blue-600">
+                  How to Use This Tool
+                </summary>
+                <div className="mt-2 pl-4 border-l-2 border-blue-800/30 dark:border-blue-300/30">
+                  {' '}
+                  <ol className="list-decimal pl-5 text-gray-300 dark:text-gray-600 space-y-2">
+                    <li>
+                      <span className="font-medium text-gray-200 dark:text-gray-700">
+                        Search for careers
+                      </span>{' '}
+                      by typing keywords in the search box or browse the list
+                      below
+                    </li>
+                    <li>
+                      <span className="font-medium text-gray-200 dark:text-gray-700">
+                        Click on a career
+                      </span>{' '}
+                      to see which subjects are most important for that path
+                    </li>
+                    <li>
+                      <span className="font-medium text-gray-200 dark:text-gray-700">
+                        Explore subject details
+                      </span>{' '}
+                      to understand their relevance to your chosen career
+                    </li>
+                  </ol>
+                </div>
+              </details>
             </div>
           </div>
           {/* Career Search Component */}

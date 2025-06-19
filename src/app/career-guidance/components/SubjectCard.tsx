@@ -1,6 +1,7 @@
 'use client';
 
 import { FC } from 'react';
+import Link from 'next/link';
 import { EnhancedSubject } from '../types';
 
 interface SubjectCardProps {
@@ -19,13 +20,28 @@ const SubjectCard: FC<SubjectCardProps> = ({ subject, colorScheme }) => {
     green: {
       topic: 'bg-green-800/30 text-green-300',
     },
+  }; // Generate the URL for the subject using the name converted to kebab-case
+  // This matches the format in your table (mathematics, bahasa-melayu, etc.)
+  const generateSlug = (text: string): string => {
+    return text
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '');
   };
+
+  const subjectSlug = generateSlug(subject.name);
+  const subjectUrl = `/quiz/${subjectSlug}/chapters`;
 
   return (
     <li className="py-4">
-      <h4 className="text-lg font-semibold text-white dark:text-gray-900">
-        {subject.name}
-      </h4>
+      <Link href={subjectUrl} className="group">
+        <h4 className="text-lg font-semibold text-white dark:text-gray-900 group-hover:text-blue-400 dark:group-hover:text-blue-600 transition-colors">
+          {subject.name}
+          <span className="inline-block ml-1 text-blue-500 dark:text-blue-700 opacity-0 group-hover:opacity-100 transition-opacity">
+            →
+          </span>
+        </h4>
+      </Link>
       <p className="mt-2 text-sm text-gray-400 dark:text-gray-500">
         {subject.description}
       </p>{' '}

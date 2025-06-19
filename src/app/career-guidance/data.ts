@@ -1,6 +1,7 @@
 import { CareerPathway } from './types';
 
 // Career pathways data with real SPM subject IDs from the database
+// Keeping only the three careers with comprehensive subject lists
 export const careerPathways: CareerPathway[] = [
   {
     id: 'software-engineer',
@@ -11,37 +12,28 @@ export const careerPathways: CareerPathway[] = [
       'c38580e8-c539-43e7-b717-209bcabc410c', // Mathematics
       '64b9676d-ac30-4252-972b-d7468098c296', // Matematik Tambahan
       '4cbe13aa-736b-4701-babf-e0a2d6d22835', // Fizik
+      '8dbabf92-c5ef-4c7a-a892-e885805d2d10', // Sains Komputer
+      'c17e2fa5-c316-4aaa-b745-4e84d050461d', // English
     ],
     shouldLearnIds: [
-      'c17e2fa5-c316-4aaa-b745-4e84d050461d', // English
-      '8dbabf92-c5ef-4c7a-a892-e885805d2d10', // Sains Komputer
       '15b85cd5-c903-4d27-94c0-46c8bce209b0', // Science
-    ],
-    canLearnIds: [
       '850b76bc-73dd-4045-b48e-7729e5b91a6a', // Kimia
-      '3475aa6b-945f-4953-9bcd-1f9206c5ec21', // Pendidikan Seni Visual
       '9e0d6b29-6cad-4eea-b8ed-8ff8b192ac0a', // Bahasa Melayu
-    ],
-  },
-  {
-    id: 'data-scientist',
-    title: 'Data Scientist',
-    description:
-      'Extract insights from data to help Malaysian organizations make better decisions',
-    mustLearnIds: [
-      '64b9676d-ac30-4252-972b-d7468098c296', // Matematik Tambahan
-      'c38580e8-c539-43e7-b717-209bcabc410c', // Mathematics
-      '4cbe13aa-736b-4701-babf-e0a2d6d22835', // Fizik
-    ],
-    shouldLearnIds: [
-      'c17e2fa5-c316-4aaa-b745-4e84d050461d', // English
-      '8dbabf92-c5ef-4c7a-a892-e885805d2d10', // Sains Komputer
-      '850b76bc-73dd-4045-b48e-7729e5b91a6a', // Kimia
+      'd62ee9d1-cf0c-4c47-8928-4f9aa267eca5', // Ekonomi
+      '48d23760-c184-4c3e-931a-9818e380edf0', // Pengajian Kejuruteraan Elektrik & Elektronik
+      '8de8447c-ee99-433d-bf3d-583cc93f1fb1', // Pengajian Kejuruteraan Mekanikal
+      '6f6f104f-5b2b-48e6-aef2-e52a9a3c79e0', // Sains Tambahan
     ],
     canLearnIds: [
+      '3475aa6b-945f-4953-9bcd-1f9206c5ec21', // Pendidikan Seni Visual
       '87505465-cd92-4339-88c5-58061e06f3e4', // Biologi
-      'd62ee9d1-cf0c-4c47-8928-4f9aa267eca5', // Ekonomi
       '6422ddab-5d94-4aa3-b17e-95a7be82dbb1', // Prinsip Perakaunan
+      'f344c1a5-8291-4677-b29e-49157c582f83', // Lukisan Kejuruteraan
+      '7f3c27c3-87d1-4012-a490-67aef51fe508', // Reka Bentuk
+      '761b2421-9a44-47a6-b45f-1ea380f5fee9', // Sejarah
+      'a3af451f-c6f6-421c-ba75-dc8488d1dfb3', // Geografi
+      'ef28afe8-c943-4b9e-9609-8ff068d183db', // Pengajian Keusahawanan
+      'cfc3b402-315b-45fa-8716-75cfdd1185bd', // Asas Kemampanan
     ],
   },
   {
@@ -53,142 +45,29 @@ export const careerPathways: CareerPathway[] = [
       '87505465-cd92-4339-88c5-58061e06f3e4', // Biologi
       '850b76bc-73dd-4045-b48e-7729e5b91a6a', // Kimia
       '4cbe13aa-736b-4701-babf-e0a2d6d22835', // Fizik
-    ],
-    shouldLearnIds: [
+      'c38580e8-c539-43e7-b717-209bcabc410c', // Mathematics
       '64b9676d-ac30-4252-972b-d7468098c296', // Matematik Tambahan
-      'c38580e8-c539-43e7-b717-209bcabc410c', // Mathematics
       'c17e2fa5-c316-4aaa-b745-4e84d050461d', // English
-    ],
-    canLearnIds: [
-      '761b2421-9a44-47a6-b45f-1ea380f5fee9', // Sejarah
-      'de1e094e-37c2-4718-930c-0b8998b3efeb', // Pendidikan Moral
-      '9e0d6b29-6cad-4eea-b8ed-8ff8b192ac0a', // Bahasa Melayu
-    ],
-  },
-  {
-    id: 'educator',
-    title: 'Educator',
-    description:
-      'Teach and develop curriculum for Malaysian schools and educational institutions',
-    mustLearnIds: [
-      '9e0d6b29-6cad-4eea-b8ed-8ff8b192ac0a', // Bahasa Melayu
-      'c17e2fa5-c316-4aaa-b745-4e84d050461d', // English
-      '761b2421-9a44-47a6-b45f-1ea380f5fee9', // Sejarah
     ],
     shouldLearnIds: [
-      'c38580e8-c539-43e7-b717-209bcabc410c', // Mathematics
+      '9e0d6b29-6cad-4eea-b8ed-8ff8b192ac0a', // Bahasa Melayu
       '15b85cd5-c903-4d27-94c0-46c8bce209b0', // Science
-      'de1e094e-37c2-4718-930c-0b8998b3efeb', // Pendidikan Moral
-    ],
-    canLearnIds: [
-      '64b9676d-ac30-4252-972b-d7468098c296', // Matematik Tambahan
-      '4cbe13aa-736b-4701-babf-e0a2d6d22835', // Fizik
+      'e738de6d-a90c-429c-90f1-82e44ea59e9c', // Sains Sukan
+      '7cf7c776-28a6-49ab-a149-1716d353e97c', // Bahasa Arab
       'dd2796a2-7138-4d76-a78e-caef6131c57c', // Pendidikan Islam
-    ],
-  },
-  {
-    id: 'accountant',
-    title: 'Accountant',
-    description:
-      'Prepare and analyze financial records for Malaysian businesses and organizations',
-    mustLearnIds: [
-      'c38580e8-c539-43e7-b717-209bcabc410c', // Mathematics
-      '64b9676d-ac30-4252-972b-d7468098c296', // Matematik Tambahan
-      '6422ddab-5d94-4aa3-b17e-95a7be82dbb1', // Prinsip Perakaunan
-    ],
-    shouldLearnIds: [
-      'c17e2fa5-c316-4aaa-b745-4e84d050461d', // English
-      'd62ee9d1-cf0c-4c47-8928-4f9aa267eca5', // Ekonomi
-      '101ab8fc-86ac-470c-933a-5012db064755', // Perniagaan
+      '6f6f104f-5b2b-48e6-aef2-e52a9a3c79e0', // Sains Tambahan
+      '20a5293b-84e9-4825-889d-62e28a7a0441', // Sains Rumah Tangga
     ],
     canLearnIds: [
-      '9e0d6b29-6cad-4eea-b8ed-8ff8b192ac0a', // Bahasa Melayu
-      'de1e094e-37c2-4718-930c-0b8998b3efeb', // Pendidikan Moral
-      '8dbabf92-c5ef-4c7a-a892-e885805d2d10', // Sains Komputer
-    ],
-  },
-  {
-    id: 'mechanical-engineer',
-    title: 'Mechanical Engineer',
-    description:
-      'Design and develop mechanical systems for Malaysian industrial sectors',
-    mustLearnIds: [
-      '4cbe13aa-736b-4701-babf-e0a2d6d22835', // Fizik
-      '64b9676d-ac30-4252-972b-d7468098c296', // Matematik Tambahan
-      'c38580e8-c539-43e7-b717-209bcabc410c', // Mathematics
-    ],
-    shouldLearnIds: [
-      '850b76bc-73dd-4045-b48e-7729e5b91a6a', // Kimia
-      'c17e2fa5-c316-4aaa-b745-4e84d050461d', // English
-      '15b85cd5-c903-4d27-94c0-46c8bce209b0', // Science
-    ],
-    canLearnIds: [
-      '8dbabf92-c5ef-4c7a-a892-e885805d2d10', // Sains Komputer
-      'f344c1a5-8291-4677-b29e-49157c582f83', // Lukisan Kejuruteraan
-      '7f3c27c3-87d1-4012-a490-67aef51fe508', // Reka Bentuk
-    ],
-  },
-  {
-    id: 'graphic-designer',
-    title: 'Graphic Designer',
-    description:
-      'Create visual content for Malaysian brands, media, and advertising',
-    mustLearnIds: [
-      '3475aa6b-945f-4953-9bcd-1f9206c5ec21', // Pendidikan Seni Visual
-      '8dbabf92-c5ef-4c7a-a892-e885805d2d10', // Sains Komputer
-      'c17e2fa5-c316-4aaa-b745-4e84d050461d', // English
-    ],
-    shouldLearnIds: [
-      'c38580e8-c539-43e7-b717-209bcabc410c', // Mathematics
-      '9e0d6b29-6cad-4eea-b8ed-8ff8b192ac0a', // Bahasa Melayu
       '761b2421-9a44-47a6-b45f-1ea380f5fee9', // Sejarah
-    ],
-    canLearnIds: [
       'de1e094e-37c2-4718-930c-0b8998b3efeb', // Pendidikan Moral
-      '15b85cd5-c903-4d27-94c0-46c8bce209b0', // Science
-      'dd2796a2-7138-4d76-a78e-caef6131c57c', // Pendidikan Islam
-    ],
-  },
-  {
-    id: 'civil-engineer',
-    title: 'Civil Engineer',
-    description:
-      'Design, develop, and maintain infrastructure projects across Malaysia',
-    mustLearnIds: [
-      '64b9676d-ac30-4252-972b-d7468098c296', // Matematik Tambahan
-      '4cbe13aa-736b-4701-babf-e0a2d6d22835', // Fizik
-      'c38580e8-c539-43e7-b717-209bcabc410c', // Mathematics
-    ],
-    shouldLearnIds: [
-      '850b76bc-73dd-4045-b48e-7729e5b91a6a', // Kimia
-      'f344c1a5-8291-4677-b29e-49157c582f83', // Lukisan Kejuruteraan
-      'c17e2fa5-c316-4aaa-b745-4e84d050461d', // English
-    ],
-    canLearnIds: [
+      'cd31c143-7de6-430e-9cb0-599b2b85d352', // Pertanian
       'a3af451f-c6f6-421c-ba75-dc8488d1dfb3', // Geografi
-      '7f3c27c3-87d1-4012-a490-67aef51fe508', // Reka Bentuk
-      '15b85cd5-c903-4d27-94c0-46c8bce209b0', // Science
-    ],
-  },
-  {
-    id: 'pharmacist',
-    title: 'Pharmacist',
-    description:
-      'Prepare and dispense medications in Malaysian healthcare settings',
-    mustLearnIds: [
-      '850b76bc-73dd-4045-b48e-7729e5b91a6a', // Kimia
-      '87505465-cd92-4339-88c5-58061e06f3e4', // Biologi
-      'c38580e8-c539-43e7-b717-209bcabc410c', // Mathematics
-    ],
-    shouldLearnIds: [
-      '4cbe13aa-736b-4701-babf-e0a2d6d22835', // Fizik
-      '64b9676d-ac30-4252-972b-d7468098c296', // Matematik Tambahan
-      'c17e2fa5-c316-4aaa-b745-4e84d050461d', // English
-    ],
-    canLearnIds: [
-      '9e0d6b29-6cad-4eea-b8ed-8ff8b192ac0a', // Bahasa Melayu
-      'de1e094e-37c2-4718-930c-0b8998b3efeb', // Pendidikan Moral
-      '15b85cd5-c903-4d27-94c0-46c8bce209b0', // Science
+      'd62ee9d1-cf0c-4c47-8928-4f9aa267eca5', // Ekonomi
+      '25dce3c6-5e97-4b35-84fb-866a0a4eb86e', // Pendidikan Muzik
+      '8dbabf92-c5ef-4c7a-a892-e885805d2d10', // Sains Komputer
+      'af1bc538-21cb-40a2-92f1-469d3ba70999', // Tasawwur Islam
+      'ea844278-703d-4f0d-8f88-8832a0d1a884', // Pendidikan Al‑Quran & As‑Sunnah
     ],
   },
   {
@@ -200,16 +79,32 @@ export const careerPathways: CareerPathway[] = [
       'd62ee9d1-cf0c-4c47-8928-4f9aa267eca5', // Ekonomi
       'c38580e8-c539-43e7-b717-209bcabc410c', // Mathematics
       'c17e2fa5-c316-4aaa-b745-4e84d050461d', // English
-    ],
-    shouldLearnIds: [
+      '9e0d6b29-6cad-4eea-b8ed-8ff8b192ac0a', // Bahasa Melayu
       '101ab8fc-86ac-470c-933a-5012db064755', // Perniagaan
       '6422ddab-5d94-4aa3-b17e-95a7be82dbb1', // Prinsip Perakaunan
-      '9e0d6b29-6cad-4eea-b8ed-8ff8b192ac0a', // Bahasa Melayu
+    ],
+    shouldLearnIds: [
+      'ef28afe8-c943-4b9e-9609-8ff068d183db', // Pengajian Keusahawanan
+      '761b2421-9a44-47a6-b45f-1ea380f5fee9', // Sejarah
+      '64b9676d-ac30-4252-972b-d7468098c296', // Matematik Tambahan
+      '8dbabf92-c5ef-4c7a-a892-e885805d2d10', // Sains Komputer
+      'de1e094e-37c2-4718-930c-0b8998b3efeb', // Pendidikan Moral
+      'cfc3b402-315b-45fa-8716-75cfdd1185bd', // Asas Kemampanan
+      '9e70c344-e80a-42bb-9b3b-b3d583152ec7', // Kesusasteraan Inggeris
+      'c1fd5dbf-1f26-4186-aef0-3ee43ba3b298', // Kesusasteraan Melayu Komunikatif
     ],
     canLearnIds: [
-      'de1e094e-37c2-4718-930c-0b8998b3efeb', // Pendidikan Moral
-      '761b2421-9a44-47a6-b45f-1ea380f5fee9', // Sejarah
-      '8dbabf92-c5ef-4c7a-a892-e885805d2d10', // Sains Komputer
+      '4cbe13aa-736b-4701-babf-e0a2d6d22835', // Fizik
+      '850b76bc-73dd-4045-b48e-7729e5b91a6a', // Kimia
+      '87505465-cd92-4339-88c5-58061e06f3e4', // Biologi
+      '15b85cd5-c903-4d27-94c0-46c8bce209b0', // Science
+      '3475aa6b-945f-4953-9bcd-1f9206c5ec21', // Pendidikan Seni Visual
+      'a3af451f-c6f6-421c-ba75-dc8488d1dfb3', // Geografi
+      'dd2796a2-7138-4d76-a78e-caef6131c57c', // Pendidikan Islam
+      '7f3c27c3-87d1-4012-a490-67aef51fe508', // Reka Bentuk
+      '7ad65b5c-54dd-47bf-8b02-9771cd5da979', // Bahasa Cina
+      'e0b62050-4c80-4c14-9d25-9102aa910fa1', // Bahasa Tamil
+      '1a9ca979-a713-499c-b1ac-8a553d456aa0', // Bahasa Perancis
     ],
   },
 ];
@@ -217,7 +112,7 @@ export const careerPathways: CareerPathway[] = [
 // Mapping actual SPM subject IDs from the database to subject names
 export const subjectMapping: Record<
   string,
-  { name: string; description: string; topics: string[]; }
+  { name: string; description: string; topics: string[] }
 > = {
   // Mathematics and Sciences
   'c38580e8-c539-43e7-b717-209bcabc410c': {
