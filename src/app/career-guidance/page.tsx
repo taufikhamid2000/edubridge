@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/navigation';
-import { fetchPublicSubjects, PublicSubject } from '@/services/subjectService';
-import { careerPathways } from './data';
+import { PublicSubject } from '@/services/subjectService';
+import { careerPathways, subjectMapping } from './data';
 import { useSubjectMatcher } from './hooks/useSubjectMatcher';
 import CareerSearch from './components/CareerSearch';
 import CareerDetails from './components/CareerDetails';
@@ -13,28 +13,20 @@ import CareerList from './components/CareerList';
 export default function CareerGuidancePage() {
   const router = useRouter();
   const [selectedCareerId, setSelectedCareerId] = useState<string>('');
-  const [subjects, setSubjects] = useState<PublicSubject[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // Load all subjects from the API
-  useEffect(() => {
-    async function loadSubjects() {
-      try {
-        const { data, error } = await fetchPublicSubjects();
-        if (error || !data) {
-          console.error('Error loading subjects:', error);
-          return;
-        }
-        setSubjects(data);
-      } catch (err) {
-        console.error('Error fetching subjects:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    }
+  // Create local subjects from subject mapping
+  const subjects: PublicSubject[] = Object.entries(subjectMapping).map(
+    ([id, details]) => ({
+      id,
+      name: details.name,
+      description: details.description,
+      slug: id,
+      icon: '',
+    })
+  );
 
-    loadSubjects();
-  }, []);
+  // No loading state needed since we're using local data
+  const isLoading = false;
 
   // Get selected career details
   const selectedCareer = careerPathways.find(

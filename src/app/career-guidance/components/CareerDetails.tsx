@@ -57,14 +57,27 @@ const CareerDetails: FC<CareerDetailsProps> = ({
         </h2>
         <p className="mt-3 max-w-2xl mx-auto text-xl text-gray-300 dark:text-gray-600">
           {career.description}
-        </p>
-
+        </p>{' '}
         <div className="mt-4 bg-blue-950/30 dark:bg-blue-100/30 rounded-lg px-4 py-3 max-w-2xl mx-auto">
-          <p className="text-sm text-blue-300 dark:text-blue-800">
-            <span className="font-semibold">SPM Context:</span> The subjects
-            shown below are relevant to your SPM studies and will help prepare
-            you for this career path.
-          </p>
+          <details className="mt-2">
+            <summary className="cursor-pointer text-sm font-medium text-blue-400 dark:text-blue-700 hover:text-blue-300 dark:hover:text-blue-600">
+              Important note about SPM requirements
+            </summary>
+            <div className="mt-2 text-sm text-blue-300 dark:text-blue-800 pl-4 border-l-2 border-blue-800/30 dark:border-blue-300/30">
+              <p className="text-sm text-blue-300 dark:text-blue-800">
+                <span className="font-semibold">SPM Context:</span> The subjects
+                shown below are relevant to your SPM studies and will help
+                prepare you for this career path.
+              </p>
+              <p>
+                <span className="font-semibold">Mandatory Subjects:</span>{' '}
+                Remember that Bahasa Melayu and Sejarah are mandatory pass
+                subjects for SPM regardless of your career path. All Malaysian
+                students must pass these core subjects to obtain their SPM
+                certificate.
+              </p>
+            </div>
+          </details>
         </div>
       </div>
       <div className="grid grid-cols-1 gap-8 md:grid-cols-3">

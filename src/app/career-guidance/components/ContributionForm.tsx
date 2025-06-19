@@ -141,10 +141,6 @@ const SubjectSelector: FC<SubjectSelectorProps> = ({
                 )}
               </ul>
             )}
-
-            <p className="mt-1 text-sm text-gray-400 dark:text-gray-500">
-              Search for subjects to add to your list
-            </p>
           </div>
 
           {/* Show selected subjects as tags */}

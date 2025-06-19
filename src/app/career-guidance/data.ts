@@ -217,7 +217,7 @@ export const careerPathways: CareerPathway[] = [
 // Mapping actual SPM subject IDs from the database to subject names
 export const subjectMapping: Record<
   string,
-  { name: string; description: string; topics: string[] }
+  { name: string; description: string; topics: string[]; }
 > = {
   // Mathematics and Sciences
   'c38580e8-c539-43e7-b717-209bcabc410c': {
