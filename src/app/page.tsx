@@ -175,7 +175,15 @@ export default function HomePage() {
                 router.push('/career-guidance');
               }}
             >
-              Explore Career Paths 🧭
+              Subject Guidance 📚
+            </button>{' '}
+            <button
+              className="inline-block uppercase tracking-wide rounded-full shadow-lg transition-all duration-300 ease-in-out px-8 py-4 bg-green-400 text-blue-800 font-medium hover:bg-green-300 hover:scale-105 transform"
+              onClick={() => {
+                router.push('/education-pathway');
+              }}
+            >
+              Education Pathway 🎓
             </button>{' '}
             <button
               className="inline-block uppercase tracking-wide rounded-full shadow-lg transition-all duration-300 ease-in-out px-8 py-4 bg-transparent border-2 border-white text-white font-medium hover:bg-white/10 hover:scale-105 transform"

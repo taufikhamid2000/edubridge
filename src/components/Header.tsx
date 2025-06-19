@@ -122,6 +122,14 @@ export default function Header(): JSX.Element {
                     School Rankings
                   </Link>
                 </div>
+                <div className="py-1 border-b border-gray-700 dark:border-gray-200">
+                  <Link href="/career-guidance" className="header-menu-link">
+                    Subject Guidance
+                  </Link>
+                  <Link href="/education-pathway" className="header-menu-link">
+                    Education Pathway
+                  </Link>
+                </div>
                 <Link href="/profile" className="header-menu-link">
                   Profile
                 </Link>
