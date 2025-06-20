@@ -11,6 +11,7 @@ import {
   LogOut,
   MenuIcon,
   ChevronLeft,
+  MessageSquare,
 } from 'lucide-react';
 import { initializeTheme } from '@/lib/theme';
 
@@ -77,6 +78,12 @@ export default function AdminNavigation({
       name: 'Content',
       path: '/admin/content',
       icon: <BookOpen className={isCollapsed ? '' : 'mr-3'} size={18} />,
+    },
+    {
+      name: 'Comments',
+      path: '/admin/comments',
+      icon: <MessageSquare className={isCollapsed ? '' : 'mr-3'} size={18} />,
+      badge: 'new',
     },
     {
       name: 'Quizzes',
@@ -201,8 +208,22 @@ export default function AdminNavigation({
                     : 'hover:bg-gray-800 dark:hover:bg-gray-700'
                 } ${isMobile ? 'active:bg-blue-800' : ''} ${isCollapsed ? 'justify-center' : ''}`}
               >
-                <div className={isCollapsed ? 'mx-auto' : ''}>{item.icon}</div>
-                {!isCollapsed && <span className="text-sm">{item.name}</span>}
+                <div className={isCollapsed ? 'mx-auto relative' : ''}>
+                  {item.icon}
+                  {isCollapsed && item.badge && (
+                    <span className="absolute -top-1 -right-1 w-2 h-2 bg-blue-500 rounded-full"></span>
+                  )}
+                </div>
+                {!isCollapsed && (
+                  <div className="flex items-center justify-between w-full">
+                    <span className="text-sm">{item.name}</span>
+                    {item.badge && (
+                      <span className="ml-2 px-1.5 py-0.5 text-xs bg-blue-500 text-white rounded-full">
+                        {item.badge}
+                      </span>
+                    )}
+                  </div>
+                )}
               </Link>
             </li>
           ))}

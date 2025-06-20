@@ -1,145 +1,33 @@
 'use client';
 
-import { FC, useState } from 'react';
-
-// Interface for pathway comments
-interface PathwayComment {
-  id: string;
-  pathwayId: string;
-  author: string;
-  date: string;
-  comment: string;
-  avatar?: string;
-}
-
-// Sample comments data for education pathways - keyed by specific pathway IDs, not general categories
-const pathwayComments: Record<string, PathwayComment[]> = {
-  // Software Engineering pathway (Pathway ID: 1)
-  '1': [
-    {
-      id: 'pathway1-comment-1',
-      pathwayId: '1',
-      author: 'Amirah',
-      date: 'June 14, 2025',
-      comment:
-        'You guys can actually join Universiti Selangor Foundation in IT programme (1 year) then take Bachelor in Computer Science (3 years). The cost would be significantly low if you signed up for dermasiswa and got 3.65 CGPA for your PTPTN loan waiver',
-      avatar: '👩‍💻',
-    },
-    {
-      id: 'pathway1-comment-2',
-      pathwayId: '1',
-      author: 'Danial',
-      date: 'June 12, 2025',
-      comment:
-        'I recommend checking out Asia Pacific University too. Their CS program has strong industry partnerships and lots of internship opportunities with tech companies in Cyberjaya.',
-      avatar: '👨‍🎓',
-    },
-    {
-      id: 'pathway1-comment-3',
-      pathwayId: '1',
-      author: 'Li Wei',
-      date: 'June 10, 2025',
-      comment:
-        "If you're interested in studying overseas but worried about costs, look into the MARA scholarship programs. They often fund CS degrees abroad if you maintain good academic standing.",
-      avatar: '🎓',
-    },
-  ],
-  // Medical Doctor pathway (Pathway ID: 2)
-  '2': [
-    {
-      id: 'pathway2-comment-1',
-      pathwayId: '2',
-      author: 'Dr. Siti',
-      date: 'June 15, 2025',
-      comment:
-        'For aspiring doctors, I suggest considering the twinning programs at IMU or UCSI. You can do half your studies in Malaysia and half abroad, which saves significant costs while still getting international exposure.',
-      avatar: '👩‍⚕️',
-    },
-    {
-      id: 'pathway2-comment-2',
-      pathwayId: '2',
-      author: 'Raj',
-      date: 'June 11, 2025',
-      comment:
-        'Medical foundation programs at Monash Malaysia or Newcastle Malaysia are great options. The competition is tough, but they have good progression rates to their MBBS programs.',
-      avatar: '🧑‍⚕️',
-    },
-  ],
-  // Business Management pathway (Pathway ID: 3)
-  '3': [
-    {
-      id: 'pathway3-comment-1',
-      pathwayId: '3',
-      author: 'Faizal',
-      date: 'June 13, 2025',
-      comment:
-        "Sunway's business program has a great reputation with employers. Their ACCA pathway also allows you to get your professional accounting qualification alongside your degree.",
-      avatar: '💼',
-    },
-    {
-      id: 'pathway3-comment-2',
-      pathwayId: '3',
-      author: 'Sarah',
-      date: 'June 8, 2025',
-      comment:
-        "For those interested in entrepreneurship, consider UNIRAZAK's programs. They have specific tracks focused on building your own business and connections to startup incubators.",
-      avatar: '📊',
-    },
-    {
-      id: 'pathway3-comment-3',
-      pathwayId: '3',
-      author: 'Chong',
-      date: 'May 25, 2025',
-      comment:
-        "If you're interested in international business, I'd strongly recommend taking an additional language like Mandarin or Spanish alongside your business degree.",
-      avatar: '🌏',
-    },
-  ],
-};
+import { FC } from 'react';
+import { formatDistanceToNow } from 'date-fns';
+import { usePathwayComments } from '../hooks/usePathwayComments';
 
 interface PathwayCommentsProps {
   pathwayId: string;
 }
 
 const PathwayComments: FC<PathwayCommentsProps> = ({ pathwayId }) => {
-  const [commentText, setCommentText] = useState('');
-  const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
-  const [currentPage, setCurrentPage] = useState(1);
-  const commentsPerPage = 3;
-  // Get comments for this pathway - only exact matches by ID, no fallbacks
-  const getCommentsForPathway = () => {
-    // Return only comments that match this specific pathway ID
-    return pathwayComments[pathwayId] || [];
-  };
-
-  const comments = getCommentsForPathway();
-
-  // Sort comments based on sortOrder
-  const sortedComments = [...comments].sort((a, b) => {
-    const dateA = new Date(a.date).getTime();
-    const dateB = new Date(b.date).getTime();
-    return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
-  });
-
-  // Calculate pagination
-  const indexOfLastComment = currentPage * commentsPerPage;
-  const indexOfFirstComment = indexOfLastComment - commentsPerPage;
-  const currentComments = sortedComments.slice(
-    indexOfFirstComment,
-    indexOfLastComment
-  );
-  const totalPages = Math.ceil(sortedComments.length / commentsPerPage);
-
-  // Handle comment submission
-  const handleCommentSubmit = () => {
-    if (!commentText.trim()) return;
-
-    // This would typically send the comment to a backend API
-    // For now, we'll just show a simple alert and clear the input
-    alert('Comment submitted for moderation!');
-    setCommentText('');
-  };
-
+  const {
+    comments: currentComments,
+    isLoading,
+    error,
+    sortOrder,
+    setSortOrder,
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    commentText,
+    setCommentText,
+    isAnonymous,
+    setIsAnonymous,
+    handleSubmitComment,
+    isAuthenticated,
+    authLoading,
+    isAdmin,
+    handleDeleteComment,
+  } = usePathwayComments(pathwayId);
   return (
     <div className="border-t border-gray-700 dark:border-gray-200 px-4 py-5 sm:px-6">
       <div className="flex justify-between items-center mb-6">
@@ -164,9 +52,22 @@ const PathwayComments: FC<PathwayCommentsProps> = ({ pathwayId }) => {
             </select>
           </div>
         </div>
-      </div>{' '}
+      </div>
+
       <div className="space-y-6">
-        {currentComments.length === 0 ? (
+        {isLoading ? (
+          <div className="text-center py-8">
+            <p className="text-gray-400 dark:text-gray-600">
+              Loading comments...
+            </p>
+          </div>
+        ) : error ? (
+          <div className="text-center py-8">
+            <p className="text-red-400 dark:text-red-600">
+              Could not load comments. Please try again later.
+            </p>
+          </div>
+        ) : currentComments.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-gray-400 dark:text-gray-600">
               No comments yet for this education pathway. Be the first to share
@@ -186,13 +87,28 @@ const PathwayComments: FC<PathwayCommentsProps> = ({ pathwayId }) => {
                   </div>
                 </div>
                 <div className="flex-1 min-w-0">
+                  {' '}
                   <div className="flex items-center justify-between mb-1">
                     <p className="text-sm font-medium text-white dark:text-gray-900">
-                      {comment.author}
+                      {comment.authorName}
                     </p>
-                    <span className="text-xs text-gray-400 dark:text-gray-500">
-                      {comment.date}
-                    </span>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-xs text-gray-400 dark:text-gray-500">
+                        {formatDistanceToNow(new Date(comment.createdAt), {
+                          addSuffix: true,
+                        })}
+                      </span>
+                      {isAdmin && (
+                        <button
+                          onClick={() => handleDeleteComment(comment.id)}
+                          className="text-xs text-red-500 hover:text-red-400 focus:outline-none"
+                          aria-label="Delete comment"
+                          title="Delete comment"
+                        >
+                          Delete
+                        </button>
+                      )}
+                    </div>
                   </div>
                   <p className="text-gray-300 dark:text-gray-600">
                     {comment.comment}
@@ -203,6 +119,7 @@ const PathwayComments: FC<PathwayCommentsProps> = ({ pathwayId }) => {
           ))
         )}
       </div>
+
       {/* Pagination controls */}
       {totalPages > 1 && (
         <div className="flex justify-center mt-8">
@@ -250,6 +167,7 @@ const PathwayComments: FC<PathwayCommentsProps> = ({ pathwayId }) => {
           </nav>
         </div>
       )}
+
       <div className="mt-6 bg-gray-700 dark:bg-gray-200 rounded-lg p-5 border border-gray-600 dark:border-gray-300">
         <h4 className="font-medium text-white dark:text-gray-900 mb-2">
           Share Your Experience
@@ -258,22 +176,48 @@ const PathwayComments: FC<PathwayCommentsProps> = ({ pathwayId }) => {
           Have you followed this education pathway? Share your tips, experiences
           or alternative options with others!
         </p>
+
+        <div className="mb-3">
+          <label className="flex items-center space-x-2 text-sm text-gray-300 dark:text-gray-600">
+            <input
+              type="checkbox"
+              checked={isAnonymous}
+              onChange={(e) => setIsAnonymous(e.target.checked)}
+              className="rounded border-gray-600 text-indigo-600 focus:ring-indigo-500"
+            />
+            <span>Post anonymously</span>
+          </label>
+        </div>
+
         <div className="flex">
           <input
             type="text"
-            placeholder="Write your comment..."
+            placeholder={authLoading ? 'Loading...' : 'Write your comment...'}
             value={commentText}
             onChange={(e) => setCommentText(e.target.value)}
+            disabled={authLoading}
             className="flex-1 rounded-l-md border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-600 dark:bg-white text-white dark:text-gray-900"
           />
           <button
             type="button"
-            onClick={handleCommentSubmit}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-r-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            onClick={handleSubmitComment}
+            disabled={!commentText.trim() || authLoading}
+            className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-r-md shadow-sm text-white ${
+              !commentText.trim() || authLoading
+                ? 'bg-gray-500 cursor-not-allowed'
+                : 'bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
+            }`}
           >
             Comment
           </button>
         </div>
+
+        {!isAuthenticated && !authLoading && (
+          <p className="mt-2 text-xs text-amber-400 dark:text-amber-600">
+            You are not signed in. Comments will be posted as a guest.
+          </p>
+        )}
+
         <p className="mt-2 text-xs text-gray-400 dark:text-gray-500">
           Comments are moderated and may take up to 24 hours to appear.
         </p>

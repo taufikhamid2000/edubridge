@@ -3,6 +3,20 @@
 // Admin Auth Service
 export { verifyAdminAccess, checkAdminAccess } from './adminAuthService';
 
+// Pathway Comments Service
+export {
+  PathwayCommentService,
+  type PathwayComment,
+  type CreatePathwayCommentParams,
+} from './pathwayCommentService';
+
+// Career Comments Service
+export {
+  CareerCommentService,
+  type CareerComment,
+  type CreateCareerCommentParams,
+} from './careerCommentService';
+
 // Subject Service
 export {
   type Subject,

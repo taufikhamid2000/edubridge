@@ -1,112 +1,13 @@
 'use client';
 
-import { FC, useState, useMemo } from 'react';
+import { FC, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { formatDistanceToNow } from 'date-fns';
 import { CareerPathway, EnhancedSubject } from '../types';
 import { PublicSubject } from '@/services/subjectService';
 import SubjectCategory from './SubjectCategory';
 import { subjectMapping } from '../data';
-
-// Interface for comments
-interface CareerComment {
-  id: string;
-  careerPath: string;
-  author: string;
-  date: string;
-  comment: string;
-  avatar?: string;
-}
-
-// Sample comments data for each career
-const careerComments: Record<string, CareerComment[]> = {
-  'software-engineer': [
-    {
-      id: 'se-comment-1',
-      careerPath: 'software-engineer',
-      author: 'Ahmad',
-      date: 'June 15, 2025',
-      comment:
-        'This guidance was incredibly helpful for my SPM preparation! I focused on these subjects and got accepted into a top CS program. Thank you EduBridge!',
-      avatar: '👨‍💻',
-    },
-    {
-      id: 'se-comment-2',
-      careerPath: 'software-engineer',
-      author: 'Mei Ling',
-      date: 'June 10, 2025',
-      comment:
-        'I wonder if Additional Mathematics is really necessary? My cousin is a successful programmer and he said coding bootcamps are better than traditional education paths.',
-      avatar: '🤔',
-    },
-    {
-      id: 'se-comment-3',
-      careerPath: 'software-engineer',
-      author: 'Raj',
-      date: 'May 28, 2025',
-      comment:
-        'Would recommend learning some basics of UI/UX design as well. It helped me stand out when applying for internships during university.',
-      avatar: '💡',
-    },
-  ],
-  'medical-doctor': [
-    {
-      id: 'doctor-comment-1',
-      careerPath: 'medical-doctor',
-      author: 'Farah',
-      date: 'June 12, 2025',
-      comment:
-        'Following this subject guidance helped me prepare for medical school entrance exams. The detailed breakdown of which science subjects to focus on was spot on!',
-      avatar: '👩‍⚕️',
-    },
-    {
-      id: 'doctor-comment-2',
-      careerPath: 'medical-doctor',
-      author: 'Jason',
-      date: 'June 5, 2025',
-      comment:
-        'Is Biology really more important than Chemistry? My medical school emphasized chemistry and biochemistry more heavily in first year.',
-      avatar: '🔬',
-    },
-    {
-      id: 'doctor-comment-3',
-      careerPath: 'medical-doctor',
-      author: 'Zainab',
-      date: 'May 20, 2025',
-      comment:
-        "Don't forget soft skills! I'd recommend taking public speaking classes and volunteering at hospitals during school holidays. Medical schools look for well-rounded candidates.",
-      avatar: '🏥',
-    },
-  ],
-  'business-manager': [
-    {
-      id: 'bm-comment-1',
-      careerPath: 'business-manager',
-      author: 'Daniel',
-      date: 'June 17, 2025',
-      comment:
-        'The subject recommendations were perfect for my business degree preparation. Economics and Accounting knowledge gave me a great foundation!',
-      avatar: '📊',
-    },
-    {
-      id: 'bm-comment-2',
-      careerPath: 'business-manager',
-      author: 'Siti',
-      date: 'June 8, 2025',
-      comment:
-        'I think language skills should be emphasized more than mathematics for business roles. In my experience, communication is the most valuable skill in management positions.',
-      avatar: '💼',
-    },
-    {
-      id: 'bm-comment-3',
-      careerPath: 'business-manager',
-      author: 'Chong',
-      date: 'May 25, 2025',
-      comment:
-        "If you're interested in international business, I'd strongly recommend taking an additional language like Mandarin or Spanish alongside these subjects.",
-      avatar: '🌏',
-    },
-  ],
-};
+import { useCareerComments } from '../hooks/useCareerComments';
 
 interface CareerDetailsProps {
   career: CareerPathway;
@@ -128,43 +29,28 @@ const CareerDetails: FC<CareerDetailsProps> = ({
 }) => {
   const router = useRouter();
   const [showContributorDetails, setShowContributorDetails] = useState(false);
-  const [commentText, setCommentText] = useState('');
-  const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
-  const [currentPage, setCurrentPage] = useState(1);
-  const commentsPerPage = 5;
 
-  // Handler for submitting a new comment
-  const handleCommentSubmit = () => {
-    if (!commentText.trim()) return;
-
-    // This would typically send the comment to a backend API
-    // For now, we'll just show a simple alert and clear the input
-    alert('Comment submitted for moderation!');
-    setCommentText('');
-  };
-
-  // Get sorted and paginated comments
-  const paginatedComments = useMemo(() => {
-    // Get comments for current career
-    const comments = careerComments[career.id] || [];
-
-    // Sort comments based on sortOrder
-    const sortedComments = [...comments].sort((a, b) => {
-      const dateA = new Date(a.date).getTime();
-      const dateB = new Date(b.date).getTime();
-      return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
-    });
-
-    // Calculate pagination
-    const indexOfLastComment = currentPage * commentsPerPage;
-    const indexOfFirstComment = indexOfLastComment - commentsPerPage;
-
-    return {
-      comments: sortedComments.slice(indexOfFirstComment, indexOfLastComment),
-      totalComments: sortedComments.length,
-      totalPages: Math.ceil(sortedComments.length / commentsPerPage),
-    };
-  }, [career.id, currentPage, sortOrder]);
+  // Use the career comments hook
+  const {
+    comments,
+    totalComments,
+    isLoading: isLoadingComments,
+    error: commentsError,
+    sortOrder,
+    setSortOrder,
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    commentText,
+    setCommentText,
+    isAnonymous,
+    setIsAnonymous,
+    handleSubmitComment,
+    isAuthenticated,
+    authLoading,
+    isAdmin,
+    handleDeleteComment,
+  } = useCareerComments(career.id);
 
   // Filter subjects to only include SPM subjects using our subject mapping
   const isSpmSubject = (subject: EnhancedSubject): boolean => {
@@ -307,8 +193,7 @@ const CareerDetails: FC<CareerDetailsProps> = ({
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-2xl font-semibold text-white dark:text-gray-900">
             Student Feedback & Experiences
-          </h3>
-
+          </h3>{' '}
           <div className="flex items-center space-x-2">
             <span className="text-sm text-gray-400 dark:text-gray-600">
               Sort by:
@@ -327,16 +212,27 @@ const CareerDetails: FC<CareerDetailsProps> = ({
             </div>
           </div>
         </div>
-
         <div className="space-y-6">
-          {paginatedComments.totalComments === 0 ? (
+          {isLoadingComments ? (
+            <div className="text-center py-8">
+              <p className="text-gray-400 dark:text-gray-600">
+                Loading comments...
+              </p>
+            </div>
+          ) : commentsError ? (
+            <div className="text-center py-8">
+              <p className="text-red-400 dark:text-red-600">
+                Error loading comments. Please try again later.
+              </p>
+            </div>
+          ) : totalComments === 0 ? (
             <div className="text-center py-8">
               <p className="text-gray-400 dark:text-gray-600">
                 No comments yet. Be the first to share your experience!
               </p>
             </div>
           ) : (
-            paginatedComments.comments.map((comment) => (
+            comments.map((comment) => (
               <div
                 key={comment.id}
                 className="bg-gray-800/70 dark:bg-white/70 rounded-lg p-5 border-l-4 border-indigo-500 dark:border-indigo-600"
@@ -348,26 +244,51 @@ const CareerDetails: FC<CareerDetailsProps> = ({
                     </div>
                   </div>
                   <div className="flex-1 min-w-0">
+                    {' '}
                     <div className="flex items-center justify-between mb-1">
                       <p className="text-sm font-medium text-white dark:text-gray-900">
-                        {comment.author}
+                        {comment.authorName}
                       </p>
-                      <span className="text-xs text-gray-400 dark:text-gray-500">
-                        {comment.date}
-                      </span>
+                      <div className="flex items-center space-x-2">
+                        <span className="text-xs text-gray-400 dark:text-gray-500">
+                          {formatDistanceToNow(new Date(comment.createdAt), {
+                            addSuffix: true,
+                          })}
+                        </span>
+                        {isAdmin && (
+                          <button
+                            onClick={() => handleDeleteComment(comment.id)}
+                            className="text-xs text-red-500 hover:text-red-400 focus:outline-none"
+                            aria-label="Delete comment"
+                            title="Delete comment"
+                          >
+                            Delete
+                          </button>
+                        )}
+                      </div>
                     </div>
                     <p className="text-gray-300 dark:text-gray-600">
                       {comment.comment}
                     </p>
                   </div>
                 </div>
+                {/* Admin delete button */}
+                {isAdmin && (
+                  <div className="mt-4 flex justify-end">
+                    <button
+                      onClick={() => handleDeleteComment(comment.id)}
+                      className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                    >
+                      Delete Comment
+                    </button>
+                  </div>
+                )}
               </div>
             ))
           )}
         </div>
-
         {/* Pagination controls */}
-        {paginatedComments.totalPages > 1 && (
+        {totalPages > 1 && (
           <div className="flex justify-center mt-8">
             <nav
               className="inline-flex rounded-md shadow-sm -space-x-px"
@@ -385,31 +306,27 @@ const CareerDetails: FC<CareerDetailsProps> = ({
                 <span className="sr-only">Previous</span>←
               </button>
 
-              {Array.from({ length: paginatedComments.totalPages }).map(
-                (_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setCurrentPage(index + 1)}
-                    className={`relative inline-flex items-center px-4 py-2 border ${
-                      currentPage === index + 1
-                        ? 'bg-indigo-600 text-white border-indigo-500'
-                        : 'border-gray-600 bg-gray-700 text-gray-300 hover:bg-gray-600'
-                    } text-sm font-medium`}
-                  >
-                    {index + 1}
-                  </button>
-                )
-              )}
+              {Array.from({ length: totalPages }).map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentPage(index + 1)}
+                  className={`relative inline-flex items-center px-4 py-2 border ${
+                    currentPage === index + 1
+                      ? 'bg-indigo-600 text-white border-indigo-500'
+                      : 'border-gray-600 bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  } text-sm font-medium`}
+                >
+                  {index + 1}
+                </button>
+              ))}
 
               <button
                 onClick={() =>
-                  setCurrentPage((p) =>
-                    Math.min(p + 1, paginatedComments.totalPages)
-                  )
+                  setCurrentPage((p) => Math.min(p + 1, totalPages))
                 }
-                disabled={currentPage === paginatedComments.totalPages}
+                disabled={currentPage === totalPages}
                 className={`relative inline-flex items-center px-2 py-2 rounded-r-md border ${
-                  currentPage === paginatedComments.totalPages
+                  currentPage === totalPages
                     ? 'border-gray-700 bg-gray-800 text-gray-500 cursor-not-allowed'
                     : 'border-gray-600 bg-gray-700 text-gray-400 hover:bg-gray-600'
                 } text-sm font-medium`}
@@ -418,8 +335,7 @@ const CareerDetails: FC<CareerDetailsProps> = ({
               </button>
             </nav>
           </div>
-        )}
-
+        )}{' '}
         <div className="mt-6 bg-gray-750 dark:bg-gray-100 rounded-lg p-5 border border-gray-700 dark:border-gray-300">
           <h4 className="font-medium text-white dark:text-gray-900 mb-2">
             Share Your Experience
@@ -428,23 +344,53 @@ const CareerDetails: FC<CareerDetailsProps> = ({
             Have you followed this career guidance in your studies? Let others
             know about your experience or ask questions!
           </p>{' '}
-          <div className="flex">
-            <input
-              type="text"
-              placeholder="Write your comment..."
-              className="flex-1 rounded-l-md border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-700 dark:bg-white text-white dark:text-gray-900"
-              value={commentText}
-              onChange={(e) => setCommentText(e.target.value)}
-            />
-            <button
-              type="button"
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-r-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              onClick={handleCommentSubmit}
-            >
-              Comment
-            </button>
+          <div className="space-y-4">
+            <div className="flex">
+              <input
+                type="text"
+                placeholder="Write your comment..."
+                className="flex-1 rounded-l-md border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-700 dark:bg-white text-white dark:text-gray-900"
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+              />
+              <button
+                type="button"
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-r-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                onClick={handleSubmitComment}
+              >
+                Comment
+              </button>
+            </div>
+
+            {/* Anonymous checkbox */}
+            <div className="flex items-center">
+              <input
+                id="anonymous-checkbox"
+                type="checkbox"
+                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-500 rounded"
+                checked={isAnonymous}
+                onChange={(e) => setIsAnonymous(e.target.checked)}
+              />
+              <label
+                htmlFor="anonymous-checkbox"
+                className="ml-2 block text-sm text-gray-400 dark:text-gray-500"
+              >
+                Post anonymously
+              </label>
+            </div>
+
+            {!isAuthenticated && !authLoading && (
+              <p className="text-xs text-yellow-400 dark:text-yellow-600">
+                You&apos;re not logged in. Your comment will be posted
+                anonymously unless you{' '}
+                <a href="/login" className="underline">
+                  log in
+                </a>{' '}
+                first.
+              </p>
+            )}
           </div>
-          <p className="mt-2 text-xs text-gray-400 dark:text-gray-500">
+          <p className="mt-4 text-xs text-gray-400 dark:text-gray-500">
             Comments are moderated and may take up to 24 hours to appear.
           </p>
         </div>
