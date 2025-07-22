@@ -241,7 +241,7 @@ export default function CreateQuizPage() {
         </div>
 
         <div className="mt-8 bg-gray-50 dark:bg-gray-800/50 border border-gray-700 dark:border-gray-200 rounded-lg p-5">
-          <h2 className="text-lg font-medium mb-3">
+          <h2 className="text-lg font-medium mb-3 text-black">
             Tips for creating effective quizzes
           </h2>
           <ul className="space-y-2 text-sm text-gray-400 dark:text-gray-600">

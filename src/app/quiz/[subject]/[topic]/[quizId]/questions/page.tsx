@@ -395,7 +395,7 @@ export default function QuestionsManagementPage() {
                     onChange={(e) =>
                       updateQuestion(qIndex, 'text', e.target.value)
                     }
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 !text-black"
                     rows={2}
                     placeholder="Enter your question here"
                   />
@@ -484,7 +484,7 @@ export default function QuestionsManagementPage() {
                                 e.target.value
                               )
                             }
-                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 !text-black"
                             placeholder={`Answer ${aIndex + 1}`}
                           />
                         </div>

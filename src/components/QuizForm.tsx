@@ -49,7 +49,7 @@ export function QuizForm({
                 <dt className="font-medium text-gray-400 dark:text-gray-500 w-24">
                   Subject:
                 </dt>
-                <dd className="text-gray-200 dark:text-gray-800">
+                <dd className="text-gray-900 dark:text-gray-800">
                   {subjectName}
                 </dd>
               </div>
@@ -59,7 +59,7 @@ export function QuizForm({
                 <dt className="font-medium text-gray-400 dark:text-gray-500 w-24">
                   Chapter:
                 </dt>
-                <dd className="text-gray-200 dark:text-gray-800">
+                <dd className="text-gray-900 dark:text-gray-800">
                   {chapterName}
                 </dd>
               </div>
@@ -69,7 +69,7 @@ export function QuizForm({
                 <dt className="font-medium text-gray-400 dark:text-gray-500 w-24">
                   Topic:
                 </dt>
-                <dd className="text-gray-200 dark:text-gray-800">
+                <dd className="text-gray-900 dark:text-gray-800">
                   {topicName}
                 </dd>
               </div>
@@ -115,7 +115,7 @@ export function QuizForm({
             id="description"
             rows={3}
             className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 
-              ${errors.description ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 dark:border-gray-700 dark:bg-gray-800'}`}
+              ${errors.description ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 dark:border-gray-700 dark:bg-gray-800'} text-black`}
             placeholder="Describe what this quiz covers"
             {...register('description')}
           />
