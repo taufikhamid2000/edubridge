@@ -70,7 +70,7 @@ export default function QuizQuestion({
             <label
               id={`label-${answer.id}`}
               htmlFor={answer.id}
-              className="ml-3 block text-gray-700 dark:text-gray-200"
+              className="ml-3 block text-blue-500"
             >
               {answer.text}
             </label>
