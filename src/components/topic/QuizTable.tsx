@@ -83,8 +83,8 @@ export default function QuizTable({
     if (!sortDirection) return filteredQuizzes;
 
     return [...filteredQuizzes].sort((a, b) => {
-      const dateA = new Date(a.created_at).getTime();
-      const dateB = new Date(b.created_at).getTime();
+      const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+      const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
       return sortDirection === 'asc' ? dateA - dateB : dateB - dateA;
     });
   }, [filteredQuizzes, sortDirection]);
@@ -323,11 +323,13 @@ export default function QuizTable({
                     </td>
                   )}
                   <td className="px-4 py-3">
-                    {new Date(quiz.created_at).toLocaleDateString('en-GB', {
-                      day: '2-digit',
-                      month: '2-digit',
-                      year: 'numeric',
-                    })}
+                    {quiz.created_at
+                      ? new Date(quiz.created_at).toLocaleDateString('en-GB', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric',
+                        })
+                      : '—'}
                   </td>
                   <td className="px-4 py-3 hidden sm:table-cell">
                     <span

@@ -29,12 +29,13 @@ export interface Subject {
 export interface Quiz {
   id: string;
   name: string;
-  created_by: string;
-  created_at: string;
+  created_by?: string;
+  created_at?: string;
   verified: boolean;
   topic_id: string;
   email?: string;
   display_name?: string;
+  questionCount?: number;
   subject_slug?: string; // Added for proper URL generation in profile page
   topic_title?: string; // Added for display purposes
 }

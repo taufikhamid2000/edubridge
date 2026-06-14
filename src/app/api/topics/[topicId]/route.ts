@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
+import { getTopicQuizzes } from '@/lib/myquiza';
 
 export async function GET(
   request: NextRequest,
@@ -43,14 +44,6 @@ export async function GET(
             category_priority,
             order_index
           )
-        ),
-        quizzes:quizzes (
-          id,
-          name,
-          created_by,
-          created_at,
-          verified,
-          topic_id
         )
       `
       )
@@ -78,41 +71,17 @@ export async function GET(
       ? Array.isArray(chapter.subjects)
         ? chapter.subjects[0]
         : chapter.subjects
-      : null; // Process quizzes to add user profile data
-    const processedQuizzes = await Promise.all(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (topicData.quizzes || []).map(async (quiz: any) => {
-        try {
-          // Fetch user profile info using created_by as UUID
-          const { data: profile } = await supabase
-            .from('user_profiles')
-            .select('display_name')
-            .eq('id', quiz.created_by)
-            .single();
+      : null;
 
-          return {
-            id: quiz.id,
-            name: quiz.name,
-            created_by: quiz.created_by,
-            created_at: quiz.created_at,
-            verified: quiz.verified,
-            topic_id: quiz.topic_id,
-            display_name: profile?.display_name || null,
-          };
-        } catch {
-          // If profile fetch fails, return quiz without display_name
-          return {
-            id: quiz.id,
-            name: quiz.name,
-            created_by: quiz.created_by,
-            created_at: quiz.created_at,
-            verified: quiz.verified,
-            topic_id: quiz.topic_id,
-            display_name: null,
-          };
-        }
-      })
-    );
+    // Fetch verified quizzes from MyQuiza API
+    const myquizaQuizzes = await getTopicQuizzes(topicId);
+    const processedQuizzes = myquizaQuizzes.map((quiz) => ({
+      id: quiz.id,
+      name: quiz.name,
+      verified: quiz.verified,
+      topic_id: quiz.topicId,
+      questionCount: quiz.questionCount,
+    }));
 
     const response = {
       topic: {
