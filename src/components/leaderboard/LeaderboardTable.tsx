@@ -29,32 +29,11 @@ export default function LeaderboardTable({
   data,
   timeFrame,
 }: LeaderboardTableProps) {
-  const [selectedType, setSelectedType] = useState<string>('all');
   const [isRewardsOpen, setIsRewardsOpen] = useState(false);
 
   const rewards = getRewardsByTimeFrame(timeFrame);
 
-  const schoolTypes = [
-    'all',
-    'SMK',
-    'SMKA',
-    'SBP',
-    'MRSM',
-    'SMT',
-    'Sekolah Seni',
-    'Sekolah Sukan',
-    'SMJK',
-    'Sekolah Sains',
-  ];
-  const filteredData =
-    selectedType === 'all'
-      ? data
-      : data.filter(
-          (user) =>
-            user.school_id !== null &&
-            user.is_school_visible &&
-            user.school?.type === selectedType
-        );
+  const filteredData = data;
 
   return (
     <div className="space-y-6">
@@ -165,7 +144,7 @@ export default function LeaderboardTable({
       </div>
 
       <div>
-        <div className="mb-4 overflow-x-auto">
+        <div className="mb-4 overflow-x-auto hidden">
           <div className="flex space-x-2 pb-2">
             {schoolTypes.map((type) => (
               <button
@@ -194,7 +173,7 @@ export default function LeaderboardTable({
                   Student
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 dark:text-gray-600 uppercase tracking-wider">
-                  School
+                  Level
                 </th>
               </tr>
             </thead>
@@ -266,27 +245,9 @@ export default function LeaderboardTable({
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
-                        {user.school_id === null ? (
-                          <span className="text-sm text-gray-400 dark:text-gray-500">
-                            Not specified
-                          </span>
-                        ) : user.is_school_visible ? (
-                          <>
-                            <Link
-                              href={`/schools/${user.school_id}`}
-                              className="text-sm font-medium text-gray-100 dark:text-gray-900 hover:text-blue-400 dark:hover:text-blue-600 transition-colors"
-                            >
-                              {user.school?.name}
-                            </Link>
-                            <p className="text-xs text-gray-400 dark:text-gray-500">
-                              {user.school?.type}
-                            </p>
-                          </>
-                        ) : (
-                          <span className="text-sm text-gray-400 dark:text-gray-500">
-                            Hidden by user for privacy
-                          </span>
-                        )}
+                        <span className="text-sm font-medium text-gray-100 dark:text-gray-900">
+                          Lv. {user.level}
+                        </span>
                       </div>
                     </td>
                   </tr>
@@ -299,9 +260,7 @@ export default function LeaderboardTable({
                     colSpan={3}
                     className="px-6 py-10 text-center text-gray-400 dark:text-gray-500"
                   >
-                    {selectedType === 'all'
-                      ? 'No leaderboard data available'
-                      : `No students found from ${selectedType} schools`}
+                    No leaderboard data available
                   </td>
                 </tr>
               )}

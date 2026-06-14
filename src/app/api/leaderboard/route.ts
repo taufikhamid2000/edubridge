@@ -1,12 +1,13 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { cookies } from 'next/headers';
+import { createServerClient } from '@supabase/ssr';
 import { logger } from '@/lib/logger';
+import { getLeaderboard } from '@/lib/myquiza';
 
-// Cache duration in seconds
 const CACHE_DURATION = {
-  daily: 60, // 1 minute for daily rankings
-  weekly: 300, // 5 minutes for weekly rankings
-  allTime: 900, // 15 minutes for all-time rankings
+  daily: 60,
+  weekly: 300,
+  allTime: 900,
 };
 
 export async function GET(request: Request) {
@@ -15,68 +16,47 @@ export async function GET(request: Request) {
     const timeFrame =
       (searchParams.get('timeFrame') as 'daily' | 'weekly' | 'allTime') ||
       'allTime';
-    const userId = searchParams.get('userId');
 
-    // Query user profiles with school data
-    let query = supabase
-      .from('user_profiles')
-      .select(
-        `
-        id,
-        display_name,
-        xp,
-        level,
-        streak,
-        avatar_url,
-        last_quiz_date,
-        daily_xp,
-        weekly_xp,
-        is_school_visible,
-        school_role,
-        school_id,
-        school:schools (
-          id, name, type, district, state
-        )
-      `
-      )
-      .eq('school_role', 'student')
-      .eq('is_disabled', false);
+    // Optional auth — used only to compute currentUserRank
+    const cookieStore = await cookies();
+    const supabaseServer = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          get: (name) => cookieStore.get(name)?.value,
+          set: () => {},
+          remove: () => {},
+        },
+      }
+    );
+    const { data: { session } } = await supabaseServer.auth.getSession();
 
-    // Apply time frame filter with optimized date handling
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const entries = await getLeaderboard(null, {
+      period: timeFrame === 'weekly' ? 'weekly' : undefined,
+      limit: 100,
+    });
 
-    if (timeFrame === 'daily') {
-      query = query
-        .gte('last_quiz_date', today.toISOString())
-        .order('daily_xp', { ascending: false });
-    } else if (timeFrame === 'weekly') {
-      const weekStart = new Date(today);
-      weekStart.setDate(weekStart.getDate() - weekStart.getDay());
-      query = query
-        .gte('last_quiz_date', weekStart.toISOString())
-        .order('weekly_xp', { ascending: false });
-    } else {
-      query = query.order('xp', { ascending: false });
+    // Map MyQuiza camelCase → User shape expected by the frontend
+    const data = entries.map((entry) => ({
+      id: entry.userId,
+      email: '',
+      display_name: entry.displayName,
+      avatar_url: entry.avatarUrl,
+      xp: entry.xp,
+      level: entry.level,
+      weeklyXp: entry.weeklyXp,
+    }));
+
+    // Compute rank for authenticated user
+    let currentUserRank: number | null = null;
+    if (session) {
+      const idx = data.findIndex((u) => u.id === session.user.id);
+      currentUserRank = idx !== -1 ? idx + 1 : null;
     }
 
-    // Execute query with limit
-    const { data: profiles, error } = await query.limit(100);
-
-    if (error) {
-      throw error;
-    }
-
-    // Calculate current user's rank if userId provided
-    let currentUserRank = null;
-    if (userId && profiles) {
-      const userIndex = profiles.findIndex((profile) => profile.id === userId);
-      currentUserRank = userIndex !== -1 ? userIndex + 1 : null;
-    }
-
-    // Return response with cache headers
     return NextResponse.json(
-      { data: profiles, currentUserRank },
+      { data, currentUserRank },
       {
         headers: {
           'Cache-Control': `public, s-maxage=${CACHE_DURATION[timeFrame]}, stale-while-revalidate=${CACHE_DURATION[timeFrame] * 2}`,

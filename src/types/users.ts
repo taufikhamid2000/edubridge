@@ -14,7 +14,7 @@ export interface User {
   email: string;
   display_name?: string;
   avatar_url?: string;
-  streak: number;
+  streak?: number;
   xp: number;
   level: number;
   lastQuizDate?: string;
