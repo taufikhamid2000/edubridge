@@ -91,7 +91,7 @@ interface QuizPlayerProps {
   quizName: string;
   questions: Question[];
   timeLimit?: number; // Time limit in minutes
-  userId: string;
+  userId?: string;
   subject?: string; // Added for navigation
   topic?: string; // Added for navigation
   onComplete?: () => void;
@@ -349,8 +349,6 @@ export default function QuizPlayer({
       // Submit quiz attempt to the server
       await submitQuizAttempt({
         quizId,
-        userId,
-        score: finalScore,
         answers: formattedAnswers,
       });
 

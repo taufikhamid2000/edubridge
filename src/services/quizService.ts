@@ -172,31 +172,22 @@ export async function submitQuiz(data: {
  */
 export async function submitQuizAttempt({
   quizId,
-  userId,
-  score,
   answers,
-  timeElapsed,
+  timeTaken,
 }: {
   quizId: string;
-  userId: string;
-  score: number;
   answers: { questionId: string; selectedAnswerIds: string[] }[];
-  timeElapsed?: number;
+  timeTaken?: number;
 }) {
   try {
-    logger.log('Submitting quiz attempt via API:', { quizId, userId, score });
+    logger.log('Submitting quiz attempt via API:', { quizId });
 
     const response = await fetch(`/api/quiz/${quizId}/submit`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        userId,
-        score,
-        answers,
-        timeElapsed,
-      }),
+      body: JSON.stringify({ answers, timeTaken }),
     });
 
     if (!response.ok) {
