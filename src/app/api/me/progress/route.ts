@@ -1,0 +1,38 @@
+import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
+import { createServerClient } from '@supabase/ssr';
+import { logger } from '@/lib/logger';
+import { getMyProgress } from '@/lib/myquiza';
+
+export async function GET() {
+  try {
+    const cookieStore = await cookies();
+    const supabaseServer = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          get: (name) => cookieStore.get(name)?.value,
+          set: () => {},
+          remove: () => {},
+        },
+      }
+    );
+
+    const { data: { session } } = await supabaseServer.auth.getSession();
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const progress = await getMyProgress(session.access_token);
+
+    return NextResponse.json(progress, {
+      headers: {
+        'Cache-Control': 'private, s-maxage=60, stale-while-revalidate=120',
+      },
+    });
+  } catch (error) {
+    logger.error('Error fetching user progress:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
