@@ -23,8 +23,6 @@ const isValidImageUrl = (url: string | undefined): boolean => {
   return url.startsWith('http://') || url.startsWith('https://');
 };
 
-// School types for filtering have been moved to schoolTypes array
-
 export default function LeaderboardTable({
   data,
   timeFrame,
@@ -144,24 +142,6 @@ export default function LeaderboardTable({
       </div>
 
       <div>
-        <div className="mb-4 overflow-x-auto hidden">
-          <div className="flex space-x-2 pb-2">
-            {schoolTypes.map((type) => (
-              <button
-                key={type}
-                onClick={() => setSelectedType(type)}
-                className={`px-3 py-1 text-sm rounded-full whitespace-nowrap ${
-                  selectedType === type
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                }`}
-              >
-                {type === 'all' ? 'All Schools' : type}
-              </button>
-            ))}
-          </div>
-        </div>
-
         <div className="overflow-x-auto rounded-lg shadow">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead className="bg-gray-800 dark:bg-gray-100">
