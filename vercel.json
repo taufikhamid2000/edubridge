@@ -5,11 +5,5 @@
   "outputDirectory": ".next",
   "env": {
     "NEXT_PUBLIC_VERCEL_ENV": "production"
-  },
-  "crons": [
-    {
-      "path": "/api/cron/keepalive",
-      "schedule": "*/10 * * * *"
-    }
-  ]
+  }
 }
