@@ -178,7 +178,14 @@ export async function submitQuizAttempt({
   quizId: string;
   answers: { questionId: string; selectedAnswerIds: string[] }[];
   timeTaken?: number;
-}) {
+}): Promise<{
+  attemptId: string;
+  score: number;
+  correctAnswers: number;
+  totalQuestions: number;
+  maxScore: number;
+  xpAwarded: boolean;
+}> {
   try {
     logger.log('Submitting quiz attempt via API:', { quizId });
 

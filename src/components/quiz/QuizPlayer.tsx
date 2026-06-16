@@ -36,7 +36,7 @@ interface AnswerLike {
   question_id: string;
   text?: string;
   answer_text?: string;
-  is_correct: boolean;
+  is_correct?: boolean;
   order_index?: number;
   created_at: string;
   updated_at?: string;
@@ -284,59 +284,7 @@ export default function QuizPlayer({
       setCurrentQuestionIndex(currentQuestionIndex - 1);
     }
   };
-  const calculateScore = (): number => {
-    let correctAnswers = 0;
-    const totalQuestions = shuffledQuestions.length;
-
-    shuffledQuestions.forEach((question) => {
-      if (!question.answers) return;
-
-      const userAnswers = answers[question.id] || [];
-
-      if (question.type === 'radio') {
-        // For radio questions, check if the selected answer is correct
-        const correctAnswerIds = question.answers
-          .filter((a) => a.is_correct)
-          .map((a) => a.id);
-
-        if (
-          correctAnswerIds.length === 1 &&
-          userAnswers.includes(correctAnswerIds[0])
-        ) {
-          correctAnswers += 1;
-        }
-      } else if (question.type === 'checkbox') {
-        // For checkbox questions, all correct options must be selected and no incorrect ones
-        const correctAnswerIds = new Set(
-          question.answers.filter((a) => a.is_correct).map((a) => a.id)
-        );
-        const incorrectAnswerIds = new Set(
-          question.answers.filter((a) => !a.is_correct).map((a) => a.id)
-        );
-
-        // Check if user selected all correct answers and no incorrect ones
-        const allCorrectSelected = Array.from(correctAnswerIds).every((id) =>
-          userAnswers.includes(id)
-        );
-        const noIncorrectSelected = !userAnswers.some((id) =>
-          incorrectAnswerIds.has(id)
-        );
-
-        if (allCorrectSelected && noIncorrectSelected) {
-          correctAnswers += 1;
-        }
-      }
-    });
-
-    // Calculate percentage score
-    return Math.round((correctAnswers / totalQuestions) * 100);
-  };
-
   const handleQuizSubmit = async () => {
-    const finalScore = calculateScore();
-    setScore(finalScore);
-    setQuizCompleted(true);
-
     try {
       // Format answers for submission
       const formattedAnswers = Object.entries(answers).map(
@@ -346,18 +294,23 @@ export default function QuizPlayer({
         })
       );
 
-      // Submit quiz attempt to the server
-      await submitQuizAttempt({
+      // Submit quiz attempt — MyQuiza scores server-side and returns the result.
+      // The answer key never reaches the client, so we trust the server score.
+      const result = await submitQuizAttempt({
         quizId,
         answers: formattedAnswers,
       });
+
+      setScore(typeof result?.score === 'number' ? result.score : 0);
 
       if (onComplete) {
         onComplete();
       }
     } catch (error) {
       logger.error('Error submitting quiz:', error);
-      // You could add error handling UI here
+      setScore(0);
+    } finally {
+      setQuizCompleted(true);
     }
   };
 
@@ -446,8 +399,6 @@ export default function QuizPlayer({
       <QuizResults
         score={score}
         totalQuestions={shuffledQuestions.length}
-        answers={answers}
-        questions={shuffledQuestions}
         isVerified={isVerified}
         onRetake={resetQuiz}
         onViewAll={() => {

@@ -55,7 +55,7 @@ export interface Answer {
   id: string;
   question_id: string;
   text: string;
-  is_correct: boolean;
+  is_correct?: boolean; // omitted for quiz takers — answer key stays server-side
   order_index: number;
   created_at: string;
   updated_at: string;

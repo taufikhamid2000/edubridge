@@ -1,12 +1,9 @@
 import React from 'react';
-import { Question } from '@/types/topics';
 import { logger } from '@/lib/logger';
 
 interface QuizResultsProps {
   score: number;
   totalQuestions: number;
-  answers: Record<string, string[]>;
-  questions: Question[];
   onRetake: () => void;
   onViewAll: () => void;
   isVerified?: boolean; // Quiz verification status
@@ -15,8 +12,6 @@ interface QuizResultsProps {
 export default function QuizResults({
   score,
   totalQuestions,
-  answers,
-  questions,
   onRetake,
   onViewAll,
   isVerified = true,
@@ -131,59 +126,6 @@ export default function QuizResults({
             Status
           </span>
         </div>
-      </div>
-
-      <div className="space-y-2 mb-8">
-        <h3 className="text-lg font-medium mb-3">Performance Breakdown</h3>
-
-        {questions.map((question, index) => {
-          const userAnswerIds = answers[question.id] || [];
-          const correctAnswerIds =
-            question.answers?.filter((a) => a.is_correct).map((a) => a.id) ||
-            [];
-
-          let isCorrect = false;
-
-          if (question.type === 'radio') {
-            // For radio buttons, check if the selected option is correct
-            isCorrect =
-              correctAnswerIds.length === 1 &&
-              userAnswerIds.includes(correctAnswerIds[0]);
-          } else {
-            // For checkboxes, all correct options must be selected and no incorrect ones
-            const allCorrectSelected = correctAnswerIds.every((id) =>
-              userAnswerIds.includes(id)
-            );
-            const noIncorrectSelected = !userAnswerIds.some(
-              (id) => !correctAnswerIds.includes(id)
-            );
-            isCorrect = allCorrectSelected && noIncorrectSelected;
-          }
-
-          return (
-            <div
-              key={question.id}
-              className={`p-3 rounded-md ${
-                isCorrect
-                  ? 'bg-green-900/20 dark:bg-green-50 border-l-4 border-green-500'
-                  : 'bg-red-900/20 dark:bg-red-900/20 border-l-4 border-red-500'
-              }`}
-            >
-              <div className="flex justify-between">
-                <span className="font-medium">Question {index + 1}</span>
-                <span
-                  className={
-                    isCorrect
-                      ? 'text-green-600 dark:text-green-400'
-                      : 'text-red-600 dark:text-red-400'
-                  }
-                >
-                  {isCorrect ? 'Correct' : 'Incorrect'}
-                </span>
-              </div>
-            </div>
-          );
-        })}
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3 justify-between">

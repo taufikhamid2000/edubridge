@@ -10,6 +10,28 @@ export interface MyQuizaQuiz {
   questionCount: number;
 }
 
+export interface QuizDetailOption {
+  id: string;
+  text: string;
+  orderIndex: number;
+}
+
+export interface QuizDetailQuestion {
+  id: string;
+  text: string;
+  type: string; // "radio" | "checkbox"
+  orderIndex: number;
+  options: QuizDetailOption[];
+}
+
+export interface QuizDetail {
+  id: string;
+  topicId: string;
+  name: string;
+  verified: boolean;
+  questions: QuizDetailQuestion[];
+}
+
 export interface SubmitAttemptPayload {
   answers: Array<{
     questionId: string;
@@ -71,6 +93,10 @@ async function myquizaFetch<T>(
 
 export function getTopicQuizzes(topicId: string) {
   return myquizaFetch<MyQuizaQuiz[]>(`/api/v1/topics/${topicId}/quizzes`, null);
+}
+
+export function getQuizDetail(quizId: string) {
+  return myquizaFetch<QuizDetail>(`/api/v1/quizzes/${quizId}`, null);
 }
 
 export function submitAttempt(
