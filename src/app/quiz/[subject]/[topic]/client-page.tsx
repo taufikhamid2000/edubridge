@@ -2,6 +2,7 @@
 
 import { ReactNode } from 'react';
 import TopicHeader from '@/components/topic/TopicHeader';
+import TopicProgressBadge from '@/components/topic/TopicProgressBadge';
 import QuizTable from '@/components/topic/QuizTable';
 import ActionButtons from '@/components/topic/ActionButtons';
 import ContentPlaceholder from '@/components/topic/ContentPlaceholder';
@@ -45,7 +46,8 @@ export default function ClientTopicPage({
           subject={subjectData}
           chapter={chapterData}
           topic={topicData}
-        />{' '}
+        />
+        <TopicProgressBadge topicId={topicData.id} />
         <QuizTable quizzes={quizzes} />
         <ActionButtons
           chapterData={chapterData}
