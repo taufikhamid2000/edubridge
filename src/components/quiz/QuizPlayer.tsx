@@ -114,6 +114,9 @@ export default function QuizPlayer({
   const [answers, setAnswers] = useState<Record<string, string[]>>({});
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [score, setScore] = useState(0);
+  const [questionResults, setQuestionResults] = useState<
+    Array<{ questionId: string; correct: boolean }> | undefined
+  >(undefined);
   const [timeRemaining, setTimeRemaining] = useState(
     timeLimit ? timeLimit * 60 : 0
   );
@@ -193,6 +196,7 @@ export default function QuizPlayer({
     setAnswers({});
     setQuizCompleted(false);
     setScore(0);
+    setQuestionResults(undefined);
     setTimeRemaining(timeLimit ? timeLimit * 60 : 0);
     setQuizStarted(false);
     // Normalize and re-shuffle questions for a fresh experience on retake
@@ -301,6 +305,7 @@ export default function QuizPlayer({
       });
 
       setScore(typeof result?.score === 'number' ? result.score : 0);
+      setQuestionResults(result?.questions);
 
       if (onComplete) {
         onComplete();
@@ -399,6 +404,7 @@ export default function QuizPlayer({
         score={score}
         totalQuestions={shuffledQuestions.length}
         isVerified={isVerified}
+        perQuestion={questionResults}
         onRetake={resetQuiz}
         onViewAll={() => {
           if (subject && topic) {

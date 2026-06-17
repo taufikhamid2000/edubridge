@@ -185,6 +185,7 @@ export async function submitQuizAttempt({
   totalQuestions: number;
   maxScore: number;
   xpAwarded: boolean;
+  questions?: Array<{ questionId: string; correct: boolean }>;
 }> {
   try {
     logger.log('Submitting quiz attempt via API:', { quizId });

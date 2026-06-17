@@ -47,6 +47,10 @@ export interface AttemptResult {
   totalQuestions: number;
   maxScore: number;
   xpAwarded: boolean;
+  // Per-question correctness, ordered by question orderIndex. Returned only in
+  // the attempt response (post-submission) — the answer key stays hidden on
+  // the quiz-detail endpoint.
+  questions?: Array<{ questionId: string; correct: boolean }>;
 }
 
 export interface TopicProgress {
