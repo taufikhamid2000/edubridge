@@ -26,7 +26,7 @@ async function checkIfFirstUser() {
 export async function POST(request: Request) {
   try {
     // Get request body
-    const { userId, role, bypassAuthCheck } = await request.json();
+    const { userId, role } = await request.json();
 
     if (!userId || !role) {
       return NextResponse.json(
@@ -35,15 +35,15 @@ export async function POST(request: Request) {
       );
     }
 
-    logger.info(`Attempting to set user ${userId} as ${role}`); // Check if this is the first user in the system
-    // If so, allow them to become admin without further checks
+    logger.info(`Attempting to set user ${userId} as ${role}`);
+
+    // Bootstrap exception: if the user_roles table is empty, allow the very
+    // first admin to be created (e.g. on a fresh deployment). Once any role
+    // exists, every request must come from an authenticated admin.
     const isFirstUser = await checkIfFirstUser();
 
-    // Check if auth check should be bypassed (emergency admin creation)
-    const shouldBypassAuth = bypassAuthCheck === true;
-
-    // If not first user and not bypassing auth, check if the requester is an admin
-    if (!isFirstUser && !shouldBypassAuth) {
+    // For all but the bootstrap case, require an authenticated admin.
+    if (!isFirstUser) {
       try {
         // Verify the user is authenticated and has admin privileges
         const cookieStore = await cookies();
@@ -66,11 +66,7 @@ export async function POST(request: Request) {
 
         if (!session) {
           return NextResponse.json(
-            {
-              error: 'Unauthorized - you must be logged in',
-              message:
-                'To bypass this check when creating your first admin, add "bypassAuthCheck: true" to your request',
-            },
+            { error: 'Unauthorized - you must be logged in' },
             { status: 401 }
           );
         }
@@ -84,11 +80,7 @@ export async function POST(request: Request) {
 
         if (!userRoles || userRoles.role !== 'admin') {
           return NextResponse.json(
-            {
-              error: 'Forbidden: Admin access required',
-              message:
-                'To bypass this check when creating your first admin, add "bypassAuthCheck: true" to your request',
-            },
+            { error: 'Forbidden: Admin access required' },
             { status: 403 }
           );
         }
