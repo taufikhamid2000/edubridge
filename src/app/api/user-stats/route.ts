@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
+import { WEEKLY_QUIZ_TARGET } from '@/config/app';
 
 // Cache duration in seconds
 const CACHE_DURATION = 600; // 10 minutes
@@ -153,7 +154,7 @@ export async function GET() {
     // Calculate weekly progress
     const weeklyQuizzes = userStatsData?.weekly_quizzes || 0;
     const weeklyAverage = userStatsData?.weekly_average_score || 0;
-    const weeklyTarget = 10; // Target quizzes per week
+    const weeklyTarget = WEEKLY_QUIZ_TARGET;
 
     // Generate achievements based on user data
     const totalQuizzes = userStatsData?.completed_quizzes || 0;

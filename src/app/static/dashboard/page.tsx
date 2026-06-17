@@ -8,6 +8,7 @@ import SubjectGrid from '@/components/dashboard/SubjectGrid';
 import EnhancedWeeklyProgress from '@/components/dashboard/EnhancedWeeklyProgress';
 import Achievements from '@/components/dashboard/Achievements';
 import { Subject } from '@/types/subject';
+import { WEEKLY_QUIZ_TARGET } from '@/config/app';
 
 // Mock static data
 const staticUser = {
@@ -155,7 +156,7 @@ export default function StaticDashboardPage() {
         <EnhancedWeeklyProgress
           initialData={{
             quizzesCompleted: 7,
-            quizzesTotal: 10,
+            quizzesTotal: WEEKLY_QUIZ_TARGET,
             averageScore: 85,
           }}
           isStatic={true}

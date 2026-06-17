@@ -4,6 +4,7 @@ import { logger } from '@/lib/logger';
 import React, { useEffect, useState } from 'react';
 import { fetchUserStats } from '@/services/dashboardService';
 import Link from 'next/link';
+import { WEEKLY_QUIZ_TARGET } from '@/config/app';
 
 interface WeeklyProgressProps {
   initialData?: {
@@ -21,7 +22,7 @@ const EnhancedWeeklyProgress = ({
   const [progressData, setProgressData] = useState(
     initialData || {
       quizzesCompleted: 0,
-      quizzesTotal: 10,
+      quizzesTotal: WEEKLY_QUIZ_TARGET,
       averageScore: 0,
     }
   );

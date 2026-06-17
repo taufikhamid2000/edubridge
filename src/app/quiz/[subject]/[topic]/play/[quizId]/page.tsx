@@ -7,6 +7,7 @@ import QuizPlayer from '@/components/quiz/QuizPlayer';
 import { Question, Quiz, TopicContext } from '@/types/topics';
 import { logger } from '@/lib/logger';
 import { supabase } from '@/lib/supabase';
+import { DEFAULT_QUIZ_TIME_LIMIT_MINUTES } from '@/config/app';
 
 export default function PlayQuizPage() {
   const params = useParams();
@@ -186,7 +187,7 @@ export default function PlayQuizPage() {
           quizId={quizId}
           quizName={quiz.name}
           questions={questions}
-          timeLimit={15} // Hardcoded for now, would come from quiz.time_limit
+          timeLimit={DEFAULT_QUIZ_TIME_LIMIT_MINUTES}
           userId={userId}
           subject={subject}
           topic={topic}
