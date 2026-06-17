@@ -99,7 +99,13 @@ export default function Auth() {
         res = await supabase.auth.signUp({ email, password });
       } else {
         res = await supabase.auth.signInWithPassword({ email, password });
-        if (!res.error) router.replace('/dashboard');
+        // Hard navigation (not router.replace): guarantees the redirect lands
+        // even if the component re-renders, and ensures server components /
+        // header pick up the freshly persisted session.
+        if (!res.error) {
+          window.location.assign('/dashboard');
+          return;
+        }
       }
 
       if (res.error) {
@@ -115,7 +121,10 @@ export default function Auth() {
             res = await supabase.auth.signUp({ email, password });
           } else {
             res = await supabase.auth.signInWithPassword({ email, password });
-            if (!res.error) router.replace('/dashboard');
+            if (!res.error) {
+              window.location.assign('/dashboard');
+              return;
+            }
           }
 
           // If still error after recovery
