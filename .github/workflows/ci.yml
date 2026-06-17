@@ -1,0 +1,33 @@
+name: CI
+
+# Lint + unit tests on every push to master and on PRs.
+# Type-checking is enforced separately at build/deploy time: next.config.mjs
+# has typescript.ignoreBuildErrors=false, so the Vercel build fails on type
+# errors. (A standalone `tsc --noEmit` here would also flag the quarantined
+# legacy test files, so type safety is gated at the build instead.)
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      # Dummy, non-secret values so modules that read env at import time don't
+      # throw. All real network/DB boundaries are mocked in the test suite.
+      NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: dummy-anon-key-for-ci
+      MYQUIZA_API_URL: https://myquiza-api.onrender.com
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Lint
+        run: npx next lint
+      - name: Unit tests
+        run: npx jest --config config/jest.config.mjs --ci
