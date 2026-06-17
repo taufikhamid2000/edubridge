@@ -49,8 +49,13 @@ export interface AttemptResult {
   xpAwarded: boolean;
   // Per-question correctness, ordered by question orderIndex. Returned only in
   // the attempt response (post-submission) — the answer key stays hidden on
-  // the quiz-detail endpoint.
-  questions?: Array<{ questionId: string; correct: boolean }>;
+  // the quiz-detail endpoint. correctAnswerIds lists the option ids that were
+  // correct, for highlighting on the results screen.
+  questions?: Array<{
+    questionId: string;
+    correct: boolean;
+    correctAnswerIds: string[];
+  }>;
 }
 
 export interface TopicProgress {

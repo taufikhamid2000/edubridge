@@ -115,7 +115,8 @@ export default function QuizPlayer({
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [score, setScore] = useState(0);
   const [questionResults, setQuestionResults] = useState<
-    Array<{ questionId: string; correct: boolean }> | undefined
+    | Array<{ questionId: string; correct: boolean; correctAnswerIds: string[] }>
+    | undefined
   >(undefined);
   const [timeRemaining, setTimeRemaining] = useState(
     timeLimit ? timeLimit * 60 : 0
@@ -405,6 +406,8 @@ export default function QuizPlayer({
         totalQuestions={shuffledQuestions.length}
         isVerified={isVerified}
         perQuestion={questionResults}
+        questions={shuffledQuestions}
+        userAnswers={answers}
         onRetake={resetQuiz}
         onViewAll={() => {
           if (subject && topic) {
