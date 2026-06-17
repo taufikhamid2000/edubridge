@@ -187,7 +187,11 @@ export default function PlayQuizPage() {
           quizId={quizId}
           quizName={quiz.name}
           questions={questions}
-          timeLimit={DEFAULT_QUIZ_TIME_LIMIT_MINUTES}
+          timeLimit={
+            quiz.timeLimit != null
+              ? quiz.timeLimit / 60 // API gives seconds; player wants minutes
+              : DEFAULT_QUIZ_TIME_LIMIT_MINUTES
+          }
           userId={userId}
           subject={subject}
           topic={topic}

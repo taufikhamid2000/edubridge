@@ -29,6 +29,7 @@ export interface QuizDetail {
   topicId: string;
   name: string;
   verified: boolean;
+  timeLimit: number | null; // seconds; null -> client falls back to default
   questions: QuizDetailQuestion[];
 }
 
