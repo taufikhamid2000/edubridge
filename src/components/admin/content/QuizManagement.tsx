@@ -34,7 +34,7 @@ export default function QuizManagement({
   const getTopicTitle = useCallback(
     (topicId: string) => {
       const topic = topics.find((t) => t.id === topicId);
-      return topic ? topic.title : 'Unknown Topic';
+      return topic ? topic.name : 'Unknown Topic';
     },
     [topics]
   );
@@ -226,7 +226,7 @@ export default function QuizManagement({
           <option value="">Select a Topic</option>
           {topics.map((topic) => (
             <option key={topic.id} value={topic.id}>
-              {topic.title}
+              {topic.name}
             </option>
           ))}
         </select>

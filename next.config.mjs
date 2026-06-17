@@ -29,11 +29,11 @@ const config = {
   skipTrailingSlashRedirect: true,
   // Exclude test files from build
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false,
   },
   typescript: {
-    // Temporarily ignore TypeScript errors during build for speed
-    ignoreBuildErrors: true,
+    // Type errors fail the build — keeps regressions out of production.
+    ignoreBuildErrors: false,
   },
   // Configure image domains for remote images (avatars)
   images: {

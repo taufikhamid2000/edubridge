@@ -4,14 +4,16 @@ import { logger } from '@/lib/logger';
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
+
     // Get school details
     const { data: school, error: schoolError } = await supabase
       .from('schools')
       .select('*')
-      .eq('id', params.id)
+      .eq('id', id)
       .single();
 
     if (schoolError) {
@@ -23,7 +25,7 @@ export async function GET(
     const { data: stats, error: statsError } = await supabase
       .from('school_stats')
       .select('*')
-      .eq('school_id', params.id)
+      .eq('school_id', id)
       .single();
 
     if (statsError) {
@@ -34,7 +36,7 @@ export async function GET(
     const { count: teacherCount, error: teacherError } = await supabase
       .from('user_profiles')
       .select('*', { count: 'exact', head: true })
-      .eq('school_id', params.id)
+      .eq('school_id', id)
       .eq('school_role', 'teacher');
 
     if (teacherError) {
@@ -45,7 +47,7 @@ export async function GET(
     const { count: studentCount, error: studentError } = await supabase
       .from('user_profiles')
       .select('*', { count: 'exact', head: true })
-      .eq('school_id', params.id)
+      .eq('school_id', id)
       .eq('school_role', 'student');
 
     if (studentError) {

@@ -12,7 +12,7 @@
     "build:optimized": "NODE_ENV=production bash scripts/improved-segment-configs.sh && next build",
     "start": "next start",
     "lint": "next lint --fix",
-    "prebuild": "echo 'Skipping TypeScript check for faster build'",
+    "prebuild": "echo 'Type-check and lint run during next build'",
     "predeploy": "npm run lint && npm run prebuild && next build",
     "fix-console-logs": "node scripts/replace-console-logs.mjs",
     "db:migrate": "node scripts/apply-migration.mjs",

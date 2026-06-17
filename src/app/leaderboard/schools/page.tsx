@@ -1,8 +1,6 @@
 'use client';
 
-import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { logger } from '@/lib/logger';
 import SchoolLeaderboardTable from '@/components/leaderboard/SchoolLeaderboardTable';
 import LeaderboardNav from '@/components/leaderboard/LeaderboardNav';
 import { SkeletonLoader } from '@/components/ui/SkeletonLoader';

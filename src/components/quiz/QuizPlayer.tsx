@@ -104,7 +104,6 @@ export default function QuizPlayer({
   quizName,
   questions,
   timeLimit,
-  userId,
   subject,
   topic,
   onComplete,

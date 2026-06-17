@@ -1,5 +1,6 @@
 'use client';
 
+import { use } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { User } from '@/types/users';
 import { fetchUserProfileByIdAPI } from '@/services/profileService';
@@ -7,13 +8,13 @@ import UserProfileClient from './UserProfileClient';
 import { redirect } from 'next/navigation';
 
 interface UserProfilePageProps {
-  params: {
+  params: Promise<{
     userId: string;
-  };
+  }>;
 }
 
 export default function UserProfilePage({ params }: UserProfilePageProps) {
-  const { userId } = params;
+  const { userId } = use(params);
 
   // Fetch user profile using React Query and API route
   const {

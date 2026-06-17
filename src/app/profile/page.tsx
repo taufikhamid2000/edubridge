@@ -224,7 +224,6 @@ function ProfileContent() {
               <QuizTable
                 quizzes={createdQuizzes || []}
                 showCreator={false}
-                showActions={true}
                 title={
                   isOwnProfile ? 'Your Created Quizzes' : 'Created Quizzes'
                 }
@@ -236,32 +235,6 @@ function ProfileContent() {
                 getQuizLink={(quiz) =>
                   `/quiz/${quiz.subject_slug}/${quiz.topic_id}`
                 }
-                renderActions={(quiz) => (
-                  <div className="flex flex-col gap-1">
-                    <button
-                      onClick={() => {
-                        window.open(
-                          `/quiz/${quiz.subject_slug}/${quiz.topic_id}`,
-                          '_blank'
-                        );
-                      }}
-                      className="px-2 py-1 text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 border border-blue-300 dark:border-blue-600 rounded hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
-                    >
-                      View Topic
-                    </button>
-                    {isOwnProfile && (
-                      <button
-                        onClick={() => {
-                          // TODO: Add edit functionality
-                          console.log('Edit quiz:', quiz.id);
-                        }}
-                        className="px-2 py-1 text-xs font-medium text-gray-400 dark:text-gray-600 hover:text-gray-800 dark:hover:text-gray-300 border border-gray-600 dark:border-gray-300 rounded hover:bg-gray-800 dark:hover:bg-gray-50 transition-colors"
-                      >
-                        Edit
-                      </button>
-                    )}
-                  </div>
-                )}
               />
             )}
             {activeTab === 'settings' && isOwnProfile && (

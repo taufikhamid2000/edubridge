@@ -5,15 +5,16 @@ import { supabase } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
 
 interface Props {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
+    const { id } = await params;
     const { data: school } = await supabase
       .from('schools')
       .select('name')
-      .eq('id', params.id)
+      .eq('id', id)
       .single();
 
     return {
@@ -35,11 +36,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function SchoolProfilePage({ params }: Props) {
   try {
+    const { id } = await params;
+
     // Get school details
     const { data: school, error: schoolError } = await supabase
       .from('schools')
       .select('*')
-      .eq('id', params.id)
+      .eq('id', id)
       .single();
 
     if (schoolError || !school) {
@@ -53,19 +56,19 @@ export default async function SchoolProfilePage({ params }: Props) {
     const { data: stats } = await supabase
       .from('school_stats')
       .select('*')
-      .eq('school_id', params.id)
+      .eq('school_id', id)
       .single();
 
     // Get teacher count
     const { count: teacherCount } = await supabase
       .from('user_profiles')
       .select('*', { count: 'exact', head: true })
-      .eq('school_id', params.id)
+      .eq('school_id', id)
       .eq('school_role', 'teacher'); // Get student count
     const { count: studentCount } = await supabase
       .from('user_profiles')
       .select('*', { count: 'exact', head: true })
-      .eq('school_id', params.id)
+      .eq('school_id', id)
       .eq('school_role', 'student');
 
     // Get top 5 students for hall of fame
@@ -80,7 +83,7 @@ export default async function SchoolProfilePage({ params }: Props) {
         total_quizzes_completed
       `
       )
-      .eq('school_id', params.id)
+      .eq('school_id', id)
       .eq('school_role', 'student')
       .order('total_points', { ascending: false })
       .limit(5);

@@ -13,7 +13,7 @@ export function useContentPlaceholderData() {
   );
   const quizPrompt = useMemo(() => {
     if (subjectData && chapterData && topicData) {
-      return `Generate a quiz for the subject '${subjectData.name}', tingkatan '${chapterData.form}', chapter '${chapterData.title}', and topic '${topicData.title}' based on the KSSM syllabus.`;
+      return `Generate a quiz for the subject '${subjectData.name}', tingkatan '${chapterData.form}', chapter '${chapterData.name}', and topic '${topicData.name}' based on the KSSM syllabus.`;
     }
     return '';
   }, [subjectData, chapterData, topicData]);
