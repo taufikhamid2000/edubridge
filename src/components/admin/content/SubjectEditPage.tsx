@@ -203,7 +203,7 @@ export default function SubjectEditPage() {
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error occurred';
       logger.error('Error fetching subject details:', errorMessage);
-      console.error('Subject fetch error details:', { error, subjectId: id });
+      logger.error('Subject fetch error details:', { error, subjectId: id });
       return null;
     }
   };
@@ -284,7 +284,7 @@ export default function SubjectEditPage() {
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error occurred';
       logger.error('Error deleting chapter:', errorMessage);
-      console.error('Chapter deletion error details:', { error, chapterId });
+      logger.error('Chapter deletion error details:', { error, chapterId });
     }
   };
 

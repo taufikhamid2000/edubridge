@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { log } from '@/lib/logger';
+import { log, logger } from '@/lib/logger';
 
 export async function middleware(request: NextRequest) {
   // Skip noise from the auth API itself and Next static files
@@ -104,7 +104,7 @@ export async function middleware(request: NextRequest) {
     return response;
   } catch (error) {
     // Log the error and clear all auth-related cookies
-    console.error('Middleware authentication error:', error);
+    logger.error('Middleware authentication error:', error);
 
     // Clear all Supabase auth cookies
     const cookiesToClear = [

@@ -129,7 +129,7 @@ export default function TopicEditPage() {
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error occurred';
       logger.error('Error fetching topic details:', errorMessage);
-      console.error('Topic fetch error details:', { error, topicId: id });
+      logger.error('Topic fetch error details:', { error, topicId: id });
       return null;
     }
   };
@@ -190,7 +190,7 @@ export default function TopicEditPage() {
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error occurred';
       logger.error('Error deleting quiz:', errorMessage);
-      console.error('Quiz deletion error details:', { error, quizId });
+      logger.error('Quiz deletion error details:', { error, quizId });
     }
   };
 

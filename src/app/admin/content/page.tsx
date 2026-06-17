@@ -70,7 +70,7 @@ export default function AdminContentPage() {
       setLoading(true);
       setError(null);
 
-      console.log('Attempting to fetch subjects via client-side service...');
+      logger.log('Attempting to fetch subjects via client-side service...');
 
       // Check admin status first
       const adminCheck = await checkAdminStatus();
@@ -81,11 +81,11 @@ export default function AdminContentPage() {
       }
 
       // Use the contentService instead of direct Supabase calls
-      console.log('Admin check passed, calling fetchAdminSubjects');
+      logger.log('Admin check passed, calling fetchAdminSubjects');
       const { data, error } = await fetchAdminSubjects();
 
       if (error) {
-        console.error('contentService error:', error);
+        logger.error('contentService error:', error);
         // More descriptive error with debugging info
         throw new Error(
           `Failed to fetch subjects: ${error.message || 'Unknown error'} (Check browser console for more details)`
@@ -104,7 +104,7 @@ export default function AdminContentPage() {
       setError(errorMessage);
 
       // More detailed error logging
-      console.error('Subject fetch error details:', {
+      logger.error('Subject fetch error details:', {
         error,
         message: errorMessage,
         errorType: typeof error,
@@ -114,7 +114,7 @@ export default function AdminContentPage() {
         authState: 'Checking auth state...',
       }); // Try to log auth state for debugging
       supabase.auth.getSession().then(({ data }) => {
-        console.log('Current auth state:', {
+        logger.log('Current auth state:', {
           hasSession: !!data?.session,
           isExpired: data?.session?.expires_at
             ? new Date(data.session.expires_at * 1000) < new Date()
@@ -132,7 +132,7 @@ export default function AdminContentPage() {
       setLoading(true);
       setError(null);
 
-      console.log('Attempting to fetch chapters via client-side service...');
+      logger.log('Attempting to fetch chapters via client-side service...');
 
       // Check admin status first
       const adminCheck = await checkAdminStatus();
@@ -143,11 +143,11 @@ export default function AdminContentPage() {
       }
 
       // Use the contentService instead of direct Supabase calls
-      console.log('Admin check passed, calling fetchAdminChapters');
+      logger.log('Admin check passed, calling fetchAdminChapters');
       const { data, error } = await fetchAdminChapters();
 
       if (error) {
-        console.error('contentService error:', error);
+        logger.error('contentService error:', error);
         throw new Error(
           `Failed to fetch chapters: ${error.message || 'Unknown error'} (Check browser console for more details)`
         );
@@ -158,7 +158,7 @@ export default function AdminContentPage() {
       }
 
       setChapters(data);
-      console.log('Admin content page - chapters fetched:', {
+      logger.log('Admin content page - chapters fetched:', {
         chaptersCount: data.length,
         chapters: data.map((c) => ({ id: c.id, name: c.name })),
       });
@@ -168,7 +168,7 @@ export default function AdminContentPage() {
       logger.error('Error fetching chapters:', error);
       setError(errorMessage);
 
-      console.error('Chapter fetch error details:', {
+      logger.error('Chapter fetch error details:', {
         error,
         message: errorMessage,
         errorType: typeof error,
@@ -187,7 +187,7 @@ export default function AdminContentPage() {
       setLoading(true);
       setError(null);
 
-      console.log('Attempting to fetch topics via client-side service...');
+      logger.log('Attempting to fetch topics via client-side service...');
 
       // Check admin status first
       const adminCheck = await checkAdminStatus();
@@ -198,11 +198,11 @@ export default function AdminContentPage() {
       }
 
       // Use the contentService instead of direct Supabase calls
-      console.log('Admin check passed, calling fetchAdminTopics');
+      logger.log('Admin check passed, calling fetchAdminTopics');
       const { data, error } = await fetchAdminTopics();
 
       if (error) {
-        console.error('contentService error:', error);
+        logger.error('contentService error:', error);
         throw new Error(
           `Failed to fetch topics: ${error.message || 'Unknown error'} (Check browser console for more details)`
         );
@@ -219,7 +219,7 @@ export default function AdminContentPage() {
       logger.error('Error fetching topics:', error);
       setError(errorMessage);
 
-      console.error('Topic fetch error details:', {
+      logger.error('Topic fetch error details:', {
         error,
         message: errorMessage,
         errorType: typeof error,
@@ -238,7 +238,7 @@ export default function AdminContentPage() {
       setLoading(true);
       setError(null);
 
-      console.log('Attempting to fetch quizzes via client-side service...');
+      logger.log('Attempting to fetch quizzes via client-side service...');
 
       // Check admin status first
       const adminCheck = await checkAdminStatus();
@@ -249,11 +249,11 @@ export default function AdminContentPage() {
       }
 
       // Use the contentService instead of direct Supabase calls
-      console.log('Admin check passed, calling fetchAdminQuizzes');
+      logger.log('Admin check passed, calling fetchAdminQuizzes');
       const { data, error } = await fetchAdminQuizzes();
 
       if (error) {
-        console.error('contentService error:', error);
+        logger.error('contentService error:', error);
         throw new Error(
           `Failed to fetch quizzes: ${error.message || 'Unknown error'} (Check browser console for more details)`
         );
@@ -270,7 +270,7 @@ export default function AdminContentPage() {
       logger.error('Error fetching quizzes:', error);
       setError(errorMessage);
 
-      console.error('Quiz fetch error details:', {
+      logger.error('Quiz fetch error details:', {
         error,
         message: errorMessage,
         errorType: typeof error,

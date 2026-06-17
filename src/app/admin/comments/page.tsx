@@ -1,4 +1,5 @@
 'use client';
+import { logger } from '@/lib/logger';
 
 import React, { useState, useEffect } from 'react';
 import { MessageSquare, Filter, Trash2, RefreshCw, Search } from 'lucide-react';
@@ -66,7 +67,7 @@ export default function CommentsAdminPage() {
 
       setComments(allComments);
     } catch (err) {
-      console.error('Failed to load comments:', err);
+      logger.error('Failed to load comments:', err);
       setError('Failed to load comments. Please try again.');
     } finally {
       setIsLoading(false);
@@ -119,7 +120,7 @@ export default function CommentsAdminPage() {
         setError('Failed to delete comment. Please try again.');
       }
     } catch (err) {
-      console.error('Error deleting comment:', err);
+      logger.error('Error deleting comment:', err);
       setError('An error occurred while deleting the comment.');
     }
   };

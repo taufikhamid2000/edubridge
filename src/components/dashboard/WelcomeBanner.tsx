@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -36,7 +37,7 @@ const WelcomeBanner = ({ user, isStatic = false }: WelcomeBannerProps) => {
         `/quiz/${data.subject_slug}/${data.topic_id}/play/${data.quiz_id}`
       );
     } catch (error) {
-      console.error('Error fetching random quiz:', error);
+      logger.error('Error fetching random quiz:', error);
       alert('Failed to find a random quiz. Please try again later.');
     }
   };
@@ -54,7 +55,7 @@ const WelcomeBanner = ({ user, isStatic = false }: WelcomeBannerProps) => {
       if (!response.ok) throw new Error(data.error);
       router.push(`/quiz/${data.subject_slug}/${data.topic_id}`);
     } catch (error) {
-      console.error('Error fetching random topic:', error);
+      logger.error('Error fetching random topic:', error);
       alert('Failed to find a random topic. Please try again later.');
     }
   };

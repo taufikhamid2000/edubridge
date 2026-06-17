@@ -33,7 +33,7 @@ export async function fetchAdminTopics(): Promise<{
     }
 
     // User is confirmed as admin, proceed with fetch
-    console.log('Fetching topics as admin...');
+    logger.log('Fetching topics as admin...');
 
     // Get all topics
     const { data: topics, error: topicsError } = await supabase
@@ -48,7 +48,7 @@ export async function fetchAdminTopics(): Promise<{
         error: new Error(topicsError.message || 'Failed to fetch topics'),
       };
     }
-    console.log('Topics fetched successfully:', { count: topics?.length });
+    logger.log('Topics fetched successfully:', { count: topics?.length });
 
     // Create a map to store quiz counts per topic
     const topicQuizCounts: Record<string, number> = {};
@@ -69,7 +69,7 @@ export async function fetchAdminTopics(): Promise<{
         });
       }
     } catch (error) {
-      console.error('Error calculating quiz counts:', error);
+      logger.error('Error calculating quiz counts:', error);
       // Continue with basic data
     }
 
@@ -91,7 +91,7 @@ export async function fetchAdminTopics(): Promise<{
           );
 
     logger.error('Error in fetchAdminTopics:', err);
-    console.error('Full error details:', error);
+    logger.error('Full error details:', error);
     return { data: null, error: err };
   }
 }

@@ -100,7 +100,7 @@ export async function fetchAdminSubjects(): Promise<{
     }
 
     // User is confirmed as admin, proceed with fetch
-    console.log('Fetching subjects as admin with optimized query...');
+    logger.log('Fetching subjects as admin with optimized query...');
 
     // OPTIMIZED: Single query with JOINs to get all data at once
     // This replaces ~50+ individual queries with 1 query
@@ -142,7 +142,7 @@ export async function fetchAdminSubjects(): Promise<{
       };
     }
 
-    console.log('Subjects with nested data fetched successfully:', {
+    logger.log('Subjects with nested data fetched successfully:', {
       count: subjectsData?.length,
     });
 
@@ -186,7 +186,7 @@ export async function fetchAdminSubjects(): Promise<{
           );
 
     logger.error('Error in fetchAdminSubjects:', err);
-    console.error('Full error details:', error);
+    logger.error('Full error details:', error);
     return { data: null, error: err };
   }
 }

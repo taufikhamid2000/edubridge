@@ -1,4 +1,5 @@
 'use client';
+import { logger } from '@/lib/logger';
 
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
@@ -23,7 +24,7 @@ export default function DashboardPage() {
   // Log dashboard data when it changes
   useEffect(() => {
     if (dashboardData) {
-      console.log('Dashboard data received:', {
+      logger.log('Dashboard data received:', {
         isGuest: dashboardData.user?.display_name === 'Guest User',
         displayName: dashboardData.user?.display_name,
         email: dashboardData.user?.email,

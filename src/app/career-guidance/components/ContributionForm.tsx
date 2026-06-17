@@ -1,4 +1,5 @@
 'use client';
+import { logger } from '@/lib/logger';
 
 import { FC, useState, useEffect } from 'react';
 import { CareerContribution } from '../types';
@@ -224,12 +225,12 @@ const ContributionForm: FC<ContributionFormProps> = ({
         setLoadingSubjects(true);
         const { data, error } = await fetchPublicSubjects();
         if (error || !data) {
-          console.error('Error loading subjects:', error);
+          logger.error('Error loading subjects:', error);
           return;
         }
         setSubjects(data);
       } catch (err) {
-        console.error('Error fetching subjects:', err);
+        logger.error('Error fetching subjects:', err);
       } finally {
         setLoadingSubjects(false);
       }
@@ -245,7 +246,7 @@ const ContributionForm: FC<ContributionFormProps> = ({
         const { data, error } = await supabase.auth.getSession();
 
         if (error) {
-          console.error('Error checking auth status:', error);
+          logger.error('Error checking auth status:', error);
           setIsLoggedIn(false);
           return;
         }
@@ -279,7 +280,7 @@ const ContributionForm: FC<ContributionFormProps> = ({
           setUserName(null);
         }
       } catch (err) {
-        console.error('Error in authentication check:', err);
+        logger.error('Error in authentication check:', err);
         setIsLoggedIn(false);
       }
     }

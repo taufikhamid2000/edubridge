@@ -1,4 +1,5 @@
 'use client';
+import { logger } from '@/lib/logger';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -31,7 +32,7 @@ export default function Auth() {
           router.replace('/dashboard');
         }
       } catch (err) {
-        console.error('Session check error:', err);
+        logger.error('Session check error:', err);
       }
     };
 
@@ -78,7 +79,7 @@ export default function Auth() {
       }
     } catch (err) {
       setError('An unexpected error occurred. Please try again.');
-      console.error('Google login error:', err);
+      logger.error('Google login error:', err);
       setLoadingGoogle(false);
     }
   };
@@ -125,7 +126,7 @@ export default function Auth() {
       }
     } catch (err) {
       setError('An unexpected error occurred. Please try again.');
-      console.error('Auth error:', err);
+      logger.error('Auth error:', err);
     } finally {
       setLoadingManual(false);
     }

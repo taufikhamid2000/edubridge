@@ -1,4 +1,5 @@
 'use client';
+import { logger } from '@/lib/logger';
 
 import { CareerContribution } from '../types';
 
@@ -12,7 +13,7 @@ export async function submitCareerContribution(
     // In a real application, this would send the data to your backend API
     // For now, we'll simulate a successful submission
 
-    console.log('Contribution submitted:', contribution);
+    logger.log('Contribution submitted:', contribution);
 
     // Simulate API call delay
     await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -20,7 +21,7 @@ export async function submitCareerContribution(
     // Return success (in a real app, this would come from the API response)
     return { success: true };
   } catch (error) {
-    console.error('Error submitting career contribution:', error);
+    logger.error('Error submitting career contribution:', error);
     return {
       success: false,
       error:

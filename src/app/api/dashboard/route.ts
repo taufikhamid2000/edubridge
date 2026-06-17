@@ -40,7 +40,7 @@ interface DashboardResponse {
 
 export async function GET() {
   try {
-    console.log('Server: Dashboard API route called');
+    logger.log('Server: Dashboard API route called');
     logger.info('Dashboard API route called');
 
     // Get authenticated user (optional for dashboard)
@@ -48,7 +48,7 @@ export async function GET() {
 
     // Debug - Log all available cookies
     const allCookies = cookieStore.getAll();
-    console.log(
+    logger.log(
       'All available cookies:',
       allCookies.map((c) => c.name)
     );
@@ -56,7 +56,7 @@ export async function GET() {
     // Check for specific auth cookies
     const accessToken = cookieStore.get('sb-access-token')?.value;
     const refreshToken = cookieStore.get('sb-refresh-token')?.value;
-    console.log('Auth tokens present:', {
+    logger.log('Auth tokens present:', {
       hasAccessToken: !!accessToken,
       hasRefreshToken: !!refreshToken,
     });
@@ -68,7 +68,7 @@ export async function GET() {
         cookies: {
           get: (name) => {
             const cookie = cookieStore.get(name);
-            console.log(
+            logger.log(
               `Server: Cookie ${name}:`,
               cookie ? 'exists' : 'missing'
             );
@@ -90,7 +90,7 @@ export async function GET() {
       // Don't return error, continue without authentication
     } // Continue without requiring authentication
     const isAuthenticated = !!session?.user?.id;
-    console.log('Dashboard API - Authentication status:', {
+    logger.log('Dashboard API - Authentication status:', {
       isAuthenticated,
       userId: session?.user?.id,
       email: session?.user?.email,

@@ -8,7 +8,7 @@ import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
   try {
-    console.log('User API route called');
+    logger.log('User API route called');
 
     const cookieStore = await cookies();
     let session = null;
@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
         cookies: {
           get: (name) => {
             const cookie = cookieStore.get(name);
-            console.log(`Cookie ${name}:`, cookie ? 'exists' : 'missing');
+            logger.log(`Cookie ${name}:`, cookie ? 'exists' : 'missing');
             return cookie?.value;
           },
           set: () => {},
@@ -37,34 +37,34 @@ export async function GET(request: NextRequest) {
     if (sessionData?.session) {
       session = sessionData.session;
       userId = session.user.id;
-      console.log('User identified via cookie auth:', userId);
+      logger.log('User identified via cookie auth:', userId);
     } else {
-      console.log('Cookie auth failed:', sessionError?.message);
+      logger.log('Cookie auth failed:', sessionError?.message);
 
       // 2. Try bearer token auth as fallback
       const authHeader = request.headers.get('authorization');
       if (authHeader?.startsWith('Bearer ')) {
         const token = authHeader.substring(7);
-        console.log('Found bearer token, attempting auth');
+        logger.log('Found bearer token, attempting auth');
 
         // Verify the token
         try {
           const { data, error } = await supabase.auth.getUser(token);
           if (data?.user && !error) {
             userId = data.user.id;
-            console.log('User identified via token auth:', userId);
+            logger.log('User identified via token auth:', userId);
           } else {
-            console.log('Token auth failed:', error?.message);
+            logger.log('Token auth failed:', error?.message);
           }
         } catch (tokenError) {
-          console.error('Error verifying token:', tokenError);
+          logger.error('Error verifying token:', tokenError);
         }
       }
     }
 
     // If we still don't have a userId, return guest data
     if (!userId) {
-      console.log('No authenticated user found, returning guest data');
+      logger.log('No authenticated user found, returning guest data');
       return NextResponse.json({
         user: {
           email: '',
@@ -85,7 +85,7 @@ export async function GET(request: NextRequest) {
       .single();
 
     if (userError && userError.code !== 'PGRST116') {
-      console.error('Error fetching user profile:', userError);
+      logger.error('Error fetching user profile:', userError);
       return NextResponse.json(
         { error: 'Failed to fetch user data' },
         { status: 500 }

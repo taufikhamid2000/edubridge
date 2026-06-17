@@ -84,7 +84,7 @@ export default function PlayQuizPage() {
           return;
         }
 
-        console.log('Quiz Page: Fetched quiz data', {
+        logger.log('Quiz Page: Fetched quiz data', {
           quizName: result.quiz.name,
           questionsCount: result.questions?.length || 0,
           questionsValid: Array.isArray(result.questions),
@@ -93,7 +93,7 @@ export default function PlayQuizPage() {
 
         // Detailed inspection of questions
         if (Array.isArray(result.questions) && result.questions.length > 0) {
-          console.log('Quiz Page: First question details:', {
+          logger.log('Quiz Page: First question details:', {
             id: result.questions[0].id,
             text: result.questions[0].text,
             type: result.questions[0].type,
@@ -111,7 +111,7 @@ export default function PlayQuizPage() {
             (k) => !questionKeys.includes(k)
           );
           if (missingKeys.length > 0) {
-            console.warn(
+            logger.warn(
               'Quiz Page: Questions missing expected fields:',
               missingKeys
             );

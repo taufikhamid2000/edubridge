@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
@@ -19,7 +20,7 @@ export async function GET() {
     const { data, error } = await supabase.rpc('get_random_quiz');
 
     if (error) {
-      console.error('Error executing get_random_quiz:', error);
+      logger.error('Error executing get_random_quiz:', error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
@@ -37,7 +38,7 @@ export async function GET() {
       quiz_id: quiz.quiz_id,
     });
   } catch (err) {
-    console.error('Error fetching random quiz:', err);
+    logger.error('Error fetching random quiz:', err);
     return NextResponse.json(
       { error: 'Failed to fetch random quiz' },
       { status: 500 }

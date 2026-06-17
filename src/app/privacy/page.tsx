@@ -1,5 +1,6 @@
-/* eslint-disable react/no-unescaped-entities */
 'use client';
+import { logger } from '@/lib/logger';
+/* eslint-disable react/no-unescaped-entities */
 
 import { useEffect } from 'react';
 import Head from 'next/head';
@@ -18,7 +19,7 @@ export default function PrivacyPage() {
           await recoverSession();
         }
       } catch (err) {
-        console.error('Session check error:', err);
+        logger.error('Session check error:', err);
       }
     };
 

@@ -136,7 +136,7 @@ export default function ChapterEditPage() {
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error occurred';
       logger.error('Error fetching chapter details:', errorMessage);
-      console.error('Chapter fetch error details:', { error, chapterId: id });
+      logger.error('Chapter fetch error details:', { error, chapterId: id });
       return null;
     }
   };
@@ -218,7 +218,7 @@ export default function ChapterEditPage() {
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error occurred';
       logger.error('Error deleting topic:', errorMessage);
-      console.error('Topic deletion error details:', { error, topicId });
+      logger.error('Topic deletion error details:', { error, topicId });
     }
   };
 

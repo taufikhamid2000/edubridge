@@ -221,13 +221,13 @@ export async function fetchAdminQuizzes(): Promise<{
   error: { message: string } | null;
 }> {
   try {
-    console.log('Fetching admin quizzes...');
+    logger.log('Fetching admin quizzes...');
 
     // Check session
     const { success, error: accessError } = await checkAdminAccess();
 
     if (!success) {
-      console.log('No admin access for quiz fetch');
+      logger.log('No admin access for quiz fetch');
       return {
         data: null,
         error: {
@@ -250,7 +250,7 @@ export async function fetchAdminQuizzes(): Promise<{
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Error fetching quizzes:', error);
+      logger.error('Error fetching quizzes:', error);
       return {
         data: null,
         error: {
@@ -333,7 +333,7 @@ export async function createAdminQuiz(quizData: {
       .select();
 
     if (error) {
-      console.error('Error creating quiz:', error);
+      logger.error('Error creating quiz:', error);
       return {
         error: { message: error.message || 'Failed to create quiz' },
       };
@@ -385,7 +385,7 @@ export async function deleteQuiz(id: string): Promise<{
       .eq('quiz_id', id);
 
     if (questionsError) {
-      console.error('Error deleting quiz questions:', questionsError);
+      logger.error('Error deleting quiz questions:', questionsError);
       return {
         error: {
           message: questionsError.message || 'Failed to delete quiz questions',
@@ -397,7 +397,7 @@ export async function deleteQuiz(id: string): Promise<{
     const { error } = await supabase.from('quizzes').delete().eq('id', id);
 
     if (error) {
-      console.error('Error deleting quiz:', error);
+      logger.error('Error deleting quiz:', error);
       return {
         error: { message: error.message || 'Failed to delete quiz' },
       };

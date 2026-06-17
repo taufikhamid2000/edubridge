@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
@@ -24,7 +25,7 @@ export async function GET() {
       .limit(1);
 
     if (topicError) {
-      console.error('Error fetching random topic:', topicError);
+      logger.error('Error fetching random topic:', topicError);
       throw topicError;
     }
     if (!topics || topics.length === 0) {
@@ -38,7 +39,7 @@ export async function GET() {
       topic: topics[0].id,
     });
   } catch (err) {
-    console.error('Error fetching random topic:', err);
+    logger.error('Error fetching random topic:', err);
     return NextResponse.json(
       { error: 'Failed to fetch random topic' },
       { status: 500 }
