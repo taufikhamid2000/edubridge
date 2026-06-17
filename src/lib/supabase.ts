@@ -208,6 +208,60 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 });
 
 /**
+ * Service-role Supabase client for server-side admin routes (bypasses RLS).
+ *
+ * Instantiated lazily via a Proxy so:
+ *  - the service-role key is never bundled into / evaluated on the client,
+ *  - importing this module (build-time page-data collection, browser) never
+ *    throws just because SUPABASE_SERVICE_ROLE_KEY is absent — the client is
+ *    only created on first property access inside a server handler.
+ *
+ * NEVER import `supabaseAdmin` into client components.
+ */
+let _supabaseAdminClient: ReturnType<typeof createClient> | null = null;
+
+function getSupabaseAdminClient(): ReturnType<typeof createClient> {
+  if (_supabaseAdminClient) return _supabaseAdminClient;
+
+  const adminUrl =
+    process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!adminUrl || !serviceRoleKey) {
+    throw new Error(
+      'Missing Supabase admin credentials (SUPABASE_SERVICE_ROLE_KEY)'
+    );
+  }
+
+  _supabaseAdminClient = createClient(adminUrl, serviceRoleKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+    global: {
+      headers: {
+        'X-Client-Info': 'edubridge-webapp-admin',
+      },
+    },
+  });
+
+  return _supabaseAdminClient;
+}
+
+export const supabaseAdmin = new Proxy(
+  {} as ReturnType<typeof createClient>,
+  {
+    get(_target, prop) {
+      const client = getSupabaseAdminClient();
+      const value = client[prop as keyof typeof client];
+      return typeof value === 'function'
+        ? (value as (...args: unknown[]) => unknown).bind(client)
+        : value;
+    },
+  }
+);
+
+/**
  * Get the current session with caching to prevent multiple simultaneous requests
  */
 export async function getCachedSession(): Promise<{
