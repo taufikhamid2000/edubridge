@@ -49,7 +49,7 @@ export default function PlayQuizPage() {
         setUserId(session.user.id);
       } catch (err) {
         logger.error('Error checking authentication:', err);
-        setError('Failed to verify authentication. Please try again.');
+        setError('Unable to connect to the API. Please contact the administrator.');
       } finally {
         setAuthLoading(false);
       }
@@ -80,7 +80,7 @@ export default function PlayQuizPage() {
         }
 
         if (!result.quiz) {
-          setError('Failed to load quiz data');
+          setError('Unable to connect to the API. Please contact the administrator.');
           setLoading(false);
           return;
         }
@@ -124,11 +124,7 @@ export default function PlayQuizPage() {
         setTopicContext(result.topicContext);
       } catch (err) {
         logger.error('Error fetching quiz:', err);
-        setError(
-          err instanceof Error
-            ? err.message
-            : 'An error occurred loading the quiz'
-        );
+        setError('Unable to connect to the API. Please contact the administrator.');
       } finally {
         setLoading(false);
       }

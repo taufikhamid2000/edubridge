@@ -64,9 +64,7 @@ export default function DashboardPage() {
         <div className="text-center">
           <h1 className="text-2xl font-bold text-red-600 mb-4">Error</h1>
           <p className="text-gray-600 mb-4">
-            {dashboardError instanceof Error
-              ? dashboardError.message
-              : 'Failed to load dashboard data'}
+            Unable to connect to the API. Please contact the administrator.
           </p>
           <button
             onClick={() => window.location.reload()}
@@ -88,7 +86,7 @@ export default function DashboardPage() {
             Data Unavailable
           </h1>
           <p className="text-gray-600 mb-4">
-            Dashboard data could not be loaded. Please try again.
+            Unable to connect to the API. Please contact the administrator.
           </p>
           <button
             onClick={() => window.location.reload()}

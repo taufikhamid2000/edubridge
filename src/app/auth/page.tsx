@@ -38,7 +38,7 @@ export default function Auth() {
         window.location.assign('/dashboard');
       }
     } catch {
-      setError('An unexpected error occurred. Please try again.');
+      setError('Unable to connect to the API. Please contact the administrator.');
     } finally {
       setLoading(false);
     }

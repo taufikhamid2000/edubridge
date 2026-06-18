@@ -52,7 +52,7 @@ export default function UserProfileClient({ user }: UserProfileClientProps) {
         setCreatedQuizzes(quizzesData || []);
       } catch (err) {
         logger.error('Error loading user data:', err);
-        setError('Failed to load user data');
+        setError('Unable to connect to the API. Please contact the administrator.');
       } finally {
         setLoading(false);
       }

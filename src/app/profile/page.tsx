@@ -130,8 +130,7 @@ function ProfileContent() {
               Error
             </h2>
             <p className="text-gray-300 dark:text-gray-600">
-              {(userError || achievementsError || quizzesError)?.message ||
-                'Failed to load profile. Please try again.'}
+              Unable to connect to the API. Please contact the administrator.
             </p>
             <button
               onClick={() => window.location.reload()}

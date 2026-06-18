@@ -44,8 +44,8 @@ export default function ChaptersPage() {
         <h1 className="text-2xl font-bold mb-4">Error</h1>
         <p>
           {error instanceof Error
-            ? error.message
-            : 'Failed to load data. Please try again later.'}
+            ? 'Unable to connect to the API. Please contact the administrator.'
+            : 'Unable to connect to the API. Please contact the administrator.'}
         </p>
         <button
           onClick={() => window.location.reload()}
@@ -61,7 +61,7 @@ export default function ChaptersPage() {
     return (
       <div className="flex flex-col items-center justify-center h-screen bg-gray-800 dark:bg-gray-100 text-gray-300 dark:text-gray-700">
         <h1 className="text-2xl font-bold mb-4">Error</h1>
-        <p>Failed to load subject data. Please try again later.</p>
+        <p>Unable to connect to the API. Please contact the administrator.</p>
         <button
           onClick={() => window.location.reload()}
           className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
