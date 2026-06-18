@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { fetchQuizWithQuestionsAPI } from '@/services/quizService';
 import QuizPlayer from '@/components/quiz/QuizPlayer';
 import { Question, Quiz, TopicContext } from '@/types/topics';
@@ -9,9 +9,10 @@ import { logger } from '@/lib/logger';
 import { supabase } from '@/lib/supabase';
 import { DEFAULT_QUIZ_TIME_LIMIT_MINUTES } from '@/config/app';
 
+const API_MSG = 'Unable to connect to the API. Please contact the administrator.';
+
 export default function PlayQuizPage() {
   const params = useParams();
-  const router = useRouter();
   const quizId = params?.quizId as string;
   const subject = params?.subject as string;
   const topic = params?.topic as string;
@@ -21,130 +22,83 @@ export default function PlayQuizPage() {
   const [quiz, setQuiz] = useState<Quiz | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
-  const [authLoading, setAuthLoading] = useState(true);
   const [topicContext, setTopicContext] = useState<TopicContext | null>(null);
 
-  // Check authentication
   useEffect(() => {
-    async function checkAuth() {
-      try {
-        const {
-          data: { session },
-          error,
-        } = await supabase.auth.getSession();
-
-        if (error) {
-          logger.error('Auth error:', error);
-          setError('Authentication error. Please log in again.');
-          router.push('/auth');
-          return;
-        }
-
-        if (!session?.user) {
-          setError('You must be logged in to take a quiz.');
-          router.push('/auth');
-          return;
-        }
-
-        setUserId(session.user.id);
-      } catch (err) {
-        logger.error('Error checking authentication:', err);
-        setError('Unable to connect to the API. Please contact the administrator.');
-      } finally {
-        setAuthLoading(false);
-      }
+    if (!quizId) {
+      setError('Quiz ID is required');
+      setLoading(false);
+      return;
     }
 
-    checkAuth();
-  }, [router]);
+    let cancelled = false;
 
-  useEffect(() => {
-    async function fetchQuizData() {
-      if (!quizId) {
-        setError('Quiz ID is required');
+    // 20-second hard timeout — MyQuiza cold-starts can be slow
+    const timeout = setTimeout(() => {
+      if (!cancelled) {
+        cancelled = true;
+        setError(API_MSG);
         setLoading(false);
-        return;
       }
+    }, 20000);
 
-      // Wait for auth check to complete
-      if (authLoading || !userId) {
-        return;
-      }
+    async function load() {
       try {
-        const result = await fetchQuizWithQuestionsAPI(quizId);
+        // Auth + quiz fetch in parallel — no sequential wait
+        const [authResult, quizResult] = await Promise.all([
+          supabase.auth.getSession(),
+          fetchQuizWithQuestionsAPI(quizId),
+        ]);
 
-        if (result.error) {
-          setError(result.error);
-          setLoading(false);
+        if (cancelled) return;
+
+        const { data: { session }, error: authError } = authResult;
+
+        if (authError || !session?.user) {
+          window.location.assign('/auth');
           return;
         }
 
-        if (!result.quiz) {
-          setError('Unable to connect to the API. Please contact the administrator.');
-          setLoading(false);
+        if (quizResult.error || !quizResult.quiz) {
+          setError(API_MSG);
           return;
         }
 
-        logger.log('Quiz Page: Fetched quiz data', {
-          quizName: result.quiz.name,
-          questionsCount: result.questions?.length || 0,
-          questionsValid: Array.isArray(result.questions),
-          questionsSample: result.questions?.slice(0, 1),
+        logger.log('Quiz loaded', {
+          quizName: quizResult.quiz.name,
+          questions: quizResult.questions?.length ?? 0,
         });
 
-        // Detailed inspection of questions
-        if (Array.isArray(result.questions) && result.questions.length > 0) {
-          logger.log('Quiz Page: First question details:', {
-            id: result.questions[0].id,
-            text: result.questions[0].text,
-            type: result.questions[0].type,
-            hasAnswers: Array.isArray(result.questions[0].answers),
-            answerCount: result.questions[0].answers?.length || 0,
-            answersValid: result.questions[0].answers?.every(
-              (a) => a.id && a.text && typeof a.is_correct === 'boolean'
-            ),
-          });
-
-          // Check if questions match expected types
-          const questionKeys = Object.keys(result.questions[0]);
-          const expectedKeys = ['id', 'quiz_id', 'text', 'type', 'answers'];
-          const missingKeys = expectedKeys.filter(
-            (k) => !questionKeys.includes(k)
-          );
-          if (missingKeys.length > 0) {
-            logger.warn(
-              'Quiz Page: Questions missing expected fields:',
-              missingKeys
-            );
-          }
-        }
-
-        setQuiz(result.quiz);
-        setQuestions(result.questions || []);
-        setTopicContext(result.topicContext);
+        setUserId(session.user.id);
+        setQuiz(quizResult.quiz);
+        setQuestions(quizResult.questions || []);
+        setTopicContext(quizResult.topicContext);
       } catch (err) {
-        logger.error('Error fetching quiz:', err);
-        setError('Unable to connect to the API. Please contact the administrator.');
+        logger.error('Error loading quiz page:', err);
+        if (!cancelled) setError(API_MSG);
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          clearTimeout(timeout);
+          setLoading(false);
+        }
       }
     }
 
-    fetchQuizData();
-  }, [quizId, authLoading, userId, topic]);
+    load();
+    return () => {
+      cancelled = true;
+      clearTimeout(timeout);
+    };
+  }, [quizId]);
 
-  if (loading || authLoading) {
+  if (loading) {
     return (
       <div className="container mx-auto py-8 px-4">
         <div className="max-w-3xl mx-auto">
           <div className="bg-gray-800 dark:bg-white rounded-lg shadow-md p-8 flex items-center justify-center">
             <div className="text-center">
               <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-t-blue-500 border-r-transparent border-b-blue-500 border-l-transparent"></div>
-              <p className="mt-4 text-gray-400 dark:text-gray-600">
-                {authLoading
-                  ? 'Verifying authentication...'
-                  : 'Loading quiz...'}
-              </p>
+              <p className="mt-4 text-gray-400 dark:text-gray-600">Loading quiz...</p>
             </div>
           </div>
         </div>
@@ -161,7 +115,7 @@ export default function PlayQuizPage() {
               Error Loading Quiz
             </h1>
             <p className="text-gray-300 dark:text-gray-700">
-              {error || 'Quiz not found or authentication required'}
+              {error || API_MSG}
             </p>
             <button
               onClick={() => window.history.back()}
@@ -178,14 +132,13 @@ export default function PlayQuizPage() {
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="max-w-3xl mx-auto">
-        {' '}
         <QuizPlayer
           quizId={quizId}
           quizName={quiz.name}
           questions={questions}
           timeLimit={
             quiz.timeLimit != null
-              ? quiz.timeLimit / 60 // API gives seconds; player wants minutes
+              ? quiz.timeLimit / 60
               : DEFAULT_QUIZ_TIME_LIMIT_MINUTES
           }
           userId={userId}
@@ -193,10 +146,7 @@ export default function PlayQuizPage() {
           topic={topic}
           topicContext={topicContext}
           isVerified={quiz.verified}
-          onComplete={() => {
-            // Handle quiz completion
-            logger.log('Quiz completed');
-          }}
+          onComplete={() => logger.log('Quiz completed')}
         />
       </div>
     </div>
