@@ -107,7 +107,9 @@ export async function GET(
         name: quizData.name,
         verified: quizData.verified,
         topic_id: quizData.topicId,
-        timeLimit: quizData.timeLimit, // seconds; null -> client default
+        timeLimit: quizData.timeLimit,
+        difficulty: quizData.difficulty,
+        isPublic: quizData.isPublic,
       },
       questions,
       topicContext,

@@ -89,6 +89,8 @@ export async function GET(
         verified: quiz.verified,
         topic_id: quiz.topicId,
         questionCount: quiz.questionCount,
+        difficulty: quiz.difficulty,
+        isPublic: quiz.isPublic,
       }));
     } catch (err) {
       logger.warn(`MyQuiza returned no quizzes for topic ${topicId}:`, err);

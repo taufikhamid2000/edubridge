@@ -8,6 +8,8 @@ export interface MyQuizaQuiz {
   name: string;
   verified: boolean;
   questionCount: number;
+  difficulty: string | null;
+  isPublic: boolean;
 }
 
 export interface QuizDetailOption {
@@ -30,7 +32,17 @@ export interface QuizDetail {
   name: string;
   verified: boolean;
   timeLimit: number | null; // seconds; null -> client falls back to default
+  difficulty: string | null;
+  isPublic: boolean;
   questions: QuizDetailQuestion[];
+}
+
+export interface CreateQuizPayload {
+  topicId: string;
+  name: string;
+  timeLimit?: number;
+  difficulty?: string;
+  isPublic?: boolean;
 }
 
 export interface SubmitAttemptPayload {
@@ -100,6 +112,13 @@ async function myquizaFetch<T>(
 }
 
 // ---- Endpoints ----
+
+export function createQuiz(payload: CreateQuizPayload, token: string | null) {
+  return myquizaFetch<{ id: string }>('/api/v1/quizzes', token, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
 
 export function getTopicQuizzes(topicId: string) {
   return myquizaFetch<MyQuizaQuiz[]>(`/api/v1/topics/${topicId}/quizzes`, null);

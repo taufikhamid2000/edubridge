@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { useMutation } from '@tanstack/react-query';
-import { createQuiz } from '@/services/quizService';
 import { QuizForm } from '@/components/QuizForm';
 import { logger } from '@/lib/logger';
 
@@ -100,41 +99,37 @@ export default function CreateQuizPage() {
   }, [topic]);
 
   const mutation = useMutation({
-    mutationFn: (data: QuizData) => createQuiz(data),
+    mutationFn: async (data: QuizData) => {
+      const res = await fetch('/api/quiz', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          topicId: topicData?.id,
+          name: data.name,
+          timeLimit: data.timeLimit ? data.timeLimit * 60 : undefined, // minutes → seconds
+          difficulty: data.difficulty || undefined,
+          isPublic: data.isPublic ?? false,
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'Failed to create quiz');
+      return json;
+    },
     onSuccess: (result) => {
-      if (result.success && result.quizId) {
-        // Show success notification
-        alert('Quiz created successfully! Now you can add questions.');
-        // Redirect to the question management page
-        router.push(`/quiz/${subject}/${topic}/${result.quizId}/questions`);
-      } else {
-        // Handle error case where quiz was created but no ID was returned
-        setError('Quiz created but unable to proceed to question creation');
-      }
+      router.push(`/quiz/${subject}/${topic}/${result.quizId}/questions`);
     },
     onError: (error) => {
       logger.error('Error creating quiz:', error);
-      setError(
-        error instanceof Error ? error.message : 'Failed to create quiz'
-      );
+      setError('Unable to connect to the API. Please contact the administrator.');
     },
   });
 
   const onSubmit = (data: QuizData) => {
-    // Validate that we have a valid topic ID
     if (!topicData?.id) {
-      setError(
-        'Cannot create a quiz: Invalid topic ID. Please select a valid topic.'
-      );
+      setError('Cannot create a quiz: topic not loaded yet.');
       return;
     }
-
-    // Add the subject and topic IDs to the form data
-    mutation.mutate({
-      ...data,
-      subject: subjectData?.id || subject,
-      topic: topicData.id, // Use the topic ID from our fetched data
-    });
+    mutation.mutate(data);
   };
 
   // Show loading state

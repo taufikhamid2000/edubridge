@@ -125,48 +125,41 @@ export function QuizForm({
             </p>
           )}
         </div>{' '}
-        <div className="space-y-2 opacity-50">
+        <div className="space-y-2">
           <label
             htmlFor="difficulty"
-            className="flex items-center text-sm font-medium text-gray-300 dark:text-gray-700"
+            className="block text-sm font-medium text-gray-300 dark:text-gray-700"
           >
             Difficulty Level
-            <span className="ml-2 text-xs py-0.5 px-1.5 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded">
-              Coming soon
-            </span>
           </label>
           <select
             id="difficulty"
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-not-allowed"
-            disabled
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             {...register('difficulty')}
           >
+            <option value="">Unspecified</option>
             <option value="beginner">Beginner</option>
             <option value="intermediate">Intermediate</option>
             <option value="advanced">Advanced</option>
           </select>
-        </div>{' '}
-        <div className="space-y-2 opacity-50">
+        </div>
+        <div className="space-y-2">
           <label
             htmlFor="timeLimit"
-            className="flex items-center text-sm font-medium text-gray-300 dark:text-gray-700"
+            className="block text-sm font-medium text-gray-300 dark:text-gray-700"
           >
             Time Limit (minutes)
-            <span className="ml-2 text-xs py-0.5 px-1.5 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded">
-              Coming soon
-            </span>
           </label>
           <input
             id="timeLimit"
             type="number"
             min="1"
             max="120"
-            disabled
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 rounded-md shadow-sm cursor-not-allowed"
-            placeholder="Time limit in minutes"
-            {...register('timeLimit')}
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Leave blank for no limit"
+            {...register('timeLimit', { valueAsNumber: true })}
           />
-        </div>{' '}
+        </div>
         <div className="space-y-2 opacity-50">
           <label className="flex items-center text-sm font-medium text-gray-300 dark:text-gray-700">
             Number of Questions
@@ -186,25 +179,21 @@ export function QuizForm({
             <span className="w-8 text-center">{questionCount}</span>
           </div>
           <p className="text-xs text-gray-400 dark:text-gray-500">
-            Default questions will be added after creating the quiz
+            Questions are added after creating the quiz
           </p>
         </div>
-        <div className="flex items-center mt-2 opacity-50">
+        <div className="flex items-center mt-2">
           <input
             id="isPublic"
             type="checkbox"
-            disabled
-            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-not-allowed"
+            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
             {...register('isPublic')}
           />
           <label
             htmlFor="isPublic"
-            className="ml-2 flex items-center text-sm text-gray-300 dark:text-gray-700"
+            className="ml-2 text-sm text-gray-300 dark:text-gray-700"
           >
             Make this quiz public
-            <span className="ml-2 text-xs py-0.5 px-1.5 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded">
-              Coming soon
-            </span>
           </label>
         </div>
       </div>
