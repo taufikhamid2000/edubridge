@@ -96,17 +96,17 @@ export async function GET() {
       email: session?.user?.email,
     });
 
-    // Fetch data in parallel for optimal performance using materialized views
+    // Fetch data in parallel for optimal performance
     const [
       { data: subjectsData, error: subjectsError },
       { data: userData, error: userError },
       { data: userStatsData, error: userStatsError },
     ] = await Promise.all([
-      // Fetch subjects from materialized view for better performance
+      // Fetch subjects directly from the base table (avoids stale materialized view)
       supabase
-        .from('mv_dashboard_subject_stats')
+        .from('subjects')
         .select(
-          'id, name, slug, description, icon, category, category_priority, order_index, quiz_count, total_attempts, average_score'
+          'id, name, slug, description, icon, category, category_priority, order_index'
         )
         .order('category_priority', { ascending: true })
         .order('order_index', { ascending: true }),
