@@ -49,7 +49,7 @@ export function QuizForm({
                 <dt className="font-medium text-gray-400 dark:text-gray-500 w-24">
                   Subject:
                 </dt>
-                <dd className="text-gray-900 dark:text-gray-800">
+                <dd className="text-gray-100 dark:text-gray-800">
                   {subjectName}
                 </dd>
               </div>
@@ -59,7 +59,7 @@ export function QuizForm({
                 <dt className="font-medium text-gray-400 dark:text-gray-500 w-24">
                   Chapter:
                 </dt>
-                <dd className="text-gray-900 dark:text-gray-800">
+                <dd className="text-gray-100 dark:text-gray-800">
                   {chapterName}
                 </dd>
               </div>
@@ -69,7 +69,7 @@ export function QuizForm({
                 <dt className="font-medium text-gray-400 dark:text-gray-500 w-24">
                   Topic:
                 </dt>
-                <dd className="text-gray-900 dark:text-gray-800">
+                <dd className="text-gray-100 dark:text-gray-800">
                   {topicName}
                 </dd>
               </div>
@@ -114,8 +114,8 @@ export function QuizForm({
           <textarea
             id="description"
             rows={3}
-            className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 
-              ${errors.description ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 dark:border-gray-700 dark:bg-gray-800'} text-black`}
+            className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 dark:bg-white text-gray-200 dark:text-gray-800 placeholder-gray-400 dark:placeholder-gray-500
+              ${errors.description ? 'border-red-400 focus:ring-red-500' : 'border-gray-600 dark:border-gray-300'}`}
             placeholder="Describe what this quiz covers"
             {...register('description')}
           />
@@ -134,7 +134,7 @@ export function QuizForm({
           </label>
           <select
             id="difficulty"
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-600 dark:border-gray-300 bg-gray-700 dark:bg-white text-gray-200 dark:text-gray-800 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             {...register('difficulty')}
           >
             <option value="">Unspecified</option>
@@ -155,7 +155,7 @@ export function QuizForm({
             type="number"
             min="1"
             max="120"
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-600 dark:border-gray-300 bg-gray-700 dark:bg-white text-gray-200 dark:text-gray-800 placeholder-gray-400 dark:placeholder-gray-500 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Leave blank for no limit"
             {...register('timeLimit', { valueAsNumber: true })}
           />
