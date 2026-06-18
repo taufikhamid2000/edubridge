@@ -1,13 +1,11 @@
 'use client';
-/* eslint-disable @typescript-eslint/no-unused-vars */
 
 import React, { useEffect, useState } from 'react';
-import { useRouter, useParams, useSearchParams } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { useMutation } from '@tanstack/react-query';
 import { createQuiz } from '@/services/quizService';
 import { QuizForm } from '@/components/QuizForm';
-import { supabase } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
 
 interface QuizData {
@@ -41,9 +39,7 @@ interface ChapterData {
 export default function CreateQuizPage() {
   const router = useRouter();
   const params = useParams();
-  const searchParams = useSearchParams();
 
-  // Get subject and topic from path parameters, not search parameters
   const subject = (params?.subject as string) || '';
   const topic = (params?.topic as string) || '';
 
@@ -57,7 +53,6 @@ export default function CreateQuizPage() {
     register,
     handleSubmit,
     formState: { errors },
-    reset,
   } = useForm<QuizData>({
     defaultValues: {
       difficulty: 'beginner',
@@ -66,83 +61,43 @@ export default function CreateQuizPage() {
     },
   });
 
-  // Fetch metadata about the subject, topic, and chapter
   useEffect(() => {
-    const fetchMetadata = async () => {
-      try {
-        setIsLoading(true);
+    if (!topic) {
+      setError('Unable to connect to the API. Please contact the administrator.');
+      setIsLoading(false);
+      return;
+    }
 
-        // Fetch subject data
-        if (subject) {
-          const { data: subjectData, error: subjectError } = await supabase
-            .from('subjects')
-            .select('id, name, slug')
-            .eq('slug', subject)
-            .single();
-
-          if (subjectError) throw subjectError;
-          if (subjectData) setSubjectData(subjectData);
-        } // Fetch topic data
-        if (topic) {
-          logger.log('Fetching topic data for topic ID:', topic);
-          const { data: topicData, error: topicError } = await supabase
-            .from('topics')
-            .select('id, name, chapter_id')
-            .eq('id', topic)
-            .single();
-
-          logger.log('Topic query result:', { topicData, topicError });
-          if (topicError) throw topicError;
-          if (topicData) {
-            setTopicData({
-              id: topicData.id,
-              title: topicData.name, // Map name to title for compatibility
-              chapter_id: topicData.chapter_id,
-            });
-
-            // Fetch chapter data if we have a chapter_id
-            if (topicData.chapter_id) {
-              logger.log(
-                'Fetching chapter data for chapter ID:',
-                topicData.chapter_id
-              );
-              const { data: chapterData, error: chapterError } = await supabase
-                .from('chapters')
-                .select('id, name, form')
-                .eq('id', topicData.chapter_id)
-                .single();
-
-              logger.log('Chapter query result:', {
-                chapterData,
-                chapterError,
-              });
-              if (chapterError) throw chapterError;
-              if (chapterData) {
-                setChapterData({
-                  id: chapterData.id,
-                  title: chapterData.name, // Map name to title for compatibility
-                  form: chapterData.form,
-                });
-              }
-            } else {
-              logger.log(
-                'No chapter_id found for topic, chapter data will be null'
-              );
-            }
-          }
-        }
-      } catch (err) {
-        logger.error('Error fetching metadata:', err);
-        setError(
-          err instanceof Error ? err.message : 'Failed to load quiz context'
-        );
-      } finally {
+    let cancelled = false;
+    const timeout = setTimeout(() => {
+      if (!cancelled) {
+        setError('Unable to connect to the API. Please contact the administrator.');
         setIsLoading(false);
       }
-    };
+    }, 10000);
 
-    fetchMetadata();
-  }, [subject, topic]);
+    fetch(`/api/topics/${topic}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (cancelled) return;
+        if (data.error) throw new Error(data.error);
+        if (data.subject) setSubjectData({ id: data.subject.id, name: data.subject.name, slug: data.subject.slug });
+        if (data.topic) setTopicData({ id: data.topic.id, title: data.topic.name, chapter_id: data.topic.chapter_id });
+        if (data.chapter) setChapterData({ id: data.chapter.id, title: data.chapter.name, form: data.chapter.form });
+      })
+      .catch((err) => {
+        logger.error('Error fetching topic metadata:', err);
+        if (!cancelled) setError('Unable to connect to the API. Please contact the administrator.');
+      })
+      .finally(() => {
+        if (!cancelled) {
+          clearTimeout(timeout);
+          setIsLoading(false);
+        }
+      });
+
+    return () => { cancelled = true; clearTimeout(timeout); };
+  }, [topic]);
 
   const mutation = useMutation({
     mutationFn: (data: QuizData) => createQuiz(data),
