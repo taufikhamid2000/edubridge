@@ -1,4 +1,11 @@
-import { createClient } from '@supabase/supabase-js';
+// NOTE: The Supabase clients below are intentionally typed as `<any>` (untyped
+// schema). EduBridge is migrating off direct DB access onto the MyQuiza API, so
+// this data layer is slated for removal — we deliberately opt it out of the
+// strict schema typing that newer @supabase/supabase-js infers (it otherwise
+// resolves every query to `never`). This restores the pre-upgrade behavior in
+// one place instead of hand-typing dozens of soon-to-be-deleted queries.
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { logger } from './logger';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -18,7 +25,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
  * source of stale-session desync; it has been removed in favor of the
  * library's built-in handling.
  */
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+export const supabase = createClient<any>(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
@@ -42,9 +49,9 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
  *
  * NEVER import `supabaseAdmin` into client components.
  */
-let _supabaseAdminClient: ReturnType<typeof createClient> | null = null;
+let _supabaseAdminClient: SupabaseClient<any, any, any> | null = null;
 
-function getSupabaseAdminClient(): ReturnType<typeof createClient> {
+function getSupabaseAdminClient(): SupabaseClient<any, any, any> {
   if (_supabaseAdminClient) return _supabaseAdminClient;
 
   const adminUrl =
@@ -57,7 +64,7 @@ function getSupabaseAdminClient(): ReturnType<typeof createClient> {
     );
   }
 
-  _supabaseAdminClient = createClient(adminUrl, serviceRoleKey, {
+  _supabaseAdminClient = createClient<any>(adminUrl, serviceRoleKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,
@@ -72,7 +79,7 @@ function getSupabaseAdminClient(): ReturnType<typeof createClient> {
   return _supabaseAdminClient;
 }
 
-export const supabaseAdmin = new Proxy({} as ReturnType<typeof createClient>, {
+export const supabaseAdmin = new Proxy({} as SupabaseClient<any, any, any>, {
   get(_target, prop) {
     const client = getSupabaseAdminClient();
     const value = client[prop as keyof typeof client];
