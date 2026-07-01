@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
@@ -18,15 +19,15 @@ export async function GET() {
   try {
     const { data, error } = await supabase.rpc('get_random_topic');
 
-    console.log('Random topic response:', { data, error });
+    logger.log('Random topic response:', { data, error });
 
     if (error) {
-      console.error('Error executing get_random_topic:', error);
+      logger.error('Error executing get_random_topic:', error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
     if (!data || !data[0]) {
-      console.error('No topics found in database');
+      logger.error('No topics found in database');
       return NextResponse.json(
         { error: 'No topics found in database' },
         { status: 404 }
@@ -36,7 +37,7 @@ export async function GET() {
     const topic = data[0];
 
     if (!topic.subject_slug) {
-      console.error('Topic found but subject_slug is missing:', topic);
+      logger.error('Topic found but subject_slug is missing:', topic);
       return NextResponse.json(
         { error: 'Topic found but subject is missing' },
         { status: 500 }
@@ -48,10 +49,10 @@ export async function GET() {
       topic_id: topic.id,
     };
 
-    console.log('Returning response:', response);
+    logger.log('Returning response:', response);
     return NextResponse.json(response);
   } catch (err) {
-    console.error('Error fetching random topic:', err);
+    logger.error('Error fetching random topic:', err);
     return NextResponse.json(
       { error: 'Failed to fetch random topic' },
       { status: 500 }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
@@ -48,7 +49,7 @@ export async function POST(request: Request) {
       },
     });
   } catch (error) {
-    console.error('Error refreshing session:', error);
+    logger.error('Error refreshing session:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

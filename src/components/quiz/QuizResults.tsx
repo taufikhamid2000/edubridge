@@ -1,4 +1,5 @@
 import React from 'react';
+import { Question } from '@/types/topics';
 import { logger } from '@/lib/logger';
 
 interface QuizResultsProps {
@@ -7,6 +8,17 @@ interface QuizResultsProps {
   onRetake: () => void;
   onViewAll: () => void;
   isVerified?: boolean; // Quiz verification status
+  // Per-question correctness + correct option ids from the server (MyQuiza),
+  // ordered by question. The answer key only arrives here, post-submission.
+  perQuestion?: Array<{
+    questionId: string;
+    correct: boolean;
+    correctAnswerIds: string[];
+  }>;
+  // The quiz questions (for option text) and the user's selections, used to
+  // render the per-question breakdown with correct/selected highlighting.
+  questions?: Question[];
+  userAnswers?: Record<string, string[]>;
 }
 
 export default function QuizResults({
@@ -15,6 +27,9 @@ export default function QuizResults({
   onRetake,
   onViewAll,
   isVerified = true,
+  perQuestion,
+  questions = [],
+  userAnswers = {},
 }: QuizResultsProps) {
   const getStatusClass = (score: number) => {
     if (score >= 80) return 'text-green-600 dark:text-green-400';
@@ -127,6 +142,80 @@ export default function QuizResults({
           </span>
         </div>
       </div>
+
+      {/* Per-question breakdown (server-scored; answer key arrives only here) */}
+      {perQuestion && perQuestion.length > 0 && (
+        <div className="space-y-3 mb-8">
+          <h3 className="text-lg font-medium mb-3">Performance Breakdown</h3>
+          {perQuestion.map((q, index) => {
+            const question = questions.find((qq) => qq.id === q.questionId);
+            const correctIds = new Set(q.correctAnswerIds);
+            const selectedIds = new Set(userAnswers[q.questionId] || []);
+
+            return (
+              <div
+                key={q.questionId}
+                className={`p-3 rounded-md ${
+                  q.correct
+                    ? 'bg-green-900/20 dark:bg-green-50 border-l-4 border-green-500'
+                    : 'bg-red-900/20 dark:bg-red-900/20 border-l-4 border-red-500'
+                }`}
+              >
+                <div className="flex justify-between">
+                  <span className="font-medium">Question {index + 1}</span>
+                  <span
+                    className={
+                      q.correct
+                        ? 'text-green-600 dark:text-green-400'
+                        : 'text-red-600 dark:text-red-400'
+                    }
+                  >
+                    {q.correct ? 'Correct' : 'Incorrect'}
+                  </span>
+                </div>
+
+                {question && (
+                  <>
+                    {question.text && (
+                      <p className="mt-2 text-sm text-gray-300 dark:text-gray-700">
+                        {question.text}
+                      </p>
+                    )}
+                    <ul className="mt-2 space-y-1">
+                      {(question.answers || []).map((opt) => {
+                        const isCorrect = correctIds.has(opt.id);
+                        const isSelected = selectedIds.has(opt.id);
+                        return (
+                          <li
+                            key={opt.id}
+                            className={`text-sm flex items-center gap-2 ${
+                              isCorrect
+                                ? 'text-green-600 dark:text-green-400 font-medium'
+                                : isSelected
+                                  ? 'text-red-600 dark:text-red-400 line-through'
+                                  : 'text-gray-400 dark:text-gray-500'
+                            }`}
+                          >
+                            <span aria-hidden="true">
+                              {isCorrect ? '✓' : isSelected ? '✗' : '•'}
+                            </span>
+                            <span>{opt.text}</span>
+                            {isSelected && (
+                              <span className="text-xs opacity-70">
+                                (your answer)
+                              </span>
+                            )}
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       <div className="flex flex-col sm:flex-row gap-3 justify-between">
         <div>

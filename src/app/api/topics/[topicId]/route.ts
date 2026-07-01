@@ -73,15 +73,28 @@ export async function GET(
         : chapter.subjects
       : null;
 
-    // Fetch verified quizzes from MyQuiza API
-    const myquizaQuizzes = await getTopicQuizzes(topicId);
-    const processedQuizzes = myquizaQuizzes.map((quiz) => ({
-      id: quiz.id,
-      name: quiz.name,
-      verified: quiz.verified,
-      topic_id: quiz.topicId,
-      questionCount: quiz.questionCount,
-    }));
+    // Fetch verified quizzes from MyQuiza API (topic may not exist there yet)
+    let processedQuizzes: {
+      id: string;
+      name: string;
+      verified: boolean;
+      topic_id: string;
+      questionCount: number;
+    }[] = [];
+    try {
+      const myquizaQuizzes = await getTopicQuizzes(topicId);
+      processedQuizzes = myquizaQuizzes.map((quiz) => ({
+        id: quiz.id,
+        name: quiz.name,
+        verified: quiz.verified,
+        topic_id: quiz.topicId,
+        questionCount: quiz.questionCount,
+        difficulty: quiz.difficulty,
+        isPublic: quiz.isPublic,
+      }));
+    } catch (err) {
+      logger.warn(`MyQuiza returned no quizzes for topic ${topicId}:`, err);
+    }
 
     const response = {
       topic: {

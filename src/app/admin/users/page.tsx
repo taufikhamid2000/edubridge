@@ -71,7 +71,7 @@ export default function AdminUsersPage() {
       setLoading(true);
       setError(null);
 
-      console.log('Attempting to fetch users via client-side service...');
+      logger.log('Attempting to fetch users via client-side service...');
 
       // Use the adminService directly instead of API route
       const { fetchAdminUsers } = await import('@/services/adminService');
@@ -89,9 +89,9 @@ export default function AdminUsersPage() {
 
       // Log for debugging
       if (data.length > 0) {
-        console.log('First user data:', data[0]);
+        logger.log('First user data:', data[0]);
       } else {
-        console.log('No user data returned');
+        logger.log('No user data returned');
       }
     } catch (error) {
       const errorMessage =
@@ -100,7 +100,7 @@ export default function AdminUsersPage() {
       setError(errorMessage);
 
       // More detailed error logging
-      console.error('User fetch error details:', {
+      logger.error('User fetch error details:', {
         error,
         message: errorMessage,
         timestamp: new Date().toISOString(),
@@ -123,7 +123,7 @@ export default function AdminUsersPage() {
       setLoading(true);
 
       // Use the client-side service instead of API endpoint
-      console.log('Updating user role via client-side service...');
+      logger.log('Updating user role via client-side service...');
       const { updateUserRole } = await import('@/services/adminService');
       const success = await updateUserRole(
         userId,
@@ -171,7 +171,7 @@ export default function AdminUsersPage() {
       setLoading(true);
 
       // Use the client-side service to toggle disable status
-      console.log(
+      logger.log(
         `${newDisabledState ? 'Disabling' : 'Enabling'} user account...`
       );
       const { toggleUserDisabled } = await import('@/services/adminService');

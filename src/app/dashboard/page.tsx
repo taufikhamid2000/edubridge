@@ -1,4 +1,5 @@
 'use client';
+import { logger } from '@/lib/logger';
 
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
@@ -23,7 +24,7 @@ export default function DashboardPage() {
   // Log dashboard data when it changes
   useEffect(() => {
     if (dashboardData) {
-      console.log('Dashboard data received:', {
+      logger.log('Dashboard data received:', {
         isGuest: dashboardData.user?.display_name === 'Guest User',
         displayName: dashboardData.user?.display_name,
         email: dashboardData.user?.email,
@@ -63,9 +64,7 @@ export default function DashboardPage() {
         <div className="text-center">
           <h1 className="text-2xl font-bold text-red-600 mb-4">Error</h1>
           <p className="text-gray-600 mb-4">
-            {dashboardError instanceof Error
-              ? dashboardError.message
-              : 'Failed to load dashboard data'}
+            Unable to connect to the API. Please contact the administrator.
           </p>
           <button
             onClick={() => window.location.reload()}
@@ -87,7 +86,7 @@ export default function DashboardPage() {
             Data Unavailable
           </h1>
           <p className="text-gray-600 mb-4">
-            Dashboard data could not be loaded. Please try again.
+            Unable to connect to the API. Please contact the administrator.
           </p>
           <button
             onClick={() => window.location.reload()}

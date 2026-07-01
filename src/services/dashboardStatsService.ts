@@ -33,7 +33,7 @@ export async function fetchDashboardStats(): Promise<{
       return { data: null, error };
     }
 
-    console.log('Fetching optimized dashboard stats...');
+    logger.log('Fetching optimized dashboard stats...');
 
     // Execute all count queries in parallel for maximum speed
     const [
@@ -115,7 +115,7 @@ export async function fetchDashboardStats(): Promise<{
       activeUsers: activeUsersResult.count || 0,
     };
 
-    console.log('Dashboard stats fetched successfully:', stats);
+    logger.log('Dashboard stats fetched successfully:', stats);
     return { data: stats, error: null };
   } catch (error) {
     const err =
@@ -128,7 +128,7 @@ export async function fetchDashboardStats(): Promise<{
           );
 
     logger.error('Error in fetchDashboardStats:', err);
-    console.error('Full error details:', error);
+    logger.error('Full error details:', error);
     return { data: null, error: err };
   }
 }

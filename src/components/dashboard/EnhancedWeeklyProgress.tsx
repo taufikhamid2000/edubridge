@@ -1,8 +1,10 @@
 'use client';
+import { logger } from '@/lib/logger';
 
 import React, { useEffect, useState } from 'react';
 import { fetchUserStats } from '@/services/dashboardService';
 import Link from 'next/link';
+import { WEEKLY_QUIZ_TARGET } from '@/config/app';
 
 interface WeeklyProgressProps {
   initialData?: {
@@ -20,7 +22,7 @@ const EnhancedWeeklyProgress = ({
   const [progressData, setProgressData] = useState(
     initialData || {
       quizzesCompleted: 0,
-      quizzesTotal: 10,
+      quizzesTotal: WEEKLY_QUIZ_TARGET,
       averageScore: 0,
     }
   );
@@ -31,18 +33,18 @@ const EnhancedWeeklyProgress = ({
     const fetchProgressData = async () => {
       // Only fetch if not static and either no initial data or appears to be guest data (0 quizzes)
       if (!isStatic && (!initialData || initialData.quizzesCompleted === 0)) {
-        console.log('EnhancedWeeklyProgress: Fetching user stats directly');
+        logger.log('EnhancedWeeklyProgress: Fetching user stats directly');
         try {
           const userData = await fetchUserStats();
           if (userData && userData.weeklyProgress) {
-            console.log(
+            logger.log(
               'EnhancedWeeklyProgress: Got progress data:',
               userData.weeklyProgress
             );
             setProgressData(userData.weeklyProgress);
           }
         } catch (error) {
-          console.error('Error fetching user progress data:', error);
+          logger.error('Error fetching user progress data:', error);
         } finally {
           setIsLoading(false);
         }

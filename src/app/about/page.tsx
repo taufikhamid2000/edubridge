@@ -1,4 +1,5 @@
 'use client';
+import { logger } from '@/lib/logger';
 
 import { useEffect } from 'react';
 import Head from 'next/head';
@@ -17,7 +18,7 @@ export default function AboutPage() {
           await recoverSession();
         }
       } catch (err) {
-        console.error('Session check error:', err);
+        logger.error('Session check error:', err);
       }
     };
 

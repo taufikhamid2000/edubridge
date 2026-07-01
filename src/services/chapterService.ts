@@ -31,7 +31,7 @@ export async function fetchAdminChapters(): Promise<{
     if (!success) {
       return { data: null, error };
     } // User is confirmed as admin, proceed with fetch
-    console.log('Fetching chapters as admin...');
+    logger.log('Fetching chapters as admin...');
 
     // Get all chapters
     const { data: chapters, error: chaptersError } = await supabase
@@ -46,7 +46,7 @@ export async function fetchAdminChapters(): Promise<{
         error: new Error(chaptersError.message || 'Failed to fetch chapters'),
       };
     }
-    console.log('Chapters fetched successfully:', { count: chapters?.length });
+    logger.log('Chapters fetched successfully:', { count: chapters?.length });
 
     // Create a map to store topic counts per chapter
     const chapterTopicCounts: Record<string, number> = {};
@@ -67,7 +67,7 @@ export async function fetchAdminChapters(): Promise<{
         });
       }
     } catch (error) {
-      console.error('Error calculating topic counts:', error);
+      logger.error('Error calculating topic counts:', error);
       // Continue with basic data
     }
 
@@ -89,7 +89,7 @@ export async function fetchAdminChapters(): Promise<{
           );
 
     logger.error('Error in fetchAdminChapters:', err);
-    console.error('Full error details:', error);
+    logger.error('Full error details:', error);
     return { data: null, error: err };
   }
 }

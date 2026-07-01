@@ -1,5 +1,6 @@
-/* eslint-disable react/no-unescaped-entities */
 'use client';
+import { logger } from '@/lib/logger';
+/* eslint-disable react/no-unescaped-entities */
 
 import { useEffect, useState } from 'react';
 import Head from 'next/head';
@@ -51,13 +52,13 @@ export default function HomePage() {
     //     } = await supabase.auth.getSession();
     //
     //     if (error) {
-    //       console.warn('Session check error:', error);
+    //       logger.warn('Session check error:', error);
     //       setIsLoggedIn(false);
     //     } else {
     //       setIsLoggedIn(!!session);
     //     }
     //   } catch (error) {
-    //     console.error('Error checking auth status:', error);
+    //     logger.error('Error checking auth status:', error);
     //     setIsLoggedIn(false);
     //   } finally {
     //     setIsLoading(false);
@@ -72,7 +73,7 @@ export default function HomePage() {
     } = supabase.auth.onAuthStateChange((event, session) => {
       const loggedIn = !!session;
       setIsLoggedIn(loggedIn);
-      console.log('Auth state changed:', {
+      logger.log('Auth state changed:', {
         event,
         isLoggedIn: loggedIn,
         hasSession: !!session,
@@ -160,7 +161,7 @@ export default function HomePage() {
             <button
               className="inline-block uppercase tracking-wide rounded-full shadow-lg transition-all duration-300 ease-in-out px-8 py-4 bg-white text-blue-600 font-medium hover:bg-gray-100 hover:scale-105 transform"
               onClick={() => {
-                console.log(
+                logger.log(
                   'Dashboard button clicked, isLoggedIn:',
                   isLoggedIn
                 );

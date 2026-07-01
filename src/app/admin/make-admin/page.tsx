@@ -1,5 +1,5 @@
-/* eslint-disable react/no-unescaped-entities */
 'use client';
+/* eslint-disable react/no-unescaped-entities */
 // Import dynamic config to optimize build
 import './config';
 

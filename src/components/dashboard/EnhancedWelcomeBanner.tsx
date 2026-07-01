@@ -1,4 +1,5 @@
 'use client';
+import { logger } from '@/lib/logger';
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -22,18 +23,18 @@ const EnhancedWelcomeBanner = ({
   useEffect(() => {
     const fetchUserData = async () => {
       if (!initialUser || initialUser.display_name === 'Guest User') {
-        console.log('EnhancedWelcomeBanner: Fetching user data directly');
+        logger.log('EnhancedWelcomeBanner: Fetching user data directly');
         try {
           const userData = await getUserData();
           if (userData) {
-            console.log('EnhancedWelcomeBanner: Got user data:', {
+            logger.log('EnhancedWelcomeBanner: Got user data:', {
               isGuest: userData.display_name === 'Guest User',
               displayName: userData.display_name,
             });
             setUser(userData);
           }
         } catch (error) {
-          console.error('Error fetching user data:', error);
+          logger.error('Error fetching user data:', error);
         } finally {
           setIsLoading(false);
         }
@@ -70,7 +71,7 @@ const EnhancedWelcomeBanner = ({
         `/quiz/${data.subject_slug}/${data.topic_id}/play/${data.quiz_id}`
       );
     } catch (error) {
-      console.error('Error fetching random quiz:', error);
+      logger.error('Error fetching random quiz:', error);
       alert('Failed to find a random quiz. Please try again later.');
     }
   };
@@ -88,7 +89,7 @@ const EnhancedWelcomeBanner = ({
       if (!response.ok) throw new Error(data.error);
       router.push(`/quiz/${data.subject_slug}/${data.topic_id}`);
     } catch (error) {
-      console.error('Error fetching random topic:', error);
+      logger.error('Error fetching random topic:', error);
       alert('Failed to find a random topic. Please try again later.');
     }
   };

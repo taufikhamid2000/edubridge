@@ -1,4 +1,5 @@
 'use client';
+import { logger } from '@/lib/logger';
 
 import { useCallback } from 'react';
 import { Topic, Chapter, createTopic, deleteTopic } from '@/services';
@@ -25,7 +26,7 @@ export default function TopicManagement({
   refreshTopics,
 }: TopicManagementProps) {
   // Debug: Log chapters data
-  console.log('TopicManagement - chapters data:', {
+  logger.log('TopicManagement - chapters data:', {
     chaptersCount: chapters.length,
     chapters: chapters.map((c) => ({ id: c.id, title: c.name })), // Using name but keeping title in the debug output
   });

@@ -7,6 +7,7 @@ import SubjectSearch from '@/components/dashboard/SubjectSearch';
 import SubjectGrid from '@/components/dashboard/SubjectGrid';
 import EnhancedWeeklyProgress from '@/components/dashboard/EnhancedWeeklyProgress';
 import Achievements from '@/components/dashboard/Achievements';
+import { WEEKLY_QUIZ_TARGET } from '@/config/app';
 
 interface Subject {
   id: string;
@@ -127,7 +128,7 @@ export default function DashboardClient({
   // Weekly progress data - use from userStats or fallback
   const weeklyProgress = userStats?.weeklyProgress || {
     quizzesCompleted: 7,
-    quizzesTotal: 10,
+    quizzesTotal: WEEKLY_QUIZ_TARGET,
     averageScore: 85,
   };
   return (

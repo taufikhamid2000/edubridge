@@ -17,7 +17,7 @@ export async function verifyAdminAccess(): Promise<{
     const userId = session?.user?.id;
 
     // Log session state for debugging
-    // console.log('Session check:', {
+    // logger.log('Session check:', {
     //   hasSession: !!session,
     //   hasUserId: !!userId,
     //   timestamp: new Date().toISOString(),
@@ -39,7 +39,7 @@ export async function verifyAdminAccess(): Promise<{
       .single();
 
     // Debug role check
-    // console.log('User role check:', {
+    // logger.log('User role check:', {
     //   userId,
     //   hasRoleData: !!userRoles,
     //   role: userRoles?.role,
@@ -79,7 +79,7 @@ export async function verifyAdminAccess(): Promise<{
           );
 
     logger.error('Error in verifyAdminAccess:', err);
-    console.error('Full error details:', error);
+    logger.error('Full error details:', error);
     return { isAdmin: false, error: err };
   }
 }

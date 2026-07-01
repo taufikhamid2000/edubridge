@@ -1,13 +1,10 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useRouter, useParams, useSearchParams } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { useMutation } from '@tanstack/react-query';
-import { createQuiz } from '@/services/quizService';
 import { QuizForm } from '@/components/QuizForm';
-import { supabase } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
 
 interface QuizData {
@@ -41,9 +38,7 @@ interface ChapterData {
 export default function CreateQuizPage() {
   const router = useRouter();
   const params = useParams();
-  const searchParams = useSearchParams();
 
-  // Get subject and topic from path parameters, not search parameters
   const subject = (params?.subject as string) || '';
   const topic = (params?.topic as string) || '';
 
@@ -57,7 +52,6 @@ export default function CreateQuizPage() {
     register,
     handleSubmit,
     formState: { errors },
-    reset,
   } = useForm<QuizData>({
     defaultValues: {
       difficulty: 'beginner',
@@ -66,120 +60,76 @@ export default function CreateQuizPage() {
     },
   });
 
-  // Fetch metadata about the subject, topic, and chapter
   useEffect(() => {
-    const fetchMetadata = async () => {
-      try {
-        setIsLoading(true);
+    if (!topic) {
+      setError('Unable to connect to the API. Please contact the administrator.');
+      setIsLoading(false);
+      return;
+    }
 
-        // Fetch subject data
-        if (subject) {
-          const { data: subjectData, error: subjectError } = await supabase
-            .from('subjects')
-            .select('id, name, slug')
-            .eq('slug', subject)
-            .single();
-
-          if (subjectError) throw subjectError;
-          if (subjectData) setSubjectData(subjectData);
-        } // Fetch topic data
-        if (topic) {
-          logger.log('Fetching topic data for topic ID:', topic);
-          const { data: topicData, error: topicError } = await supabase
-            .from('topics')
-            .select('id, name, chapter_id')
-            .eq('id', topic)
-            .single();
-
-          logger.log('Topic query result:', { topicData, topicError });
-          if (topicError) throw topicError;
-          if (topicData) {
-            setTopicData({
-              id: topicData.id,
-              title: topicData.name, // Map name to title for compatibility
-              chapter_id: topicData.chapter_id,
-            });
-
-            // Fetch chapter data if we have a chapter_id
-            if (topicData.chapter_id) {
-              logger.log(
-                'Fetching chapter data for chapter ID:',
-                topicData.chapter_id
-              );
-              const { data: chapterData, error: chapterError } = await supabase
-                .from('chapters')
-                .select('id, name, form')
-                .eq('id', topicData.chapter_id)
-                .single();
-
-              logger.log('Chapter query result:', {
-                chapterData,
-                chapterError,
-              });
-              if (chapterError) throw chapterError;
-              if (chapterData) {
-                setChapterData({
-                  id: chapterData.id,
-                  title: chapterData.name, // Map name to title for compatibility
-                  form: chapterData.form,
-                });
-              }
-            } else {
-              logger.log(
-                'No chapter_id found for topic, chapter data will be null'
-              );
-            }
-          }
-        }
-      } catch (err) {
-        logger.error('Error fetching metadata:', err);
-        setError(
-          err instanceof Error ? err.message : 'Failed to load quiz context'
-        );
-      } finally {
+    let cancelled = false;
+    const timeout = setTimeout(() => {
+      if (!cancelled) {
+        setError('Unable to connect to the API. Please contact the administrator.');
         setIsLoading(false);
       }
-    };
+    }, 10000);
 
-    fetchMetadata();
-  }, [subject, topic]);
+    fetch(`/api/topics/${topic}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (cancelled) return;
+        if (data.error) throw new Error(data.error);
+        if (data.subject) setSubjectData({ id: data.subject.id, name: data.subject.name, slug: data.subject.slug });
+        if (data.topic) setTopicData({ id: data.topic.id, title: data.topic.name, chapter_id: data.topic.chapter_id });
+        if (data.chapter) setChapterData({ id: data.chapter.id, title: data.chapter.name, form: data.chapter.form });
+      })
+      .catch((err) => {
+        logger.error('Error fetching topic metadata:', err);
+        if (!cancelled) setError('Unable to connect to the API. Please contact the administrator.');
+      })
+      .finally(() => {
+        if (!cancelled) {
+          clearTimeout(timeout);
+          setIsLoading(false);
+        }
+      });
+
+    return () => { cancelled = true; clearTimeout(timeout); };
+  }, [topic]);
 
   const mutation = useMutation({
-    mutationFn: (data: QuizData) => createQuiz(data),
+    mutationFn: async (data: QuizData) => {
+      const res = await fetch('/api/quiz', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          topicId: topicData?.id,
+          name: data.name,
+          timeLimit: data.timeLimit ? data.timeLimit * 60 : undefined, // minutes → seconds
+          difficulty: data.difficulty || undefined,
+          isPublic: data.isPublic ?? false,
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'Failed to create quiz');
+      return json;
+    },
     onSuccess: (result) => {
-      if (result.success && result.quizId) {
-        // Show success notification
-        alert('Quiz created successfully! Now you can add questions.');
-        // Redirect to the question management page
-        router.push(`/quiz/${subject}/${topic}/${result.quizId}/questions`);
-      } else {
-        // Handle error case where quiz was created but no ID was returned
-        setError('Quiz created but unable to proceed to question creation');
-      }
+      router.push(`/quiz/${subject}/${topic}/${result.quizId}/questions`);
     },
     onError: (error) => {
       logger.error('Error creating quiz:', error);
-      setError(
-        error instanceof Error ? error.message : 'Failed to create quiz'
-      );
+      setError('Unable to connect to the API. Please contact the administrator.');
     },
   });
 
   const onSubmit = (data: QuizData) => {
-    // Validate that we have a valid topic ID
     if (!topicData?.id) {
-      setError(
-        'Cannot create a quiz: Invalid topic ID. Please select a valid topic.'
-      );
+      setError('Cannot create a quiz: topic not loaded yet.');
       return;
     }
-
-    // Add the subject and topic IDs to the form data
-    mutation.mutate({
-      ...data,
-      subject: subjectData?.id || subject,
-      topic: topicData.id, // Use the topic ID from our fetched data
-    });
+    mutation.mutate(data);
   };
 
   // Show loading state
@@ -241,7 +191,7 @@ export default function CreateQuizPage() {
         </div>
 
         <div className="mt-8 bg-gray-50 dark:bg-gray-800/50 border border-gray-700 dark:border-gray-200 rounded-lg p-5">
-          <h2 className="text-lg font-medium mb-3 text-black">
+          <h2 className="text-lg font-medium mb-3 text-gray-200 dark:text-gray-800">
             Tips for creating effective quizzes
           </h2>
           <ul className="space-y-2 text-sm text-gray-400 dark:text-gray-600">

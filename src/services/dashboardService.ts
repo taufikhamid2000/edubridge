@@ -38,7 +38,7 @@ export interface DashboardData {
  */
 export async function fetchDashboardData(): Promise<DashboardData> {
   try {
-    console.log('Client: Fetching dashboard data from API...');
+    logger.log('Client: Fetching dashboard data from API...');
     const response = await fetch('/api/dashboard', {
       method: 'GET',
       headers: {
@@ -47,7 +47,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
       credentials: 'include',
     });
 
-    console.log('Client: Dashboard API response status:', response.status);
+    logger.log('Client: Dashboard API response status:', response.status);
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
@@ -205,13 +205,13 @@ export async function getUserData(): Promise<DashboardUser | null> {
           );
           accessToken = authData?.access_token;
           userId = authData?.user?.id;
-          console.log('Found local auth data:', {
+          logger.log('Found local auth data:', {
             hasToken: !!accessToken,
             hasUserId: !!userId,
           });
         }
       } catch (e) {
-        console.warn('Error accessing localStorage:', e);
+        logger.warn('Error accessing localStorage:', e);
       }
     }
 
@@ -238,7 +238,7 @@ export async function getUserData(): Promise<DashboardUser | null> {
     const userData = await response.json();
     return userData.user;
   } catch (error) {
-    console.error('Error fetching user data:', error);
+    logger.error('Error fetching user data:', error);
     return null;
   }
 }

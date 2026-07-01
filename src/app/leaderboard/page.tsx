@@ -19,7 +19,7 @@ async function fetchLeaderboardData(
 ): Promise<LeaderboardResponse> {
   const response = await fetch(`/api/leaderboard?timeFrame=${timeFrame}`);
   if (!response.ok) {
-    throw new Error('Failed to fetch leaderboard data');
+    throw new Error('Unable to connect to the API. Please contact the administrator.');
   }
   return response.json();
 }
@@ -46,8 +46,7 @@ export default function LeaderboardPage() {
     setSubjectFilter(subjectId);
   };
 
-  const errorMessage =
-    error instanceof Error ? error.message : 'An unexpected error occurred';
+  const errorMessage = 'Unable to connect to the API. Please contact the administrator.';
   const lastUpdated = dataUpdatedAt ? new Date(dataUpdatedAt) : new Date();
 
   return (
@@ -93,7 +92,7 @@ export default function LeaderboardPage() {
             <p className="text-gray-400 dark:text-gray-600 mb-6 max-w-md mx-auto">
               {errorMessage.includes('No leaderboard data')
                 ? 'Complete quizzes to appear on the leaderboard and compete with other students!'
-                : 'There was a problem loading the leaderboard data. Please try again later.'}
+                : 'Unable to connect to the API. Please contact the administrator.'}
             </p>
             <button
               onClick={() => refetch()}

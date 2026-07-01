@@ -1,4 +1,5 @@
 'use client';
+import { logger } from '@/lib/logger';
 
 import { FC, useState, useEffect } from 'react';
 import { PathwayContribution, PathwayOptionDetail } from '../types';
@@ -11,7 +12,7 @@ const submitPathwayContribution = async (
 ): Promise<{ success: boolean; error?: string }> => {
   // This is a mock implementation that always succeeds
   // In a real implementation, this would make an API call
-  console.log('Submitting pathway contribution:', contribution);
+  logger.log('Submitting pathway contribution:', contribution);
 
   // Simulate API delay
   await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -69,7 +70,7 @@ const ContributionForm: FC<ContributionFormProps> = ({
         const { data, error } = await supabase.auth.getSession();
 
         if (error) {
-          console.error('Error checking auth status:', error);
+          logger.error('Error checking auth status:', error);
           setIsLoggedIn(false);
           return;
         }
@@ -103,7 +104,7 @@ const ContributionForm: FC<ContributionFormProps> = ({
           setUserName(null);
         }
       } catch (err) {
-        console.error('Error in authentication check:', err);
+        logger.error('Error in authentication check:', err);
         setIsLoggedIn(false);
       }
     }

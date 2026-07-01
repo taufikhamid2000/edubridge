@@ -40,7 +40,7 @@ interface DashboardResponse {
 
 export async function GET() {
   try {
-    console.log('Server: Dashboard API route called');
+    logger.log('Server: Dashboard API route called');
     logger.info('Dashboard API route called');
 
     // Get authenticated user (optional for dashboard)
@@ -48,7 +48,7 @@ export async function GET() {
 
     // Debug - Log all available cookies
     const allCookies = cookieStore.getAll();
-    console.log(
+    logger.log(
       'All available cookies:',
       allCookies.map((c) => c.name)
     );
@@ -56,7 +56,7 @@ export async function GET() {
     // Check for specific auth cookies
     const accessToken = cookieStore.get('sb-access-token')?.value;
     const refreshToken = cookieStore.get('sb-refresh-token')?.value;
-    console.log('Auth tokens present:', {
+    logger.log('Auth tokens present:', {
       hasAccessToken: !!accessToken,
       hasRefreshToken: !!refreshToken,
     });
@@ -68,7 +68,7 @@ export async function GET() {
         cookies: {
           get: (name) => {
             const cookie = cookieStore.get(name);
-            console.log(
+            logger.log(
               `Server: Cookie ${name}:`,
               cookie ? 'exists' : 'missing'
             );
@@ -90,23 +90,23 @@ export async function GET() {
       // Don't return error, continue without authentication
     } // Continue without requiring authentication
     const isAuthenticated = !!session?.user?.id;
-    console.log('Dashboard API - Authentication status:', {
+    logger.log('Dashboard API - Authentication status:', {
       isAuthenticated,
       userId: session?.user?.id,
       email: session?.user?.email,
     });
 
-    // Fetch data in parallel for optimal performance using materialized views
+    // Fetch data in parallel for optimal performance
     const [
       { data: subjectsData, error: subjectsError },
       { data: userData, error: userError },
       { data: userStatsData, error: userStatsError },
     ] = await Promise.all([
-      // Fetch subjects from materialized view for better performance
+      // Fetch subjects directly from the base table (avoids stale materialized view)
       supabase
-        .from('mv_dashboard_subject_stats')
+        .from('subjects')
         .select(
-          'id, name, slug, description, icon, category, category_priority, order_index, quiz_count, total_attempts, average_score'
+          'id, name, slug, description, icon, category, category_priority, order_index'
         )
         .order('category_priority', { ascending: true })
         .order('order_index', { ascending: true }),

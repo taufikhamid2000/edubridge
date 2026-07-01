@@ -108,7 +108,7 @@ export default function AdminAchievementsPage() {
 
   function handleDeleteAchievement(id: string) {
     // This would be implemented to delete an achievement
-    console.log('Delete achievement', id);
+    logger.log('Delete achievement', id);
   }
 
   // Filter achievements based on search term and type filter
@@ -397,7 +397,7 @@ export default function AdminAchievementsPage() {
           </div>
           <button
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600"
-            onClick={() => console.log('Create new achievement')}
+            onClick={() => logger.log('Create new achievement')}
           >
             Create New Achievement
           </button>

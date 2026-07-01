@@ -45,7 +45,7 @@ interface AnswerLike {
 // Helper to normalize questions that might have different structures
 function normalizeQuestions(questions: QuestionLike[]): Question[] {
   if (!Array.isArray(questions) || questions.length === 0) {
-    console.warn('No questions to normalize');
+    logger.warn('No questions to normalize');
     return [];
   }
 
@@ -114,6 +114,10 @@ export default function QuizPlayer({
   const [answers, setAnswers] = useState<Record<string, string[]>>({});
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [score, setScore] = useState(0);
+  const [questionResults, setQuestionResults] = useState<
+    | Array<{ questionId: string; correct: boolean; correctAnswerIds: string[] }>
+    | undefined
+  >(undefined);
   const [timeRemaining, setTimeRemaining] = useState(
     timeLimit ? timeLimit * 60 : 0
   );
@@ -123,7 +127,7 @@ export default function QuizPlayer({
   const router = useRouter();
   // Initialize shuffled questions when component mounts or questions change
   useEffect(() => {
-    console.log('QuizPlayer: questions prop changed', {
+    logger.log('QuizPlayer: questions prop changed', {
       questionsLength: questions.length,
       quizId: quizId,
       quizName: quizName,
@@ -132,7 +136,7 @@ export default function QuizPlayer({
 
     // Normalize questions to handle potential field name differences
     const normalizedQuestions = normalizeQuestions(questions);
-    console.log('QuizPlayer: normalized questions', {
+    logger.log('QuizPlayer: normalized questions', {
       normalizedCount: normalizedQuestions.length,
       firstNormalized:
         normalizedQuestions.length > 0
@@ -150,7 +154,7 @@ export default function QuizPlayer({
     );
 
     if (validQuestions.length !== normalizedQuestions.length) {
-      console.warn('QuizPlayer: Some questions are missing required fields', {
+      logger.warn('QuizPlayer: Some questions are missing required fields', {
         totalQuestions: normalizedQuestions.length,
         validQuestions: validQuestions.length,
         invalidQuestions: normalizedQuestions.filter(
@@ -165,7 +169,7 @@ export default function QuizPlayer({
 
     if (validQuestions.length > 0) {
       const shuffled = shuffleArray(validQuestions);
-      console.log('QuizPlayer: shuffling complete', {
+      logger.log('QuizPlayer: shuffling complete', {
         shuffledLength: shuffled.length,
         firstQuestion:
           shuffled.length > 0
@@ -184,7 +188,7 @@ export default function QuizPlayer({
         shuffledOrder: shuffled.map((q) => q.id.slice(-8)),
       });
     } else {
-      console.warn('QuizPlayer: No valid questions available to shuffle');
+      logger.warn('QuizPlayer: No valid questions available to shuffle');
     }
   }, [questions]);
   // Function to reset quiz state for retaking
@@ -193,6 +197,7 @@ export default function QuizPlayer({
     setAnswers({});
     setQuizCompleted(false);
     setScore(0);
+    setQuestionResults(undefined);
     setTimeRemaining(timeLimit ? timeLimit * 60 : 0);
     setQuizStarted(false);
     // Normalize and re-shuffle questions for a fresh experience on retake
@@ -232,7 +237,7 @@ export default function QuizPlayer({
 
     if (shuffledQuestions.length === 0 && questions.length > 0) {
       timeoutId = setTimeout(() => {
-        console.warn('QuizPlayer: Loading timeout reached');
+        logger.warn('QuizPlayer: Loading timeout reached');
         setLoadingTimeout(true);
       }, 10000); // 10 second timeout
     }
@@ -249,12 +254,12 @@ export default function QuizPlayer({
       questions.length > 0 &&
       shuffledQuestions.length === 0
     ) {
-      console.log('QuizPlayer: Forcing shuffle after timeout');
+      logger.log('QuizPlayer: Forcing shuffle after timeout');
       try {
         const forceShuffle = [...questions].sort(() => Math.random() - 0.5);
         setShuffledQuestions(forceShuffle);
       } catch (err) {
-        console.error('QuizPlayer: Force shuffle error', err);
+        logger.error('QuizPlayer: Force shuffle error', err);
       }
     }
   }, [loadingTimeout, questions, shuffledQuestions.length]);
@@ -301,6 +306,7 @@ export default function QuizPlayer({
       });
 
       setScore(typeof result?.score === 'number' ? result.score : 0);
+      setQuestionResults(result?.questions);
 
       if (onComplete) {
         onComplete();
@@ -399,6 +405,9 @@ export default function QuizPlayer({
         score={score}
         totalQuestions={shuffledQuestions.length}
         isVerified={isVerified}
+        perQuestion={questionResults}
+        questions={shuffledQuestions}
+        userAnswers={answers}
         onRetake={resetQuiz}
         onViewAll={() => {
           if (subject && topic) {
@@ -413,7 +422,7 @@ export default function QuizPlayer({
 
   // Don't render if shuffledQuestions is not ready
   if (shuffledQuestions.length === 0) {
-    console.log('QuizPlayer: In loading state', {
+    logger.log('QuizPlayer: In loading state', {
       shuffledQuestionsLength: shuffledQuestions.length,
       originalQuestionsLength: questions.length,
     });

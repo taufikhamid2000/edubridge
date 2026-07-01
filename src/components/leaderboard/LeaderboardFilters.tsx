@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import React, { useEffect } from 'react';
 // import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
@@ -27,7 +28,7 @@ export default function LeaderboardFilters({
           .order('name');
 
         if (error) {
-          console.error('Error fetching subjects:', error);
+          logger.error('Error fetching subjects:', error);
           return;
         }
 
@@ -36,7 +37,7 @@ export default function LeaderboardFilters({
         //   setSubjects(data as Subject[]);
         // }
       } catch (err) {
-        console.error('Failed to fetch subjects:', err);
+        logger.error('Failed to fetch subjects:', err);
       }
     }
 

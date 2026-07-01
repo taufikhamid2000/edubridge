@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 
@@ -25,7 +26,7 @@ export async function GET(request: NextRequest) {
     const { data: quizzes, error } = await query;
 
     if (error) {
-      console.error('Error fetching quizzes:', error);
+      logger.error('Error fetching quizzes:', error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     } // Process the data to count questions
     type Quiz = {
@@ -54,7 +55,7 @@ export async function GET(request: NextRequest) {
       };
     });
 
-    console.log(
+    logger.log(
       `Found ${formattedQuizzes.length} quizzes${topicId ? ' for topic ' + topicId : ''}`
     );
 
@@ -63,7 +64,7 @@ export async function GET(request: NextRequest) {
       quizzes: formattedQuizzes,
     });
   } catch (error) {
-    console.error('Unexpected error:', error);
+    logger.error('Unexpected error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

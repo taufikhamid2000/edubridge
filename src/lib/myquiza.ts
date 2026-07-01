@@ -8,6 +8,8 @@ export interface MyQuizaQuiz {
   name: string;
   verified: boolean;
   questionCount: number;
+  difficulty: string | null;
+  isPublic: boolean;
 }
 
 export interface QuizDetailOption {
@@ -29,7 +31,18 @@ export interface QuizDetail {
   topicId: string;
   name: string;
   verified: boolean;
+  timeLimit: number | null; // seconds; null -> client falls back to default
+  difficulty: string | null;
+  isPublic: boolean;
   questions: QuizDetailQuestion[];
+}
+
+export interface CreateQuizPayload {
+  topicId: string;
+  name: string;
+  timeLimit?: number;
+  difficulty?: string;
+  isPublic?: boolean;
 }
 
 export interface SubmitAttemptPayload {
@@ -47,6 +60,15 @@ export interface AttemptResult {
   totalQuestions: number;
   maxScore: number;
   xpAwarded: boolean;
+  // Per-question correctness, ordered by question orderIndex. Returned only in
+  // the attempt response (post-submission) — the answer key stays hidden on
+  // the quiz-detail endpoint. correctAnswerIds lists the option ids that were
+  // correct, for highlighting on the results screen.
+  questions?: Array<{
+    questionId: string;
+    correct: boolean;
+    correctAnswerIds: string[];
+  }>;
 }
 
 export interface TopicProgress {
@@ -90,6 +112,13 @@ async function myquizaFetch<T>(
 }
 
 // ---- Endpoints ----
+
+export function createQuiz(payload: CreateQuizPayload, token: string | null) {
+  return myquizaFetch<{ id: string }>('/api/v1/quizzes', token, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
 
 export function getTopicQuizzes(topicId: string) {
   return myquizaFetch<MyQuizaQuiz[]>(`/api/v1/topics/${topicId}/quizzes`, null);
