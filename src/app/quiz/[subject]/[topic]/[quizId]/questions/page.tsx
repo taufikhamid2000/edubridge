@@ -4,11 +4,9 @@ import React, { useState, useEffect } from 'react';
 import { logger } from '@/lib/logger';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { Quiz } from '@/types/topics';
 
 type QuestionType = 'radio' | 'checkbox';
 
-// Local interface for our form state (camelCase)
 interface QuestionAnswer {
   text: string;
   isCorrect: boolean;
@@ -21,6 +19,8 @@ interface QuestionFormData {
   tempId: string; // Used for UI management only
 }
 
+const API_MSG = 'Unable to connect to the API. Please contact the administrator.';
+
 export default function QuestionsManagementPage() {
   const router = useRouter();
   const params = useParams();
@@ -30,11 +30,12 @@ export default function QuestionsManagementPage() {
     quizId: string;
   };
 
-  const [quiz, setQuiz] = useState<Quiz | null>(null);
+  const [quizName, setQuizName] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [questions, setQuestions] = useState<QuestionFormData[]>([]);
+  const [existingQuestionIds, setExistingQuestionIds] = useState<string[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
 
   // Check if user is authenticated
@@ -44,71 +45,54 @@ export default function QuestionsManagementPage() {
         data: { session },
       } = await supabase.auth.getSession();
       if (!session) {
-        // Redirect to login page if not authenticated
         alert('You need to be logged in to create quiz questions.');
         router.push('/auth');
         return;
       }
 
-      // Store the user ID for later use
       setUserId(session.user.id);
     };
 
     checkAuth();
   }, [router]);
 
-  // Fetch quiz data on page load
+  // Fetch quiz + existing questions (author view, includes isCorrect)
   useEffect(() => {
     const fetchQuiz = async () => {
       try {
         setLoading(true);
-        const { data: quizData, error: quizError } = await supabase
-          .from('quizzes')
-          .select('*')
-          .eq('id', quizId)
-          .single();
+        const res = await fetch(`/api/quiz/${quizId}/author`);
+        const data = await res.json();
 
-        if (quizError)
-          throw new Error(`Failed to fetch quiz: ${quizError.message}`);
-        if (!quizData) throw new Error('Quiz not found');
+        if (!res.ok) throw new Error(data.error || API_MSG);
 
-        setQuiz(quizData);
+        setQuizName(data.name);
 
-        // Check if there are existing questions for this quiz
-        const { data: questionsData, error: questionsError } = await supabase
-          .from('questions')
-          .select('*, answers(*)')
-          .eq('quiz_id', quizId)
-          .order('order_index', { ascending: true });
-
-        if (questionsError)
-          throw new Error(
-            `Failed to fetch questions: ${questionsError.message}`
-          );
-
-        if (questionsData && questionsData.length > 0) {
-          // Map existing questions to form format
-          const formattedQuestions: QuestionFormData[] = questionsData.map(
-            (q) => ({
+        if (Array.isArray(data.questions) && data.questions.length > 0) {
+          const formattedQuestions: QuestionFormData[] = data.questions.map(
+            (q: {
+              id: string;
+              text: string;
+              type: QuestionType;
+              options: Array<{ text: string; isCorrect: boolean }>;
+            }) => ({
               text: q.text,
-              type: q.type as QuestionType,
-              answers: q.answers
-                ? q.answers.map((a: { text: string; is_correct: boolean }) => ({
-                    text: a.text,
-                    isCorrect: a.is_correct, // Map database is_correct to our form's isCorrect
-                  }))
-                : [],
+              type: q.type,
+              answers: q.options.map((o) => ({
+                text: o.text,
+                isCorrect: o.isCorrect,
+              })),
               tempId: q.id,
             })
           );
           setQuestions(formattedQuestions);
+          setExistingQuestionIds(data.questions.map((q: { id: string }) => q.id));
         } else {
-          // Start with one empty question
           addNewQuestion();
         }
       } catch (err) {
         logger.error('Error:', err);
-        setError(err instanceof Error ? err.message : 'An error occurred');
+        setError(API_MSG);
       } finally {
         setLoading(false);
       }
@@ -219,7 +203,6 @@ export default function QuestionsManagementPage() {
 
   const saveQuestions = async () => {
     try {
-      // Check if user is authenticated
       if (!userId) {
         setError(
           'You must be logged in to save questions. Please log in and try again.'
@@ -253,7 +236,6 @@ export default function QuestionsManagementPage() {
           }
         }
 
-        // Make sure at least one answer is marked as correct
         if (!question.answers.some((a) => a.isCorrect)) {
           setError(
             `Question ${index + 1} must have at least one correct answer`
@@ -263,63 +245,45 @@ export default function QuestionsManagementPage() {
         }
       }
 
-      // Delete any existing questions and answers first (if updating)
-      // This is a simpler approach than trying to merge
-      const { error: deleteError } = await supabase
-        .from('questions')
-        .delete()
-        .eq('quiz_id', quizId);
-      if (deleteError) {
-        logger.error('Error deleting existing questions:', deleteError);
-        throw new Error(
-          `Failed to delete existing questions: ${deleteError.message}`
-        );
+      // Replace-all strategy via MyQuiza CRUD: delete every existing question
+      // (cascades to its answers), then recreate all questions from the form.
+      for (const questionId of existingQuestionIds) {
+        const res = await fetch(`/api/questions/${questionId}`, {
+          method: 'DELETE',
+        });
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          throw new Error(data.error || API_MSG);
+        }
       }
 
-      // Save all questions
       for (let i = 0; i < questions.length; i++) {
         const question = questions[i];
-
-        // Insert question
-        const { data: questionData, error: questionError } = await supabase
-          .from('questions')
-          .insert([
-            {
-              quiz_id: quizId,
-              text: question.text,
-              type: question.type,
-              order_index: i,
-            },
-          ])
-          .select()
-          .single();
-
-        if (questionError)
-          throw new Error(`Failed to save question: ${questionError.message}`);
-
-        // Insert answers for this question
-        const answerRows = question.answers.map((a, aIndex) => ({
-          question_id: questionData.id,
-          text: a.text,
-          is_correct: a.isCorrect,
-          order_index: aIndex,
-        }));
-
-        const { error: answersError } = await supabase
-          .from('answers')
-          .insert(answerRows);
-
-        if (answersError)
-          throw new Error(`Failed to save answers: ${answersError.message}`);
+        const res = await fetch(`/api/quiz/${quizId}/questions`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            text: question.text,
+            type: question.type,
+            orderIndex: i,
+            answers: question.answers.map((a, aIndex) => ({
+              text: a.text,
+              isCorrect: a.isCorrect,
+              orderIndex: aIndex,
+            })),
+          }),
+        });
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          throw new Error(data.error || API_MSG);
+        }
       }
-
-      // Update quiz completion status if needed
 
       alert('Questions saved successfully!');
       router.push(`/quiz/${subject}/${topic}`);
     } catch (err) {
       logger.error('Error saving questions:', err);
-      setError(err instanceof Error ? err.message : 'Failed to save questions');
+      setError(err instanceof Error ? err.message : API_MSG);
     } finally {
       setSaving(false);
     }
@@ -357,7 +321,7 @@ export default function QuestionsManagementPage() {
         <div className="bg-gray-800 dark:bg-white rounded-lg shadow-md p-6">
           <div className="mb-6">
             <h1 className="text-2xl font-bold mb-2">
-              {quiz?.name}: Add Questions
+              {quizName}: Add Questions
             </h1>
             <p className="text-gray-400 dark:text-gray-600">
               Add questions and answers to your quiz

@@ -45,6 +45,52 @@ export interface CreateQuizPayload {
   isPublic?: boolean;
 }
 
+export interface UpdateQuizPayload {
+  name?: string;
+  difficulty?: string;
+  timeLimit?: number;
+  isPublic?: boolean;
+}
+
+// Author-only view of a quiz: same shape as QuizDetail but answer options
+// carry `isCorrect` (never exposed on the public quiz-detail endpoint).
+export interface QuizAuthorOption extends QuizDetailOption {
+  isCorrect: boolean;
+}
+
+export interface QuizAuthorQuestion extends Omit<QuizDetailQuestion, 'options'> {
+  options: QuizAuthorOption[];
+}
+
+export interface QuizAuthorDetail extends Omit<QuizDetail, 'questions'> {
+  questions: QuizAuthorQuestion[];
+}
+
+export interface CreateQuestionPayload {
+  text: string;
+  type: 'radio' | 'checkbox';
+  orderIndex: number;
+  answers: Array<{ text: string; isCorrect: boolean; orderIndex: number }>;
+}
+
+export interface UpdateQuestionPayload {
+  text?: string;
+  type?: 'radio' | 'checkbox';
+  orderIndex?: number;
+}
+
+export interface CreateAnswerPayload {
+  text: string;
+  isCorrect: boolean;
+  orderIndex: number;
+}
+
+export interface UpdateAnswerPayload {
+  text?: string;
+  isCorrect?: boolean;
+  orderIndex?: number;
+}
+
 export interface SubmitAttemptPayload {
   answers: Array<{
     questionId: string;
@@ -108,7 +154,9 @@ async function myquizaFetch<T>(
     throw new Error(`MyQuiza ${res.status}: ${path}`);
   }
 
-  return res.json() as Promise<T>;
+  // PATCH/DELETE may return 204 No Content or an empty body.
+  const text = await res.text();
+  return (text ? JSON.parse(text) : undefined) as T;
 }
 
 // ---- Endpoints ----
@@ -126,6 +174,80 @@ export function getTopicQuizzes(topicId: string) {
 
 export function getQuizDetail(quizId: string) {
   return myquizaFetch<QuizDetail>(`/api/v1/quizzes/${quizId}`, null);
+}
+
+// Author/moderator-only quiz view — includes isCorrect on every answer.
+// Use for the quiz editor; never expose this response to non-owners.
+export function getQuizAuthorDetail(quizId: string, token: string | null) {
+  return myquizaFetch<QuizAuthorDetail>(`/api/v1/quizzes/${quizId}/author`, token);
+}
+
+export function updateQuiz(
+  quizId: string,
+  payload: UpdateQuizPayload,
+  token: string | null
+) {
+  return myquizaFetch<QuizDetail>(`/api/v1/quizzes/${quizId}`, token, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  });
+}
+
+export function createQuestion(
+  quizId: string,
+  payload: CreateQuestionPayload,
+  token: string | null
+) {
+  return myquizaFetch<{ id: string }>(`/api/v1/quizzes/${quizId}/questions`, token, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+
+export function updateQuestion(
+  questionId: string,
+  payload: UpdateQuestionPayload,
+  token: string | null
+) {
+  return myquizaFetch<void>(`/api/v1/questions/${questionId}`, token, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  });
+}
+
+export function deleteQuestion(questionId: string, token: string | null) {
+  return myquizaFetch<void>(`/api/v1/questions/${questionId}`, token, {
+    method: 'DELETE',
+  });
+}
+
+export function createAnswer(
+  questionId: string,
+  payload: CreateAnswerPayload,
+  token: string | null
+) {
+  return myquizaFetch<{ id: string }>(
+    `/api/v1/questions/${questionId}/answers`,
+    token,
+    { method: 'POST', body: JSON.stringify(payload) }
+  );
+}
+
+export function updateAnswer(
+  answerId: string,
+  payload: UpdateAnswerPayload,
+  token: string | null
+) {
+  return myquizaFetch<void>(`/api/v1/answers/${answerId}`, token, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  });
+}
+
+export function deleteAnswer(answerId: string, token: string | null) {
+  return myquizaFetch<void>(`/api/v1/answers/${answerId}`, token, {
+    method: 'DELETE',
+  });
 }
 
 export function submitAttempt(
