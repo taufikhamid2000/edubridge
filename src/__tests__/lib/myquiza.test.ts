@@ -29,6 +29,7 @@ describe('MyQuiza API client (lib/myquiza)', () => {
       ok: true,
       status: 200,
       json: async () => body,
+      text: async () => JSON.stringify(body),
     });
 
   it('getTopicQuizzes hits the topic-quizzes path without an Authorization header', async () => {
@@ -112,7 +113,12 @@ describe('MyQuiza API client (lib/myquiza)', () => {
   });
 
   it('throws with the status and path on a non-ok response', async () => {
-    fetchMock.mockResolvedValue({ ok: false, status: 404, json: async () => ({}) });
+    fetchMock.mockResolvedValue({
+      ok: false,
+      status: 404,
+      json: async () => ({}),
+      text: async () => '{}',
+    });
 
     await expect(getQuizDetail('missing')).rejects.toThrow('MyQuiza 404');
   });
