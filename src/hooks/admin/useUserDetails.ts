@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
-import { UserDetail, QuizAttempt } from '@/components/admin/users/types';
+import { UserDetail, QuizAttempt, Achievement } from '@/components/admin/users/types';
 
 // Utility function to check if a table exists in the database
 async function checkTableExists(tableName: string): Promise<boolean> {
@@ -62,13 +62,18 @@ export function useUserDetails(userId: string) {
           logger.warn('Error fetching user role:', roleError);
         }
 
-        // Fetch achievements
-        const { data: achievements, error: achievementsError } = await supabase
-          .from('achievements')
-          .select('*')
-          .eq('user_id', userId);
-
-        if (achievementsError) {
+        // Fetch achievements (moderator-gated MyQuiza endpoint)
+        let achievements: Achievement[] = [];
+        try {
+          const achievementsRes = await fetch(
+            `/api/admin/users/${userId}/achievements`
+          );
+          if (achievementsRes.ok) {
+            achievements = await achievementsRes.json();
+          } else {
+            logger.warn('Error fetching achievements:', achievementsRes.status);
+          }
+        } catch (achievementsError) {
           logger.warn('Error fetching achievements:', achievementsError);
         } // Check if quiz_attempts table exists before querying
         const quizAttemptsExists = await checkTableExists('quiz_attempts');

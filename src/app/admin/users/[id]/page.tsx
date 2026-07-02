@@ -3,7 +3,6 @@
 import './config';
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
 import AdminNavigation from '@/components/admin/AdminNavigation';
 import Link from 'next/link';
@@ -90,29 +89,27 @@ export default function AdminUserDetailPage() {
         return;
       }
 
-      const newAchievement = {
-        user_id: userId,
-        title: formData.title,
-        description: formData.description || 'No description provided',
-        earned_at: formData.earned_at,
-        created_at: new Date().toISOString(),
-      };
+      const res = await fetch(`/api/admin/users/${userId}/achievements`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: formData.title,
+          description: formData.description || 'No description provided',
+        }),
+      });
 
-      // Insert the achievement into the database
-      const { data, error } = await supabase
-        .from('achievements')
-        .insert([newAchievement])
-        .select();
-
-      if (error) {
-        throw error;
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'Failed to award achievement');
       }
 
+      const newAchievement = await res.json();
+
       // Update local state
-      if (user && data) {
+      if (user) {
         setUser({
           ...user,
-          achievements: [...user.achievements, data[0] as Achievement],
+          achievements: [...user.achievements, newAchievement as Achievement],
         });
       }
 

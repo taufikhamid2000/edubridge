@@ -341,6 +341,54 @@ export function verifyQuiz(
   });
 }
 
+// Achievements are already-awarded rows, not a catalog — there is no
+// "browse all possible achievements" endpoint (see MyQuiza's Sprint B
+// item 1 note). title/description/icon are freeform, set at award time.
+export interface MyQuizaAchievement {
+  id: string;
+  achievementType: string;
+  title: string;
+  description: string;
+  icon: string;
+  progress: number | null;
+  maxProgress: number | null;
+  earnedAt: string;
+}
+
+export interface AwardAchievementPayload {
+  achievementType: string;
+  title: string;
+  description: string;
+  icon: string;
+  progress?: number;
+  maxProgress?: number;
+}
+
+export function getMyAchievements(token: string | null) {
+  return myquizaFetch<MyQuizaAchievement[]>('/api/v1/me/achievements', token);
+}
+
+// Moderator-only (viewing another user's achievements, not a public profile call).
+export function getUserAchievements(userId: string, token: string | null) {
+  return myquizaFetch<MyQuizaAchievement[]>(
+    `/api/v1/users/${userId}/achievements`,
+    token
+  );
+}
+
+// Moderator-only.
+export function awardAchievement(
+  userId: string,
+  payload: AwardAchievementPayload,
+  token: string | null
+) {
+  return myquizaFetch<MyQuizaAchievement>(
+    `/api/v1/users/${userId}/achievements`,
+    token,
+    { method: 'POST', body: JSON.stringify(payload) }
+  );
+}
+
 export function submitAttempt(
   quizId: string,
   payload: SubmitAttemptPayload,
