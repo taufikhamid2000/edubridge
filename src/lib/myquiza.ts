@@ -122,6 +122,29 @@ export interface UpdateMePayload {
   avatarUrl?: string;
 }
 
+// Audit comments: identical shape on quizzes/questions/answers, per MyQuiza.
+export type AuditEntityType = 'quizzes' | 'questions' | 'answers';
+
+export interface MyQuizaAuditComment {
+  id: string;
+  commentText: string;
+  commentType: 'suggestion' | 'issue' | 'approved' | 'rejected';
+  isResolved: boolean;
+  createdAt: string;
+}
+
+export interface CreateAuditCommentPayload {
+  commentText: string;
+  commentType: 'suggestion' | 'issue' | 'approved' | 'rejected';
+}
+
+export interface MyQuizaVerificationLogEntry {
+  id: string;
+  action: 'verified' | 'unverified';
+  reason: string | null;
+  createdAt: string;
+}
+
 export interface TopicProgress {
   topicId: string | null;
   status: string | null;
@@ -253,6 +276,51 @@ export function deleteAnswer(answerId: string, token: string | null) {
   return myquizaFetch<void>(`/api/v1/answers/${answerId}`, token, {
     method: 'DELETE',
   });
+}
+
+export function getAuditComments(
+  entity: AuditEntityType,
+  entityId: string,
+  token: string | null
+) {
+  return myquizaFetch<MyQuizaAuditComment[]>(
+    `/api/v1/${entity}/${entityId}/comments`,
+    token
+  );
+}
+
+export function addAuditComment(
+  entity: AuditEntityType,
+  entityId: string,
+  payload: CreateAuditCommentPayload,
+  token: string | null
+) {
+  return myquizaFetch<MyQuizaAuditComment>(
+    `/api/v1/${entity}/${entityId}/comments`,
+    token,
+    { method: 'POST', body: JSON.stringify(payload) }
+  );
+}
+
+export function resolveAuditComment(
+  entity: AuditEntityType,
+  entityId: string,
+  commentId: string,
+  isResolved: boolean,
+  token: string | null
+) {
+  return myquizaFetch<MyQuizaAuditComment>(
+    `/api/v1/${entity}/${entityId}/comments/${commentId}`,
+    token,
+    { method: 'PATCH', body: JSON.stringify({ isResolved }) }
+  );
+}
+
+export function getQuizVerificationLog(quizId: string, token: string | null) {
+  return myquizaFetch<MyQuizaVerificationLogEntry[]>(
+    `/api/v1/quizzes/${quizId}/verification-log`,
+    token
+  );
 }
 
 export function submitAttempt(

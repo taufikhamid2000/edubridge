@@ -1,4 +1,19 @@
-// Audit service for quiz verification system
+// Audit service for quiz verification system.
+//
+// Comments (quiz/question/answer) and the verification log now come from
+// MyQuiza (Sprint A item 3), proxied through /api/quiz/[quizId]/comments,
+// /api/questions/[id]/comments, /api/answers/[id]/comments, and
+// /api/quiz/[quizId]/verification-log. Responses are mapped into the
+// existing snake_case shapes below so the consuming pages didn't need to
+// change. MyQuiza's comment response has no author/admin_user info, so
+// admin_user_id/admin_user are left blank/undefined on the mapped result.
+//
+// updateQuizVerification/getQuizzesNeedingReview/getAuditDashboardStats
+// are NOT migrated: the verify/unverify action's exact request contract
+// wasn't given in MyQuiza's Sprint A item 3 message (only its side effect
+// on the log was described), and the dashboard stats need an aggregate
+// endpoint across all quizzes that MyQuiza hasn't exposed — both still
+// read/write Supabase directly.
 import { supabase } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
 import {
@@ -11,6 +26,37 @@ import {
   QuizWithAudit,
   AuditDashboardStats,
 } from '@/types/audit';
+import { MyQuizaAuditComment, MyQuizaVerificationLogEntry } from '@/lib/myquiza';
+
+async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
+  const res = await fetch(url, options);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || `Request failed: ${res.status}`);
+  return data as T;
+}
+
+function mapComment<
+  T extends {
+    id: string;
+    comment_text: string;
+    comment_type: 'suggestion' | 'issue' | 'approved' | 'rejected';
+    is_resolved: boolean;
+    created_at: string;
+    updated_at: string;
+    admin_user_id: string;
+  },
+>(c: MyQuizaAuditComment, parentField: Extract<keyof T, string>, parentId: string): T {
+  return {
+    id: c.id,
+    [parentField]: parentId,
+    admin_user_id: '',
+    comment_text: c.commentText,
+    comment_type: c.commentType,
+    is_resolved: c.isResolved,
+    created_at: c.createdAt,
+    updated_at: c.createdAt,
+  } as unknown as T;
+}
 
 /**
  * Get audit comments for a quiz
@@ -19,14 +65,10 @@ export async function getQuizAuditComments(
   quizId: string
 ): Promise<QuizAuditComment[]> {
   try {
-    const { data, error } = await supabase
-      .from('quiz_audit_comments')
-      .select('*')
-      .eq('quiz_id', quizId)
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
-    return data || [];
+    const comments = await fetchJson<MyQuizaAuditComment[]>(
+      `/api/quiz/${quizId}/comments`
+    );
+    return comments.map((c) => mapComment<QuizAuditComment>(c, 'quiz_id', quizId));
   } catch (error) {
     logger.error('Error fetching quiz audit comments:', error);
     return [];
@@ -40,14 +82,12 @@ export async function getQuestionAuditComments(
   questionId: string
 ): Promise<QuestionAuditComment[]> {
   try {
-    const { data, error } = await supabase
-      .from('question_audit_comments')
-      .select('*')
-      .eq('question_id', questionId)
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
-    return data || [];
+    const comments = await fetchJson<MyQuizaAuditComment[]>(
+      `/api/questions/${questionId}/comments`
+    );
+    return comments.map((c) =>
+      mapComment<QuestionAuditComment>(c, 'question_id', questionId)
+    );
   } catch (error) {
     logger.error('Error fetching question audit comments:', error);
     return [];
@@ -61,14 +101,12 @@ export async function getAnswerAuditComments(
   answerId: string
 ): Promise<AnswerAuditComment[]> {
   try {
-    const { data, error } = await supabase
-      .from('answer_audit_comments')
-      .select('*')
-      .eq('answer_id', answerId)
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
-    return data || [];
+    const comments = await fetchJson<MyQuizaAuditComment[]>(
+      `/api/answers/${answerId}/comments`
+    );
+    return comments.map((c) =>
+      mapComment<AnswerAuditComment>(c, 'answer_id', answerId)
+    );
   } catch (error) {
     logger.error('Error fetching answer audit comments:', error);
     return [];
@@ -83,20 +121,14 @@ export async function addQuizAuditComment(
   commentInput: AuditCommentInput
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const { data: session, error: sessionError } =
-      await supabase.auth.getSession();
-    if (sessionError || !session.session?.user) {
-      return { success: false, error: 'Authentication required' };
-    }
-
-    const { error } = await supabase.from('quiz_audit_comments').insert({
-      quiz_id: quizId,
-      admin_user_id: session.session.user.id,
-      comment_text: commentInput.comment_text,
-      comment_type: commentInput.comment_type,
+    await fetchJson(`/api/quiz/${quizId}/comments`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        commentText: commentInput.comment_text,
+        commentType: commentInput.comment_type,
+      }),
     });
-
-    if (error) throw error;
     return { success: true };
   } catch (error) {
     logger.error('Error adding quiz audit comment:', error);
@@ -115,20 +147,14 @@ export async function addQuestionAuditComment(
   commentInput: AuditCommentInput
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const { data: session, error: sessionError } =
-      await supabase.auth.getSession();
-    if (sessionError || !session.session?.user) {
-      return { success: false, error: 'Authentication required' };
-    }
-
-    const { error } = await supabase.from('question_audit_comments').insert({
-      question_id: questionId,
-      admin_user_id: session.session.user.id,
-      comment_text: commentInput.comment_text,
-      comment_type: commentInput.comment_type,
+    await fetchJson(`/api/questions/${questionId}/comments`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        commentText: commentInput.comment_text,
+        commentType: commentInput.comment_type,
+      }),
     });
-
-    if (error) throw error;
     return { success: true };
   } catch (error) {
     logger.error('Error adding question audit comment:', error);
@@ -147,20 +173,14 @@ export async function addAnswerAuditComment(
   commentInput: AuditCommentInput
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const { data: session, error: sessionError } =
-      await supabase.auth.getSession();
-    if (sessionError || !session.session?.user) {
-      return { success: false, error: 'Authentication required' };
-    }
-
-    const { error } = await supabase.from('answer_audit_comments').insert({
-      answer_id: answerId,
-      admin_user_id: session.session.user.id,
-      comment_text: commentInput.comment_text,
-      comment_type: commentInput.comment_type,
+    await fetchJson(`/api/answers/${answerId}/comments`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        commentText: commentInput.comment_text,
+        commentType: commentInput.comment_type,
+      }),
     });
-
-    if (error) throw error;
     return { success: true };
   } catch (error) {
     logger.error('Error adding answer audit comment:', error);
@@ -172,20 +192,28 @@ export async function addAnswerAuditComment(
 }
 
 /**
- * Resolve an audit comment
+ * Resolve an audit comment. Unlike the old Supabase version (update by
+ * comment id alone), MyQuiza scopes comments under their parent entity, so
+ * the parent id is now required too.
  */
 export async function resolveAuditComment(
+  entityId: string,
   commentId: string,
   commentType: 'quiz' | 'question' | 'answer'
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const table = `${commentType}_audit_comments`;
-    const { error } = await supabase
-      .from(table)
-      .update({ is_resolved: true })
-      .eq('id', commentId);
+    const base =
+      commentType === 'quiz'
+        ? `/api/quiz/${entityId}`
+        : commentType === 'question'
+          ? `/api/questions/${entityId}`
+          : `/api/answers/${entityId}`;
 
-    if (error) throw error;
+    await fetchJson(`${base}/comments/${commentId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ isResolved: true }),
+    });
     return { success: true };
   } catch (error) {
     logger.error('Error resolving audit comment:', error);
@@ -260,14 +288,17 @@ export async function getQuizVerificationHistory(
   quizId: string
 ): Promise<QuizVerificationLog[]> {
   try {
-    const { data, error } = await supabase
-      .from('quiz_verification_log')
-      .select('*')
-      .eq('quiz_id', quizId)
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
-    return data || [];
+    const log = await fetchJson<MyQuizaVerificationLogEntry[]>(
+      `/api/quiz/${quizId}/verification-log`
+    );
+    return log.map((entry) => ({
+      id: entry.id,
+      quiz_id: quizId,
+      admin_user_id: '',
+      action: entry.action,
+      reason: entry.reason ?? undefined,
+      created_at: entry.createdAt,
+    }));
   } catch (error) {
     logger.error('Error fetching quiz verification history:', error);
     return [];
