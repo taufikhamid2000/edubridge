@@ -165,7 +165,12 @@ export async function fetchUserProfile(): Promise<{
 }
 
 /**
- * Updates user profile data
+ * Updates user profile data.
+ *
+ * display_name/avatar_url go through MyQuiza (PATCH /api/v1/me) — MyQuiza is
+ * now the source of truth for those fields. school_id/is_school_visible are
+ * not yet covered by that endpoint (Schools domain isn't migrated), so they
+ * still write directly to Supabase.
  */
 export async function updateUserProfile(profileData: {
   display_name?: string;
@@ -174,7 +179,6 @@ export async function updateUserProfile(profileData: {
   is_school_visible?: boolean;
 }): Promise<{ success: boolean; error: Error | null }> {
   try {
-    // Get current user
     const { data: sessionData } = await supabase.auth.getSession();
     const currentUserId = sessionData?.session?.user?.id;
 
@@ -185,21 +189,45 @@ export async function updateUserProfile(profileData: {
       };
     }
 
-    // Update profile data
-    const { error } = await supabase
-      .from('user_profiles')
-      .update({
-        display_name: profileData.display_name,
-        avatar_url: profileData.avatar_url,
-        school_id: profileData.school_id,
-        is_school_visible: profileData.is_school_visible,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', currentUserId);
+    if (
+      profileData.display_name !== undefined ||
+      profileData.avatar_url !== undefined
+    ) {
+      const res = await fetch('/api/me', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          displayName: profileData.display_name,
+          avatarUrl: profileData.avatar_url,
+        }),
+      });
 
-    if (error) {
-      logger.error('Error updating user profile:', error);
-      return { success: false, error };
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        return {
+          success: false,
+          error: new Error(data.error || 'Failed to update profile'),
+        };
+      }
+    }
+
+    if (
+      profileData.school_id !== undefined ||
+      profileData.is_school_visible !== undefined
+    ) {
+      const { error } = await supabase
+        .from('user_profiles')
+        .update({
+          school_id: profileData.school_id,
+          is_school_visible: profileData.is_school_visible,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', currentUserId);
+
+      if (error) {
+        logger.error('Error updating school fields:', error);
+        return { success: false, error };
+      }
     }
 
     return { success: true, error: null };

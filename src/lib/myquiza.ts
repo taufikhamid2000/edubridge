@@ -117,6 +117,11 @@ export interface AttemptResult {
   }>;
 }
 
+export interface UpdateMePayload {
+  displayName?: string;
+  avatarUrl?: string;
+}
+
 export interface TopicProgress {
   topicId: string | null;
   status: string | null;
@@ -263,6 +268,15 @@ export function submitAttempt(
 
 export function getMyProgress(token: string | null) {
   return myquizaFetch<TopicProgress[]>('/api/v1/me/progress', token);
+}
+
+// displayName/avatarUrl only — schoolRole is deliberately not editable here
+// (privilege-escalation risk: schoolRole drives Moderator/Admin authorization).
+export function updateMe(payload: UpdateMePayload, token: string | null) {
+  return myquizaFetch<{ id: string }>('/api/v1/me', token, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  });
 }
 
 export function getLeaderboard(
