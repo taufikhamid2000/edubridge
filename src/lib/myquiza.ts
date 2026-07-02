@@ -323,6 +323,24 @@ export function getQuizVerificationLog(quizId: string, token: string | null) {
   );
 }
 
+export interface VerifyQuizPayload {
+  verified: boolean;
+  feedback?: string;
+}
+
+// 204 No Content on success — auto-inserts the verification-log entry
+// server-side (no separate write endpoint for the log by design).
+export function verifyQuiz(
+  quizId: string,
+  payload: VerifyQuizPayload,
+  token: string | null
+) {
+  return myquizaFetch<void>(`/api/v1/quizzes/${quizId}/verify`, token, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+
 export function submitAttempt(
   quizId: string,
   payload: SubmitAttemptPayload,

@@ -1,19 +1,18 @@
 // Audit service for quiz verification system.
 //
-// Comments (quiz/question/answer) and the verification log now come from
-// MyQuiza (Sprint A item 3), proxied through /api/quiz/[quizId]/comments,
-// /api/questions/[id]/comments, /api/answers/[id]/comments, and
-// /api/quiz/[quizId]/verification-log. Responses are mapped into the
-// existing snake_case shapes below so the consuming pages didn't need to
-// change. MyQuiza's comment response has no author/admin_user info, so
+// Comments (quiz/question/answer), the verification log, and the verify/
+// unverify action itself all come from MyQuiza now (Sprint A item 3),
+// proxied through /api/quiz/[quizId]/comments, /api/questions/[id]/comments,
+// /api/answers/[id]/comments, /api/quiz/[quizId]/verification-log, and
+// /api/quiz/[quizId]/verify. Responses are mapped into the existing
+// snake_case shapes below so the consuming pages didn't need to change.
+// MyQuiza's comment response has no author/admin_user info, so
 // admin_user_id/admin_user are left blank/undefined on the mapped result.
 //
-// updateQuizVerification/getQuizzesNeedingReview/getAuditDashboardStats
-// are NOT migrated: the verify/unverify action's exact request contract
-// wasn't given in MyQuiza's Sprint A item 3 message (only its side effect
-// on the log was described), and the dashboard stats need an aggregate
-// endpoint across all quizzes that MyQuiza hasn't exposed — both still
-// read/write Supabase directly.
+// getQuizzesNeedingReview/getAuditDashboardStats are NOT migrated: the
+// dashboard stats need an aggregate endpoint across all quizzes that
+// MyQuiza hasn't exposed (their comment/log/verify endpoints are all
+// scoped to one quiz at a time) — these still read Supabase directly.
 import { supabase } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
 import {
@@ -225,46 +224,29 @@ export async function resolveAuditComment(
 }
 
 /**
- * Verify or unverify a quiz
+ * Verify or unverify a quiz via MyQuiza's POST /api/v1/quizzes/{id}/verify.
+ * That endpoint takes a single `verified` boolean (no separate action enum) —
+ * 'reject' is our own client-side composition: unverify + a 'rejected'
+ * comment, same as before the migration.
  */
 export async function updateQuizVerification(
   quizId: string,
   action: VerificationAction
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const { data: session, error: sessionError } =
-      await supabase.auth.getSession();
-    if (sessionError || !session.session?.user) {
-      return { success: false, error: 'Authentication required' };
-    }
+    const verified = action.action === 'verify';
+    const feedback =
+      action.action === 'reject'
+        ? action.reason || 'Quiz rejected'
+        : action.reason || undefined;
 
-    if (action.action === 'verify') {
-      const { error } = await supabase.rpc('verify_quiz', {
-        quiz_id_param: quizId,
-        admin_user_id_param: session.session.user.id,
-        reason_param: action.reason || null,
-      });
+    await fetchJson(`/api/quiz/${quizId}/verify`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ verified, feedback }),
+    });
 
-      if (error) throw error;
-    } else if (action.action === 'unverify') {
-      const { error } = await supabase.rpc('unverify_quiz', {
-        quiz_id_param: quizId,
-        admin_user_id_param: session.session.user.id,
-        reason_param: action.reason || null,
-      });
-
-      if (error) throw error;
-    } else if (action.action === 'reject') {
-      // For rejection, we unverify and add a rejection comment
-      const { error: unverifyError } = await supabase.rpc('unverify_quiz', {
-        quiz_id_param: quizId,
-        admin_user_id_param: session.session.user.id,
-        reason_param: action.reason || 'Quiz rejected',
-      });
-
-      if (unverifyError) throw unverifyError;
-
-      // Add rejection comment
+    if (action.action === 'reject') {
       await addQuizAuditComment(quizId, {
         comment_text: action.reason || 'Quiz rejected by admin',
         comment_type: 'rejected',
