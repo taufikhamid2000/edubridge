@@ -19,7 +19,9 @@ import OverviewTab from '@/components/admin/users/tabs/OverviewTab';
 import AchievementsTab from '@/components/admin/users/tabs/AchievementsTab';
 import QuizHistoryTab from '@/components/admin/users/tabs/QuizHistoryTab';
 import ActivityLogTab from '@/components/admin/users/tabs/ActivityLogTab';
-import AwardAchievementModal from '@/components/admin/users/modals/AwardAchievementModal';
+import AwardAchievementModal, {
+  AwardFormData,
+} from '@/components/admin/users/modals/AwardAchievementModal';
 
 // Import types
 import { Achievement } from '@/components/admin/users/types';
@@ -78,24 +80,12 @@ export default function AdminUserDetailPage() {
   }
 
   // Handle achievement awards
-  async function handleAwardAchievement(formData: {
-    title: string;
-    description: string;
-    earned_at: string;
-  }) {
+  async function handleAwardAchievement(formData: AwardFormData) {
     try {
-      if (!formData.title) {
-        alert('Please enter an achievement title');
-        return;
-      }
-
       const res = await fetch(`/api/admin/users/${userId}/achievements`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: formData.title,
-          description: formData.description || 'No description provided',
-        }),
+        body: JSON.stringify(formData),
       });
 
       if (!res.ok) {

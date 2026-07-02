@@ -3,6 +3,7 @@ import { logger } from '@/lib/logger';
 import {
   getUserAchievements,
   awardAchievement,
+  AwardAchievementPayload,
   MyQuizaAchievement,
 } from '@/lib/myquiza';
 import { getSessionToken } from '@/lib/serverSession';
@@ -54,11 +55,34 @@ export async function POST(
   try {
     const { userId } = await params;
     const body = await request.json();
-    const { achievementType, title, description, icon, progress, maxProgress } =
-      body;
+    const {
+      achievementId,
+      achievementType,
+      title,
+      description,
+      icon,
+      progress,
+      maxProgress,
+    } = body;
 
-    if (!title) {
-      return NextResponse.json({ error: 'title is required' }, { status: 400 });
+    let payload: AwardAchievementPayload;
+    if (achievementId) {
+      payload = { achievementId, progress, maxProgress };
+    } else {
+      if (!title) {
+        return NextResponse.json(
+          { error: 'title is required for a freeform award' },
+          { status: 400 }
+        );
+      }
+      payload = {
+        achievementType: achievementType || 'manual',
+        title,
+        description: description || '',
+        icon: icon || '🏆',
+        progress,
+        maxProgress,
+      };
     }
 
     const token = await getSessionToken();
@@ -66,18 +90,7 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const achievement = await awardAchievement(
-      userId,
-      {
-        achievementType: achievementType || 'manual',
-        title,
-        description: description || '',
-        icon: icon || '🏆',
-        progress,
-        maxProgress,
-      },
-      token
-    );
+    const achievement = await awardAchievement(userId, payload, token);
     return NextResponse.json(mapAchievement(achievement, userId));
   } catch (error) {
     logger.error('Error awarding achievement:', error);

@@ -3,9 +3,7 @@
 import './config';
 
 import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
-import Image from 'next/image';
 import {
   AdminLayout,
   SearchBar,
@@ -18,56 +16,55 @@ import {
   type SortDirection,
 } from '@/components/admin/ui';
 
-interface AchievementRequirement {
-  count?: number;
-  subject_id?: string;
-  streak_days?: number;
-  score_percentage?: number;
-  quiz_count?: number;
-}
-
-interface Achievement {
+interface CatalogAchievement {
   id: string;
-  achievement_type: string;
+  achievementType: string;
   title: string;
   description: string;
-  icon_url: string | null;
-  xp_reward: number;
-  requirements: Record<string, AchievementRequirement>;
-  created_at: string;
+  icon: string;
+  maxProgress: number | null;
 }
 
-// Type filter options
-type TypeFilterOption = 'all' | 'quiz' | 'streak' | 'subject' | 'score';
-type SortOption = 'title' | 'type' | 'xp' | 'created';
+type FormData = {
+  achievementType: string;
+  title: string;
+  description: string;
+  icon: string;
+  maxProgress: string; // kept as string for the number input, parsed on submit
+};
+
+const emptyForm: FormData = {
+  achievementType: '',
+  title: '',
+  description: '',
+  icon: '🏆',
+  maxProgress: '',
+};
+
+type SortOption = 'title' | 'type';
 
 export default function AdminAchievementsPage() {
-  const [achievements, setAchievements] = useState<Achievement[]>([]);
+  const [achievements, setAchievements] = useState<CatalogAchievement[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  // Filtering and sorting state
-  const [typeFilter, setTypeFilter] = useState<TypeFilterOption>('all');
+  const [typeFilter, setTypeFilter] = useState('all');
   const [sortBy, setSortBy] = useState<SortOption>('title');
-  const [sortDirection, setSortDirection] = useState<SortDirection>('asc'); // Modal state - will be used in future implementation
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_showEditModal, setShowEditModal] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_currentAchievement, setCurrentAchievement] =
-    useState<Achievement | null>(null);
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
-  // Clear success message after 5 seconds
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [formData, setFormData] = useState<FormData>(emptyForm);
+  const [saving, setSaving] = useState(false);
+
   useEffect(() => {
     if (successMessage) {
-      const timer = setTimeout(() => {
-        setSuccessMessage(null);
-      }, 5000);
+      const timer = setTimeout(() => setSuccessMessage(null), 5000);
       return () => clearTimeout(timer);
     }
   }, [successMessage]);
@@ -80,96 +77,116 @@ export default function AdminAchievementsPage() {
     try {
       setLoading(true);
       setError(null);
-
-      const { data, error } = await supabase
-        .from('achievements')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        throw error;
-      }
-
-      setAchievements(data || []);
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      logger.error('Error fetching achievements:', error);
-      setError(errorMessage);
+      const res = await fetch('/api/achievements');
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to fetch achievements');
+      setAchievements(data);
+    } catch (err) {
+      logger.error('Error fetching achievement catalog:', err);
+      setError('Unable to connect to the API. Please contact the administrator.');
     } finally {
       setLoading(false);
     }
   }
 
-  function handleEditAchievement(achievement: Achievement) {
-    setCurrentAchievement(achievement);
-    setShowEditModal(true);
+  function openCreateForm() {
+    setEditingId(null);
+    setFormData(emptyForm);
+    setIsFormOpen(true);
   }
 
-  function handleDeleteAchievement(id: string) {
-    // This would be implemented to delete an achievement
-    logger.log('Delete achievement', id);
+  function openEditForm(achievement: CatalogAchievement) {
+    setEditingId(achievement.id);
+    setFormData({
+      achievementType: achievement.achievementType,
+      title: achievement.title,
+      description: achievement.description,
+      icon: achievement.icon,
+      maxProgress: achievement.maxProgress?.toString() ?? '',
+    });
+    setIsFormOpen(true);
   }
 
-  // Filter achievements based on search term and type filter
+  async function handleSubmit() {
+    if (!formData.achievementType.trim() || !formData.title.trim()) {
+      setError('Type and title are required');
+      return;
+    }
+
+    try {
+      setSaving(true);
+      setError(null);
+
+      const payload = {
+        achievementType: formData.achievementType.trim(),
+        title: formData.title.trim(),
+        description: formData.description.trim(),
+        icon: formData.icon.trim() || '🏆',
+        maxProgress: formData.maxProgress ? Number(formData.maxProgress) : undefined,
+      };
+
+      const res = editingId
+        ? await fetch(`/api/achievements/${editingId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          })
+        : await fetch('/api/achievements', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'Failed to save achievement');
+      }
+
+      setSuccessMessage(editingId ? 'Achievement updated' : 'Achievement created');
+      setIsFormOpen(false);
+      await fetchAchievements();
+    } catch (err) {
+      logger.error('Error saving catalog achievement:', err);
+      setError(err instanceof Error ? err.message : 'Failed to save achievement');
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleDelete(id: string) {
+    if (!confirm('Delete this achievement from the catalog?')) return;
+
+    try {
+      const res = await fetch(`/api/achievements/${id}`, { method: 'DELETE' });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'Failed to delete achievement');
+      }
+      setSuccessMessage('Achievement deleted');
+      setAchievements((prev) => prev.filter((a) => a.id !== id));
+    } catch (err) {
+      logger.error('Error deleting catalog achievement:', err);
+      setError(err instanceof Error ? err.message : 'Failed to delete achievement');
+    }
+  }
+
   const filteredAchievements = achievements.filter((achievement) => {
-    // Apply search filter
     const matchesSearch =
       achievement.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       achievement.description.toLowerCase().includes(searchTerm.toLowerCase());
-
-    // Apply type filter
     const matchesType =
-      typeFilter === 'all' ||
-      (typeFilter === 'quiz' &&
-        achievement.achievement_type.includes('quiz')) ||
-      (typeFilter === 'streak' &&
-        achievement.achievement_type.includes('streak')) ||
-      (typeFilter === 'subject' &&
-        achievement.achievement_type.includes('subject')) ||
-      (typeFilter === 'score' &&
-        achievement.achievement_type.includes('score'));
-
+      typeFilter === 'all' || achievement.achievementType === typeFilter;
     return matchesSearch && matchesType;
   });
 
-  // Sort the filtered achievements
   const sortedAchievements = [...filteredAchievements].sort((a, b) => {
-    let compareA: string | number = '';
-    let compareB: string | number = '';
-
-    switch (sortBy) {
-      case 'title':
-        compareA = a.title;
-        compareB = b.title;
-        break;
-      case 'type':
-        compareA = a.achievement_type;
-        compareB = b.achievement_type;
-        break;
-      case 'xp':
-        compareA = a.xp_reward;
-        compareB = b.xp_reward;
-        break;
-      case 'created':
-        compareA = new Date(a.created_at).getTime();
-        compareB = new Date(b.created_at).getTime();
-        break;
-    }
-
-    // Compare based on direction
-    if (typeof compareA === 'string' && typeof compareB === 'string') {
-      return sortDirection === 'asc'
-        ? compareA.localeCompare(compareB)
-        : compareB.localeCompare(compareA);
-    } else {
-      return sortDirection === 'asc'
-        ? Number(compareA) - Number(compareB)
-        : Number(compareB) - Number(compareA);
-    }
+    const compareA = sortBy === 'title' ? a.title : a.achievementType;
+    const compareB = sortBy === 'title' ? b.title : b.achievementType;
+    return sortDirection === 'asc'
+      ? compareA.localeCompare(compareB)
+      : compareB.localeCompare(compareA);
   });
 
-  // Pagination logic
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentAchievements = sortedAchievements.slice(
@@ -178,41 +195,19 @@ export default function AdminAchievementsPage() {
   );
   const totalPages = Math.ceil(sortedAchievements.length / itemsPerPage);
 
-  // Define columns for the data table
-  const columns: Column<Achievement>[] = [
+  const achievementTypes = [
+    'all',
+    ...new Set(achievements.map((a) => a.achievementType)),
+  ];
+
+  const columns: Column<CatalogAchievement>[] = [
     {
       key: 'achievement',
       header: 'Achievement',
       render: (achievement) => (
         <div className="flex items-center">
-          <div className="flex-shrink-0 h-10 w-10">
-            {achievement.icon_url ? (
-              <Image
-                className="h-10 w-10 rounded-full object-cover"
-                src={achievement.icon_url}
-                alt={achievement.title}
-                width={40}
-                height={40}
-                unoptimized={achievement.icon_url.startsWith('data:')}
-              />
-            ) : (
-              <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6 text-blue-500"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
-                  />
-                </svg>
-              </div>
-            )}
+          <div className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-xl">
+            {achievement.icon}
           </div>
           <div className="ml-4">
             <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
@@ -230,72 +225,30 @@ export default function AdminAchievementsPage() {
       header: 'Type',
       render: (achievement) => (
         <span className="text-sm text-gray-400 dark:text-gray-500">
-          {achievement.achievement_type}
+          {achievement.achievementType}
         </span>
       ),
     },
     {
-      key: 'xp',
-      header: 'XP Reward',
-      render: (achievement) => (
-        <div className="text-sm text-gray-900 dark:text-gray-100">
-          {achievement.xp_reward} XP
-        </div>
-      ),
-    },
-    {
-      key: 'requirements',
-      header: 'Requirements',
+      key: 'maxProgress',
+      header: 'Max Progress',
       render: (achievement) => (
         <span className="text-sm text-gray-400 dark:text-gray-500">
-          {achievement.requirements ? (
-            <div className="max-w-xs truncate">
-              {JSON.stringify(achievement.requirements)}
-            </div>
-          ) : (
-            'None'
-          )}
+          {achievement.maxProgress ?? '—'}
         </span>
       ),
     },
   ];
 
-  // Define fields for the mobile card view
-  const cardFields: CardField<Achievement>[] = [
+  const cardFields: CardField<CatalogAchievement>[] = [
     {
       key: 'header',
       label: '',
       isHeader: true,
       render: (achievement) => (
         <div className="flex items-center mb-3">
-          <div className="flex-shrink-0 h-12 w-12 mr-3">
-            {achievement.icon_url ? (
-              <Image
-                className="h-12 w-12 rounded-full object-cover"
-                src={achievement.icon_url}
-                alt={achievement.title}
-                width={48}
-                height={48}
-                unoptimized={achievement.icon_url.startsWith('data:')}
-              />
-            ) : (
-              <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-7 w-7 text-blue-500"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
-                  />
-                </svg>
-              </div>
-            )}
+          <div className="flex-shrink-0 h-12 w-12 mr-3 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-2xl">
+            {achievement.icon}
           </div>
           <div>
             <div className="text-base font-medium text-gray-900 dark:text-gray-100">
@@ -311,34 +264,20 @@ export default function AdminAchievementsPage() {
     {
       key: 'type',
       label: 'Type',
-      render: (achievement) => <span>{achievement.achievement_type}</span>,
+      render: (achievement) => <span>{achievement.achievementType}</span>,
     },
     {
-      key: 'xp',
-      label: 'XP Reward',
-      render: (achievement) => <span>{achievement.xp_reward} XP</span>,
-    },
-    {
-      key: 'requirements',
-      label: 'Requirements',
+      key: 'maxProgress',
+      label: 'Max Progress',
       isFooter: true,
-      render: (achievement) =>
-        achievement.requirements ? (
-          <div className="truncate max-w-full">
-            {JSON.stringify(achievement.requirements)}
-          </div>
-        ) : (
-          'None'
-        ),
+      render: (achievement) => <span>{achievement.maxProgress ?? '—'}</span>,
     },
   ];
 
-  // Toggle sort direction
   const toggleSortDirection = () => {
     setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
   };
 
-  // Handle sort change
   const handleSortChange = (option: string) => {
     if (sortBy === (option as SortOption)) {
       toggleSortDirection();
@@ -348,31 +287,23 @@ export default function AdminAchievementsPage() {
     }
   };
 
-  // Filter options
-  const filterOptions = [
-    { id: 'all', label: 'All' },
-    { id: 'quiz', label: 'Quiz' },
-    { id: 'streak', label: 'Streak' },
-    { id: 'subject', label: 'Subject' },
-    { id: 'score', label: 'Score' },
-  ];
+  const filterOptions = achievementTypes.map((t) => ({
+    id: t,
+    label: t === 'all' ? 'All' : t,
+  }));
 
-  // Sort options
   const sortOptions = [
     { id: 'title', label: 'Title' },
     { id: 'type', label: 'Type' },
-    { id: 'xp', label: 'XP Reward' },
-    { id: 'created', label: 'Created Date' },
   ];
 
   return (
     <AdminLayout
-      title="Achievement Management"
+      title="Achievement Catalog"
       refreshAction={fetchAchievements}
       isLoading={loading}
     >
       <div className="space-y-4">
-        {/* Success/Error Messages */}
         {error && (
           <Message
             type="error"
@@ -390,20 +321,16 @@ export default function AdminAchievementsPage() {
           />
         )}
 
-        {/* Header with Create Button */}
         <div className="flex justify-between items-center">
-          <div className="hidden md:block">
-            {/* SearchBar is shown in the mobile dropdown */}
-          </div>
+          <div className="hidden md:block" />
           <button
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600"
-            onClick={() => logger.log('Create new achievement')}
+            onClick={openCreateForm}
           >
             Create New Achievement
           </button>
         </div>
 
-        {/* Search Bar + Filter Controls */}
         <div className="mb-4">
           <SearchBar
             searchTerm={searchTerm}
@@ -414,9 +341,7 @@ export default function AdminAchievementsPage() {
 
           <FilterSortControls
             selectedFilter={typeFilter}
-            onFilterChange={(filter) =>
-              setTypeFilter(filter as TypeFilterOption)
-            }
+            onFilterChange={setTypeFilter}
             filterOptions={filterOptions}
             selectedSort={sortBy}
             onSortChange={handleSortChange}
@@ -429,27 +354,26 @@ export default function AdminAchievementsPage() {
           />
         </div>
 
-        {/* Data Table and Card View */}
         <DataTableCardView
           data={currentAchievements}
           isLoading={loading}
           columns={columns}
           cardFields={cardFields}
           keyExtractor={(item) => item.id}
-          emptyMessage="No achievements found. Create your first achievement to get started."
+          emptyMessage="No achievements in the catalog yet. Create your first one to get started."
           emptyFilteredMessage="No achievements match your search criteria."
           isFiltered={searchTerm !== '' || typeFilter !== 'all'}
           actions={(achievement) => (
             <>
               <button
                 className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-4"
-                onClick={() => handleEditAchievement(achievement)}
+                onClick={() => openEditForm(achievement)}
               >
                 Edit
               </button>
               <button
                 className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
-                onClick={() => handleDeleteAchievement(achievement.id)}
+                onClick={() => handleDelete(achievement.id)}
               >
                 Delete
               </button>
@@ -457,7 +381,6 @@ export default function AdminAchievementsPage() {
           )}
         />
 
-        {/* Pagination */}
         {sortedAchievements.length > 0 && (
           <Pagination
             currentPage={currentPage}
@@ -467,33 +390,110 @@ export default function AdminAchievementsPage() {
             onPageChange={setCurrentPage}
           />
         )}
-
-        {/* Achievement Examples Section */}
-        {achievements.length === 0 && !loading && (
-          <div className="mt-8 bg-blue-50 border border-blue-200 p-6 rounded-lg dark:bg-blue-900/20 dark:border-blue-800">
-            <h2 className="text-lg font-medium text-blue-800 dark:text-blue-300 mb-2">
-              Achievement Examples
-            </h2>
-            <p className="text-blue-700 dark:text-blue-400 mb-4">
-              Here are some example achievements you might want to create:
-            </p>
-            <ul className="list-disc list-inside space-y-2 text-blue-700 dark:text-blue-400">
-              <li>
-                First Quiz Completed - Awarded when a user completes their first
-                quiz
-              </li>
-              <li>Perfect Score - Awarded when a user gets 100% on a quiz</li>
-              <li>
-                Study Streak - Awarded for completing quizzes 5 days in a row
-              </li>
-              <li>
-                Subject Master - Awarded for completing all quizzes in a subject
-              </li>
-              <li>Quiz Creator - Awarded for creating their first quiz</li>
-            </ul>
-          </div>
-        )}
       </div>
+
+      {isFormOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
+          <div className="bg-gray-800 dark:bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <h3 className="text-xl font-bold mb-4 text-white dark:text-gray-900">
+              {editingId ? 'Edit Achievement' : 'Create Achievement'}
+            </h3>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-gray-300 dark:text-gray-700 text-sm font-bold mb-2">
+                  Type*
+                </label>
+                <input
+                  type="text"
+                  value={formData.achievementType}
+                  onChange={(e) =>
+                    setFormData({ ...formData, achievementType: e.target.value })
+                  }
+                  placeholder="e.g. quiz_streak, first_quiz"
+                  className="w-full px-3 py-2 border border-gray-600 dark:border-gray-300 rounded-md bg-white dark:bg-gray-700 text-white dark:text-gray-900"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-gray-300 dark:text-gray-700 text-sm font-bold mb-2">
+                  Title*
+                </label>
+                <input
+                  type="text"
+                  value={formData.title}
+                  onChange={(e) =>
+                    setFormData({ ...formData, title: e.target.value })
+                  }
+                  className="w-full px-3 py-2 border border-gray-600 dark:border-gray-300 rounded-md bg-white dark:bg-gray-700 text-white dark:text-gray-900"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-gray-300 dark:text-gray-700 text-sm font-bold mb-2">
+                  Description
+                </label>
+                <textarea
+                  value={formData.description}
+                  onChange={(e) =>
+                    setFormData({ ...formData, description: e.target.value })
+                  }
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-600 dark:border-gray-300 rounded-md bg-white dark:bg-gray-700 text-white dark:text-gray-900"
+                />
+              </div>
+
+              <div>
+                <label className="block text-gray-300 dark:text-gray-700 text-sm font-bold mb-2">
+                  Icon (emoji)
+                </label>
+                <input
+                  type="text"
+                  value={formData.icon}
+                  onChange={(e) =>
+                    setFormData({ ...formData, icon: e.target.value })
+                  }
+                  className="w-full px-3 py-2 border border-gray-600 dark:border-gray-300 rounded-md bg-white dark:bg-gray-700 text-white dark:text-gray-900"
+                />
+              </div>
+
+              <div>
+                <label className="block text-gray-300 dark:text-gray-700 text-sm font-bold mb-2">
+                  Max Progress (optional)
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  value={formData.maxProgress}
+                  onChange={(e) =>
+                    setFormData({ ...formData, maxProgress: e.target.value })
+                  }
+                  placeholder="Leave blank for a one-shot achievement"
+                  className="w-full px-3 py-2 border border-gray-600 dark:border-gray-300 rounded-md bg-white dark:bg-gray-700 text-white dark:text-gray-900"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end space-x-2 mt-6">
+              <button
+                onClick={() => setIsFormOpen(false)}
+                className="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-200 dark:text-gray-800 rounded hover:bg-gray-400 dark:hover:bg-gray-500"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSubmit}
+                disabled={saving}
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 disabled:opacity-50"
+              >
+                {saving ? 'Saving...' : editingId ? 'Save Changes' : 'Create'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </AdminLayout>
   );
 }

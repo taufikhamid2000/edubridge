@@ -341,9 +341,10 @@ export function verifyQuiz(
   });
 }
 
-// Achievements are already-awarded rows, not a catalog — there is no
-// "browse all possible achievements" endpoint (see MyQuiza's Sprint B
-// item 1 note). title/description/icon are freeform, set at award time.
+// Awarded-achievement rows (per user). A real catalog now exists too —
+// see MyQuizaAchievementCatalogEntry below — but earned rows always
+// snapshot title/description/icon/achievementType at award time, so
+// editing the catalog later never retroactively changes past awards.
 export interface MyQuizaAchievement {
   id: string;
   achievementType: string;
@@ -355,14 +356,18 @@ export interface MyQuizaAchievement {
   earnedAt: string;
 }
 
-export interface AwardAchievementPayload {
-  achievementType: string;
-  title: string;
-  description: string;
-  icon: string;
-  progress?: number;
-  maxProgress?: number;
-}
+// Award from the catalog (server snapshots the catalog entry's fields),
+// or a one-off freeform award with no catalog entry — pick one shape.
+export type AwardAchievementPayload =
+  | { achievementId: string; progress?: number; maxProgress?: number }
+  | {
+      achievementType: string;
+      title: string;
+      description: string;
+      icon: string;
+      progress?: number;
+      maxProgress?: number;
+    };
 
 export function getMyAchievements(token: string | null) {
   return myquizaFetch<MyQuizaAchievement[]>('/api/v1/me/achievements', token);
@@ -387,6 +392,61 @@ export function awardAchievement(
     token,
     { method: 'POST', body: JSON.stringify(payload) }
   );
+}
+
+// Achievement catalog — template definitions admins manage, referenced by
+// achievementId when awarding (see AwardAchievementPayload above).
+export interface MyQuizaAchievementCatalogEntry {
+  id: string;
+  achievementType: string;
+  title: string;
+  description: string;
+  icon: string;
+  maxProgress: number | null;
+}
+
+export interface CatalogAchievementPayload {
+  achievementType: string;
+  title: string;
+  description: string;
+  icon: string;
+  maxProgress?: number;
+}
+
+export function getAchievementCatalog() {
+  return myquizaFetch<MyQuizaAchievementCatalogEntry[]>(
+    '/api/v1/achievements',
+    null
+  );
+}
+
+export function createCatalogAchievement(
+  payload: CatalogAchievementPayload,
+  token: string | null
+) {
+  return myquizaFetch<MyQuizaAchievementCatalogEntry>(
+    '/api/v1/achievements',
+    token,
+    { method: 'POST', body: JSON.stringify(payload) }
+  );
+}
+
+export function updateCatalogAchievement(
+  id: string,
+  payload: Partial<CatalogAchievementPayload>,
+  token: string | null
+) {
+  return myquizaFetch<MyQuizaAchievementCatalogEntry>(
+    `/api/v1/achievements/${id}`,
+    token,
+    { method: 'PATCH', body: JSON.stringify(payload) }
+  );
+}
+
+export function deleteCatalogAchievement(id: string, token: string | null) {
+  return myquizaFetch<void>(`/api/v1/achievements/${id}`, token, {
+    method: 'DELETE',
+  });
 }
 
 export function submitAttempt(
