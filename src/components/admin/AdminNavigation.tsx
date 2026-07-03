@@ -6,6 +6,7 @@ import {
   Users,
   BookOpen,
   Award,
+  School,
   Settings,
   BarChart3,
   LogOut,
@@ -105,6 +106,11 @@ export default function AdminNavigation({
       name: 'Achievements',
       path: '/admin/achievements',
       icon: <Award className={isCollapsed ? '' : 'mr-3'} size={18} />,
+    },
+    {
+      name: 'Schools',
+      path: '/admin/schools',
+      icon: <School className={isCollapsed ? '' : 'mr-3'} size={18} />,
     },
     {
       name: 'Analytics',
