@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
+import { attachSchool } from '@/lib/schoolEnrichment';
 
 // Cache duration in seconds
 const CACHE_DURATION = 300; // 5 minutes
@@ -36,10 +37,7 @@ export async function GET(
         created_at,
         updated_at,
         school_id,
-        is_school_visible,
-        school:schools (
-          id, name, type, district, state
-        )
+        is_school_visible
       `
       )
       .eq('id', userId)
@@ -63,11 +61,11 @@ export async function GET(
     }
 
     // Return profile without email for privacy (public profile)
-    const publicProfile = {
+    const publicProfile = await attachSchool({
       ...profileData,
       email: '', // Don't expose email in public profiles
       isGuest: false,
-    };
+    });
 
     return NextResponse.json(publicProfile, {
       headers: {

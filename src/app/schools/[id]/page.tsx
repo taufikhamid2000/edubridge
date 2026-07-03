@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import SchoolProfileContent from '@/components/schools/SchoolProfileContent';
 import { supabase } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
+import { getSchoolDetail } from '@/lib/myquiza';
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -11,19 +12,11 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
     const { id } = await params;
-    const { data: school } = await supabase
-      .from('schools')
-      .select('name')
-      .eq('id', id)
-      .single();
+    const school = await getSchoolDetail(id);
 
     return {
-      title: school
-        ? `${school.name} | EduBridge`
-        : 'School Profile | EduBridge',
-      description: school
-        ? `View ${school.name}'s performance and statistics on EduBridge`
-        : 'View school performance and statistics on EduBridge',
+      title: `${school.name} | EduBridge`,
+      description: `View ${school.name}'s performance and statistics on EduBridge`,
     };
   } catch (error) {
     logger.error('Error generating metadata:', error);
@@ -38,40 +31,31 @@ export default async function SchoolProfilePage({ params }: Props) {
   try {
     const { id } = await params;
 
-    // Get school details
-    const { data: school, error: schoolError } = await supabase
-      .from('schools')
-      .select('*')
-      .eq('id', id)
-      .single();
-
-    if (schoolError || !school) {
-      if (schoolError?.code === 'PGRST116') {
+    let school;
+    try {
+      school = await getSchoolDetail(id);
+    } catch (err) {
+      if (err instanceof Error && err.message.includes('404')) {
         notFound();
       }
-      throw schoolError || new Error('School not found');
+      throw err;
     }
 
-    // Get school stats
-    const { data: stats } = await supabase
-      .from('school_stats')
-      .select('*')
-      .eq('school_id', id)
-      .single();
-
-    // Get teacher count
+    // teacherCount/studentCount/topStudents come from user_profiles
+    // (school_id/school_role linkage), which MyQuiza's schools domain
+    // doesn't own — these stay on Supabase.
     const { count: teacherCount } = await supabase
       .from('user_profiles')
       .select('*', { count: 'exact', head: true })
       .eq('school_id', id)
-      .eq('school_role', 'teacher'); // Get student count
+      .eq('school_role', 'teacher');
+
     const { count: studentCount } = await supabase
       .from('user_profiles')
       .select('*', { count: 'exact', head: true })
       .eq('school_id', id)
       .eq('school_role', 'student');
 
-    // Get top 5 students for hall of fame
     const { data: topStudents } = await supabase
       .from('user_profiles')
       .select(
@@ -89,8 +73,28 @@ export default async function SchoolProfilePage({ params }: Props) {
       .limit(5);
 
     const schoolData = {
-      ...school,
-      stats,
+      id: school.id,
+      name: school.name,
+      type: school.type,
+      district: school.district,
+      state: school.state,
+      code: school.code ?? undefined,
+      address: school.address ?? undefined,
+      website: school.website ?? undefined,
+      phone: school.phone ?? undefined,
+      principal_name: school.principalName ?? undefined,
+      total_students: school.totalStudents ?? undefined,
+      created_at: '',
+      updated_at: '',
+      stats: {
+        school_id: school.id,
+        average_score: school.averageScore,
+        participation_rate: school.participationRate,
+        total_quizzes_taken: school.stats?.totalQuizzesTaken || 0,
+        total_questions_answered: school.stats?.totalQuestionsAnswered || 0,
+        correct_answers: school.stats?.correctAnswers || 0,
+        last_calculated_at: school.stats?.lastCalculatedAt || '',
+      },
       teacherCount: teacherCount || 0,
       studentCount: studentCount || 0,
       topStudents: topStudents || [],

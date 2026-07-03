@@ -486,3 +486,94 @@ export function getLeaderboard(
     token
   );
 }
+
+// Schools: reads are public (same as the user leaderboard); writes are
+// admin-only, not moderator — institutional data, not user-generated
+// content needing review. `type` is DB-constrained; validate client-side
+// against SCHOOL_TYPES before submitting (an invalid value 500s server-side
+// rather than a clean 400).
+export const SCHOOL_TYPES = [
+  'SMK',
+  'SMKA',
+  'MRSM',
+  'Sekolah Sains',
+  'Sekolah Sukan',
+  'Sekolah Seni',
+  'SBP',
+  'SMJK',
+  'KV',
+] as const;
+export type SchoolType = (typeof SCHOOL_TYPES)[number];
+
+export interface MyQuizaSchool {
+  id: string;
+  name: string;
+  type: SchoolType;
+  district: string;
+  state: string;
+  averageScore: number;
+  participationRate: number;
+  activeStudents: number;
+}
+
+export interface MyQuizaSchoolStats {
+  totalQuizzesTaken: number;
+  totalQuestionsAnswered: number;
+  correctAnswers: number;
+  lastCalculatedAt: string;
+}
+
+export interface MyQuizaSchoolDetail extends MyQuizaSchool {
+  code: string | null;
+  address: string | null;
+  website: string | null;
+  phone: string | null;
+  principalName: string | null;
+  totalStudents: number | null;
+  stats: MyQuizaSchoolStats | null;
+}
+
+export interface SchoolPayload {
+  name: string;
+  type: SchoolType;
+  district: string;
+  state: string;
+  code?: string;
+  address?: string;
+  website?: string;
+  phone?: string;
+  principalName?: string;
+  totalStudents?: number;
+}
+
+export function getSchools() {
+  return myquizaFetch<MyQuizaSchool[]>('/api/v1/schools', null);
+}
+
+export function getSchoolDetail(id: string) {
+  return myquizaFetch<MyQuizaSchoolDetail>(`/api/v1/schools/${id}`, null);
+}
+
+export function createSchool(payload: SchoolPayload, token: string | null) {
+  return myquizaFetch<MyQuizaSchoolDetail>('/api/v1/schools', token, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+
+export function updateSchool(
+  id: string,
+  payload: Partial<SchoolPayload>,
+  token: string | null
+) {
+  return myquizaFetch<MyQuizaSchoolDetail>(`/api/v1/schools/${id}`, token, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  });
+}
+
+export function deleteSchool(id: string, token: string | null) {
+  return myquizaFetch<void>(`/api/v1/schools/${id}`, token, {
+    method: 'DELETE',
+  });
+}

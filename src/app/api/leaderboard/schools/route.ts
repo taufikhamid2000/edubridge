@@ -1,90 +1,57 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
+import { getSchools } from '@/lib/myquiza';
 
 export async function GET() {
   try {
-    // Fetch schools data and stats in parallel for better performance
-    const [schoolsResult, studentsResult, statsResult, historyResult] =
-      await Promise.all([
-        supabase
-          .from('schools')
-          .select(
-            `
-          id,
-          name,
-          type,
-          district,
-          state,
-          total_students,
-          school_stats (
-            average_score,
-            participation_rate,
-            total_quizzes_taken,
-            total_questions_answered,
-            correct_answers,
-            last_calculated_at
-          )
-        `
-          )
-          .order('school_stats(average_score)', { ascending: false }),
+    // School rankings + per-school stats come from MyQuiza now. Growth rates
+    // still read school_stats_history directly — MyQuiza excluded that table
+    // (it's a single platform-wide time series, not per-school, so it
+    // doesn't fit their schools domain).
+    const [mqSchools, studentsResult, historyResult] = await Promise.all([
+      getSchools(),
+      supabase
+        .from('user_profiles')
+        .select('*', { count: 'exact', head: true })
+        .eq('school_role', 'student'),
+      supabase
+        .from('school_stats_history')
+        .select('*')
+        .gte(
+          'recorded_at',
+          new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
+        )
+        .order('recorded_at', { ascending: false })
+        .limit(1),
+    ]);
 
-        supabase
-          .from('user_profiles')
-          .select('*', { count: 'exact', head: true })
-          .eq('school_role', 'student'),
-
-        supabase.from('school_stats').select('participation_rate'),
-
-        supabase
-          .from('school_stats_history')
-          .select('*')
-          .gte(
-            'recorded_at',
-            new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
-          )
-          .order('recorded_at', { ascending: false })
-          .limit(1),
-      ]);
-
-    if (schoolsResult.error || studentsResult.error || statsResult.error) {
-      throw new Error('Failed to fetch one or more statistics');
+    if (studentsResult.error) {
+      throw new Error('Failed to fetch student count');
     }
 
-    // Process school data
-    const schools = (schoolsResult.data || [])
-      .filter((school) => {
-        return school && school.id && school.name && school.type;
-      })
+    const schools = [...mqSchools]
+      .sort((a, b) => b.averageScore - a.averageScore)
       .map((school, index) => ({
         id: school.id,
         name: school.name,
         type: school.type,
         district: school.district || 'Unknown',
         state: school.state || 'Unknown',
-        totalStudents: school.total_students || 0,
-        averageScore: school.school_stats?.[0]?.average_score
-          ? Math.round(school.school_stats[0].average_score * 10) / 10
-          : 0,
-        participationRate: school.school_stats?.[0]?.participation_rate
-          ? Math.round(school.school_stats[0].participation_rate * 10) / 10
-          : 0,
+        activeStudents: school.activeStudents || 0,
+        averageScore: Math.round(school.averageScore * 10) / 10,
+        participationRate: Math.round(school.participationRate * 10) / 10,
         rank: index + 1,
       }));
 
-    // Calculate stats
-    const schoolCount = schoolsResult.data?.length || 0;
+    const schoolCount = schools.length;
     const studentCount = studentsResult.count || 0;
 
-    // Calculate average participation, excluding schools with 0 participation
+    const withParticipation = schools.filter((s) => s.participationRate > 0);
     const averageParticipation =
-      statsResult.data
-        .filter((stat) => stat.participation_rate > 0)
-        .reduce((acc, stat) => acc + stat.participation_rate, 0) /
-      (statsResult.data.filter((stat) => stat.participation_rate > 0).length ||
-        1);
+      withParticipation.reduce((acc, s) => acc + s.participationRate, 0) /
+      (withParticipation.length || 1);
 
-    // Calculate growth rates
     const lastMonthStats = historyResult.data?.[0];
     const growthRates = {
       schools:
@@ -125,14 +92,14 @@ export async function GET() {
       },
       {
         headers: {
-          'Cache-Control': 'public, s-maxage=900, stale-while-revalidate=1800', // 15 minutes cache, 30 minutes stale-while-revalidate
+          'Cache-Control': 'public, s-maxage=900, stale-while-revalidate=1800',
         },
       }
     );
   } catch (error) {
     logger.error('Error in school leaderboard API:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch school leaderboard data' },
+      { error: 'Unable to connect to the API. Please contact the administrator.' },
       { status: 500 }
     );
   }

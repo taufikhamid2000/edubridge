@@ -3,6 +3,7 @@ import { supabase } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
+import { attachSchool } from '@/lib/schoolEnrichment';
 
 // Cache duration in seconds
 const CACHE_DURATION = 300; // 5 minutes
@@ -75,10 +76,7 @@ export async function GET() {
         created_at,
         updated_at,
         school_id,
-        is_school_visible,
-        school:schools (
-          id, name, type, district, state
-        )
+        is_school_visible
       `
       )
       .eq('id', session.user.id)
@@ -129,11 +127,11 @@ export async function GET() {
         }
 
         // Add email and guest flag to the new profile
-        const userProfile = {
+        const userProfile = await attachSchool({
           ...newProfile,
           email: session.user.email || '',
           isGuest: false,
-        };
+        });
 
         return NextResponse.json(userProfile, {
           headers: {
@@ -150,11 +148,11 @@ export async function GET() {
     }
 
     // Add email and guest flag to the profile
-    const userProfile = {
+    const userProfile = await attachSchool({
       ...profileData,
       email: session.user.email || '',
       isGuest: false,
-    };
+    });
 
     return NextResponse.json(userProfile, {
       headers: {

@@ -4,7 +4,7 @@ export interface School {
   type: SchoolType;
   district: string;
   state: string;
-  totalStudents: number;
+  activeStudents: number;
   averageScore: number;
   participationRate: number;
   rank: number;

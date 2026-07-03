@@ -65,17 +65,15 @@ export default function ProfileSettings({ user }: ProfileSettingsProps) {
   useEffect(() => {
     const fetchSchools = async () => {
       try {
-        const { data, error } = await supabase
-          .from('schools')
-          .select('id, name, type, district, state')
-          .order('name');
-
-        if (error) {
-          logger.error('Error fetching schools:', error);
+        const res = await fetch('/api/schools');
+        if (!res.ok) {
+          logger.error('Error fetching schools:', res.status);
           return;
         }
-
-        setSchools(data || []);
+        const data = await res.json();
+        setSchools(
+          [...data].sort((a: School, b: School) => a.name.localeCompare(b.name))
+        );
       } catch (err) {
         logger.error('Error in fetchSchools:', err);
       } finally {
