@@ -3,7 +3,7 @@ import { supabase } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
-import { getMyStats } from '@/lib/myquiza';
+import { getMyStats, getMe } from '@/lib/myquiza';
 
 // Cache duration in seconds
 const CACHE_DURATION = 300; // 5 minutes
@@ -102,6 +102,7 @@ export async function GET() {
       { data: subjectsData, error: subjectsError },
       { data: userData, error: userError },
       userStatsData,
+      meData,
     ] = await Promise.all([
       // Fetch subjects directly from the base table (avoids stale materialized view)
       supabase
@@ -112,11 +113,11 @@ export async function GET() {
         .order('category_priority', { ascending: true })
         .order('order_index', { ascending: true }),
 
-      // Fetch user profile only if authenticated
+      // display_name/streak stay on Supabase — MyQuiza doesn't touch streak
       isAuthenticated
         ? supabase
             .from('user_profiles')
-            .select('display_name, streak, xp, level, last_quiz_date')
+            .select('display_name, streak')
             .eq('id', session!.user.id)
             .single()
         : Promise.resolve({ data: null, error: null }),
@@ -126,6 +127,15 @@ export async function GET() {
       isAuthenticated
         ? getMyStats(session!.access_token).catch((err) => {
             logger.error('Error fetching user stats from MyQuiza:', err);
+            return null;
+          })
+        : Promise.resolve(null),
+
+      // xp/level/lastQuizDate are authoritative on MyQuiza's side
+      // (submitAttempt writes them directly to user_profiles)
+      isAuthenticated
+        ? getMe(session!.access_token).catch((err) => {
+            logger.error('Error fetching /me from MyQuiza:', err);
             return null;
           })
         : Promise.resolve(null),
@@ -167,10 +177,10 @@ export async function GET() {
           email: session!.user.email || '',
           display_name: userData?.display_name || undefined,
           streak: userData?.streak || 0,
-          xp: userData?.xp || 0,
-          level: userData?.level || 1,
+          xp: meData?.xp || 0,
+          level: meData?.level || 1,
           lastQuizDate:
-            userData?.last_quiz_date || new Date().toISOString().split('T')[0],
+            meData?.lastQuizDate || new Date().toISOString().split('T')[0],
         }
       : {
           email: '',

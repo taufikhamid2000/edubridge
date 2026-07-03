@@ -579,8 +579,6 @@ export function deleteSchool(id: string, token: string | null) {
 }
 
 // Dashboard aggregate stats, backed by MyQuiza's mv_user_dashboard_stats.
-// streak/xp/level are deliberately NOT here — those are on GET /api/v1/me
-// (not yet wired up on our side; still read from Supabase user_profiles).
 export interface MyQuizaUserStats {
   completedQuizzes: number;
   averageScore: number;
@@ -592,4 +590,42 @@ export interface MyQuizaUserStats {
 
 export function getMyStats(token: string | null) {
   return myquizaFetch<MyQuizaUserStats>('/api/v1/me/stats', token);
+}
+
+// MyQuiza is authoritative for xp/level/dailyXp/weeklyXp/lastQuizDate —
+// its submitAttempt endpoint writes these directly to user_profiles.
+// streak is NOT touched by MyQuiza; keep reading that from Supabase.
+export interface MyQuizaMe {
+  id: string;
+  displayName: string | null;
+  avatarUrl: string | null;
+  xp: number;
+  level: number;
+  dailyXp: number;
+  weeklyXp: number;
+  lastQuizDate: string | null;
+  schoolRole: string | null;
+}
+
+export function getMe(token: string | null) {
+  return myquizaFetch<MyQuizaMe>('/api/v1/me', token);
+}
+
+// Attempt history. topic/subject were added to the response after we
+// flagged the gap — subject is null on attempts recorded before that fix
+// (never captured), topic is present on all attempts.
+export interface MyQuizaAttempt {
+  id: string;
+  quizId: string;
+  quizTitle: string;
+  topic: string | null;
+  subject: string | null;
+  score: number;
+  correctAnswers: number;
+  totalQuestions: number;
+  createdAt: string;
+}
+
+export function getMyAttempts(token: string | null) {
+  return myquizaFetch<MyQuizaAttempt[]>('/api/v1/me/attempts', token);
 }

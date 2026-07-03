@@ -1,11 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 import { WEEKLY_QUIZ_TARGET } from '@/config/app';
-import { getMyStats } from '@/lib/myquiza';
+import { getMyStats, getMe, getMyAttempts } from '@/lib/myquiza';
 
 // Cache duration in seconds
 const CACHE_DURATION = 600; // 10 minutes
@@ -89,53 +88,35 @@ export async function GET() {
     }
 
     // Fetch user statistics in parallel
-    const [
-      userStatsData,
-      { data: recentQuizzes, error: recentQuizzesError },
-      { data: userProfile, error: userProfileError },
-    ] = await Promise.all([
-      // mv_user_dashboard_stats is now served by MyQuiza
-      getMyStats(session.access_token).catch((err) => {
-        logger.error('Error fetching user stats from MyQuiza:', err);
-        return null;
-      }),
+    const [userStatsData, meData, recentAttempts, { data: userProfile, error: userProfileError }] =
+      await Promise.all([
+        // mv_user_dashboard_stats is now served by MyQuiza
+        getMyStats(session.access_token).catch((err) => {
+          logger.error('Error fetching user stats from MyQuiza:', err);
+          return null;
+        }),
 
-      // Get recent quiz attempts
-      supabase
-        .from('quiz_attempts')
-        .select(
-          `
-          id,
-          score,
-          completed,
-          created_at,
-          quiz:quizzes (
-            name,
-            topic:topics (
-              title,
-              chapter:chapters (
-                subject:subjects (name)
-              )
-            )
-          )
-        `
-        )
-        .eq('user_id', session.user.id)
-        .eq('completed', true)
-        .order('created_at', { ascending: false })
-        .limit(10),
+        // xp/level are authoritative on MyQuiza's side (submitAttempt writes
+        // them directly to user_profiles)
+        getMe(session.access_token).catch((err) => {
+          logger.error('Error fetching /me from MyQuiza:', err);
+          return null;
+        }),
 
-      // Get user profile for streak and level info
-      supabase
-        .from('user_profiles')
-        .select('streak, level, xp, created_at')
-        .eq('id', session.user.id)
-        .single(),
-    ]);
+        // Recent quiz attempts (topic/subject added to this response after
+        // we flagged the gap; subject is null on pre-fix historical rows)
+        getMyAttempts(session.access_token).catch((err) => {
+          logger.error('Error fetching attempts from MyQuiza:', err);
+          return [] as Awaited<ReturnType<typeof getMyAttempts>>;
+        }),
 
-    if (recentQuizzesError) {
-      logger.error('Error fetching recent quizzes:', recentQuizzesError);
-    }
+        // streak stays on Supabase — MyQuiza doesn't touch it
+        supabase
+          .from('user_profiles')
+          .select('streak')
+          .eq('id', session.user.id)
+          .single(),
+      ]);
 
     if (userProfileError && userProfileError.code !== 'PGRST116') {
       logger.error('Error fetching user profile:', userProfileError);
@@ -154,7 +135,7 @@ export async function GET() {
     const totalQuizzes = userStatsData?.completedQuizzes || 0;
     const averageScore = userStatsData?.averageScore || 0;
     const currentStreak = userProfile?.streak || 0;
-    const currentLevel = userProfile?.level || 1;
+    const currentLevel = meData?.level || 1;
 
     const achievements = [
       {
@@ -202,16 +183,16 @@ export async function GET() {
       description: string;
       date: string;
       score?: number;
-    }> = []; // Add quiz completion activities
-    const quizActivities = (recentQuizzes || [])
-      .slice(0, 5)
-      .map((quiz: any) => ({
-        type: 'quiz_completed' as const,
-        title: `Completed ${quiz.quiz?.name || 'Quiz'}`,
-        description: `${quiz.quiz?.topic?.chapter?.subject?.name || 'Subject'} - ${quiz.quiz?.topic?.title || 'Topic'}`,
-        date: quiz.created_at,
-        score: quiz.score,
-      }));
+    }> = [];
+
+    // Add quiz completion activities
+    const quizActivities = recentAttempts.slice(0, 5).map((attempt) => ({
+      type: 'quiz_completed' as const,
+      title: `Completed ${attempt.quizTitle || 'Quiz'}`,
+      description: `${attempt.subject || 'Subject'} - ${attempt.topic || 'Topic'}`,
+      date: attempt.createdAt,
+      score: attempt.score,
+    }));
 
     recentActivity.push(...quizActivities);
 
