@@ -5,6 +5,7 @@ import { logger } from '@/lib/logger';
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 import { WEEKLY_QUIZ_TARGET } from '@/config/app';
+import { getMyStats } from '@/lib/myquiza';
 
 // Cache duration in seconds
 const CACHE_DURATION = 600; // 10 minutes
@@ -89,18 +90,15 @@ export async function GET() {
 
     // Fetch user statistics in parallel
     const [
-      { data: userStatsData, error: userStatsError },
+      userStatsData,
       { data: recentQuizzes, error: recentQuizzesError },
       { data: userProfile, error: userProfileError },
     ] = await Promise.all([
-      // Try to get from materialized view first, fallback if not available
-      supabase
-        .from('mv_user_dashboard_stats')
-        .select(
-          'completed_quizzes, average_score, weekly_quizzes, weekly_average_score, active_days'
-        )
-        .eq('user_id', session.user.id)
-        .maybeSingle(),
+      // mv_user_dashboard_stats is now served by MyQuiza
+      getMyStats(session.access_token).catch((err) => {
+        logger.error('Error fetching user stats from MyQuiza:', err);
+        return null;
+      }),
 
       // Get recent quiz attempts
       supabase
@@ -135,10 +133,6 @@ export async function GET() {
         .single(),
     ]);
 
-    if (userStatsError) {
-      logger.warn('Could not fetch from materialized view, using fallback');
-    }
-
     if (recentQuizzesError) {
       logger.error('Error fetching recent quizzes:', recentQuizzesError);
     }
@@ -152,13 +146,13 @@ export async function GET() {
     }
 
     // Calculate weekly progress
-    const weeklyQuizzes = userStatsData?.weekly_quizzes || 0;
-    const weeklyAverage = userStatsData?.weekly_average_score || 0;
+    const weeklyQuizzes = userStatsData?.weeklyQuizzes || 0;
+    const weeklyAverage = userStatsData?.weeklyAverageScore || 0;
     const weeklyTarget = WEEKLY_QUIZ_TARGET;
 
     // Generate achievements based on user data
-    const totalQuizzes = userStatsData?.completed_quizzes || 0;
-    const averageScore = userStatsData?.average_score || 0;
+    const totalQuizzes = userStatsData?.completedQuizzes || 0;
+    const averageScore = userStatsData?.averageScore || 0;
     const currentStreak = userProfile?.streak || 0;
     const currentLevel = userProfile?.level || 1;
 

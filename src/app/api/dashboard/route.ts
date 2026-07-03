@@ -3,6 +3,7 @@ import { supabase } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
+import { getMyStats } from '@/lib/myquiza';
 
 // Cache duration in seconds
 const CACHE_DURATION = 300; // 5 minutes
@@ -100,7 +101,7 @@ export async function GET() {
     const [
       { data: subjectsData, error: subjectsError },
       { data: userData, error: userError },
-      { data: userStatsData, error: userStatsError },
+      userStatsData,
     ] = await Promise.all([
       // Fetch subjects directly from the base table (avoids stale materialized view)
       supabase
@@ -120,16 +121,14 @@ export async function GET() {
             .single()
         : Promise.resolve({ data: null, error: null }),
 
-      // Fetch user statistics only if authenticated
+      // Fetch user statistics only if authenticated (mv_user_dashboard_stats
+      // is now served by MyQuiza)
       isAuthenticated
-        ? supabase
-            .from('mv_user_dashboard_stats')
-            .select(
-              'completed_quizzes, average_score, weekly_quizzes, weekly_average_score, active_days'
-            )
-            .eq('user_id', session!.user.id)
-            .maybeSingle()
-        : Promise.resolve({ data: null, error: null }),
+        ? getMyStats(session!.access_token).catch((err) => {
+            logger.error('Error fetching user stats from MyQuiza:', err);
+            return null;
+          })
+        : Promise.resolve(null),
     ]);
 
     // Handle fetch errors
@@ -148,14 +147,6 @@ export async function GET() {
         { error: 'Failed to load user profile' },
         { status: 500 }
       );
-    }
-
-    if (userStatsError) {
-      logger.error(
-        'Error fetching user stats in dashboard API:',
-        userStatsError
-      );
-      // Non-critical error, continue without stats
     }
 
     // Process subjects data server-side
@@ -197,7 +188,7 @@ export async function GET() {
       categories,
       stats: {
         totalSubjects: processedSubjects.length,
-        completedQuizzes: userStatsData?.completed_quizzes || 0,
+        completedQuizzes: userStatsData?.completedQuizzes || 0,
       },
     };
 

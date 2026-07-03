@@ -577,3 +577,19 @@ export function deleteSchool(id: string, token: string | null) {
     method: 'DELETE',
   });
 }
+
+// Dashboard aggregate stats, backed by MyQuiza's mv_user_dashboard_stats.
+// streak/xp/level are deliberately NOT here — those are on GET /api/v1/me
+// (not yet wired up on our side; still read from Supabase user_profiles).
+export interface MyQuizaUserStats {
+  completedQuizzes: number;
+  averageScore: number;
+  activeDays: number;
+  weeklyQuizzes: number;
+  weeklyAverageScore: number;
+  lastQuizDate: string | null;
+}
+
+export function getMyStats(token: string | null) {
+  return myquizaFetch<MyQuizaUserStats>('/api/v1/me/stats', token);
+}
