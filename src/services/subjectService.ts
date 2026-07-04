@@ -343,7 +343,8 @@ export async function deleteSubject(id: string): Promise<{
 }
 
 /**
- * Fetches subjects for public API (no auth required)
+ * Fetches subjects for public API (no auth required) via MyQuiza
+ * (GET /api/v1/subjects, proxied through /api/subjects)
  * @returns A promise with public subjects data
  */
 export async function fetchPublicSubjects(): Promise<{
@@ -351,16 +352,14 @@ export async function fetchPublicSubjects(): Promise<{
   error: Error | null;
 }> {
   try {
-    const { data: subjects, error } = await supabase
-      .from('subjects')
-      .select('id, name, slug, description, icon');
+    const res = await fetch('/api/subjects');
+    const data = await res.json();
 
-    if (error) {
-      logger.error('Error fetching public subjects:', error);
-      return { data: null, error };
+    if (!res.ok) {
+      return { data: null, error: new Error(data.error || 'Failed to fetch subjects') };
     }
 
-    return { data: subjects as PublicSubject[], error: null };
+    return { data: data as PublicSubject[], error: null };
   } catch (error) {
     const err = error instanceof Error ? error : new Error('Unknown error');
     logger.error('Error in fetchPublicSubjects:', err);

@@ -742,3 +742,54 @@ export function deleteMyQuizaTopic(id: string, token: string | null) {
     method: 'DELETE',
   });
 }
+
+// Content tree reads — public, confirmed live against the real API (no
+// formal contract given; verified directly). No by-slug or by-single-id
+// lookup exists for subjects/topics; only "list all subjects" and
+// "list a subject's chapters" / "list a chapter's topics".
+export interface MyQuizaSubjectListEntry {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  icon: string;
+  category: string | null;
+  orderIndex: number;
+  isDisabled: boolean;
+}
+
+export interface MyQuizaChapterListEntry {
+  id: string;
+  subjectId: string;
+  name: string;
+  form: number;
+  orderIndex: number;
+}
+
+export interface MyQuizaTopicListEntry {
+  id: string;
+  chapterId: string;
+  name: string;
+  description: string;
+  difficultyLevel: number;
+  timeEstimateMinutes: number;
+  orderIndex: number;
+}
+
+export function getSubjectsList() {
+  return myquizaFetch<MyQuizaSubjectListEntry[]>('/api/v1/subjects', null);
+}
+
+export function getSubjectChapters(subjectId: string) {
+  return myquizaFetch<MyQuizaChapterListEntry[]>(
+    `/api/v1/subjects/${subjectId}/chapters`,
+    null
+  );
+}
+
+export function getChapterTopics(chapterId: string) {
+  return myquizaFetch<MyQuizaTopicListEntry[]>(
+    `/api/v1/chapters/${chapterId}/topics`,
+    null
+  );
+}

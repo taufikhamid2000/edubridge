@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
+import { getSubjectsList, getSubjectChapters } from '@/lib/myquiza';
 
 // Cache duration in seconds
 const CACHE_DURATION = 300; // 5 minutes
@@ -19,49 +19,36 @@ export async function GET(
       );
     }
 
-    // Step 1: Get the subject ID first
-    const { data: subjectData, error: subjectError } = await supabase
-      .from('subjects')
-      .select('id')
-      .eq('slug', slug)
-      .single();
+    // No by-slug lookup on MyQuiza's side — resolve slug -> id first.
+    const subjects = await getSubjectsList();
+    const subject = subjects.find((s) => s.slug === slug);
 
-    if (subjectError) {
-      logger.error('Error fetching subject ID:', subjectError);
+    if (!subject) {
       return NextResponse.json({ error: 'Subject not found' }, { status: 404 });
     }
 
-    const subjectId = subjectData?.id;
-    if (!subjectId) {
-      return NextResponse.json({ error: 'Subject not found' }, { status: 404 });
-    }
+    const chapters = await getSubjectChapters(subject.id);
+    const sorted = [...chapters].sort(
+      (a, b) => a.form - b.form || a.orderIndex - b.orderIndex
+    );
 
-    // Step 2: Fetch chapters using the subject ID
-    const { data: chaptersData, error: chaptersError } = await supabase
-      .from('chapters')
-      .select('id, name, form, order_index')
-      .eq('subject_id', subjectId)
-      .order('form', { ascending: true })
-      .order('order_index', { ascending: true });
-
-    if (chaptersError) {
-      logger.error('Error fetching chapters:', chaptersError);
-      return NextResponse.json(
-        { error: 'Failed to fetch chapters' },
-        { status: 500 }
-      );
-    }
-
-    // Return response with cache headers
-    return NextResponse.json(chaptersData || [], {
-      headers: {
-        'Cache-Control': `public, s-maxage=${CACHE_DURATION}, stale-while-revalidate=${CACHE_DURATION * 2}`,
-      },
-    });
+    return NextResponse.json(
+      sorted.map((c) => ({
+        id: c.id,
+        name: c.name,
+        form: c.form,
+        order_index: c.orderIndex,
+      })),
+      {
+        headers: {
+          'Cache-Control': `public, s-maxage=${CACHE_DURATION}, stale-while-revalidate=${CACHE_DURATION * 2}`,
+        },
+      }
+    );
   } catch (error) {
     logger.error('Error in chapters API:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Unable to connect to the API. Please contact the administrator.' },
       { status: 500 }
     );
   }

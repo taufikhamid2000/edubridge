@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
+import {
+  getSubjectsList,
+  getSubjectChapters,
+  getChapterTopics,
+} from '@/lib/myquiza';
 
 // Cache duration in seconds
 const CACHE_DURATION = 300; // 5 minutes
@@ -9,13 +13,13 @@ interface Topic {
   id: string;
   name: string;
   description: string;
-  difficulty_level: string;
+  difficulty_level: number;
   time_estimate_minutes: number;
   order_index: number;
 }
 
 interface ChapterWithTopics {
-  id: number;
+  id: string;
   name: string;
   form: number;
   order_index: number;
@@ -36,70 +40,46 @@ export async function GET(
       );
     }
 
-    // Step 1: Get the subject ID first
-    const { data: subjectData, error: subjectError } = await supabase
-      .from('subjects')
-      .select('id, name')
-      .eq('slug', slug)
-      .single();
+    // No by-slug lookup on MyQuiza's side — resolve slug -> id first.
+    const subjects = await getSubjectsList();
+    const subject = subjects.find((s) => s.slug === slug);
 
-    if (subjectError) {
-      logger.error('Error fetching subject ID:', subjectError);
+    if (!subject) {
       return NextResponse.json({ error: 'Subject not found' }, { status: 404 });
     }
 
-    const subjectId = subjectData?.id;
-    if (!subjectId) {
-      return NextResponse.json({ error: 'Subject not found' }, { status: 404 });
-    }
+    const chapters = await getSubjectChapters(subject.id);
+    const sortedChapters = [...chapters].sort(
+      (a, b) => a.form - b.form || a.orderIndex - b.orderIndex
+    );
 
-    // Step 2: Fetch chapters with their topics in a single query
-    const { data: chaptersData, error: chaptersError } = await supabase
-      .from('chapters')
-      .select(
-        `
-        id,
-        name,
-        form,
-        order_index,
-        topics (
-          id,
-          name,
-          description,
-          difficulty_level,
-          time_estimate_minutes,
-          order_index
-        )
-      `
-      )
-      .eq('subject_id', subjectId)
-      .order('form', { ascending: true })
-      .order('order_index', { ascending: true });
-
-    if (chaptersError) {
-      logger.error('Error fetching chapters with topics:', chaptersError);
-      return NextResponse.json(
-        { error: 'Failed to fetch chapters' },
-        { status: 500 }
-      );
-    }
-
-    // Step 3: Transform the data to ensure topics are properly sorted
-    const transformedChapters: ChapterWithTopics[] = (chaptersData || []).map(
-      (chapter) => ({
-        id: chapter.id,
-        name: chapter.name,
-        form: chapter.form,
-        order_index: chapter.order_index,
-        topics: (chapter.topics || []).sort(
-          (a: Topic, b: Topic) => a.order_index - b.order_index
-        ),
+    // One topics call per chapter — bounded by a single subject's chapter
+    // count (typically under 20), unlike a full admin-wide listing.
+    const transformedChapters: ChapterWithTopics[] = await Promise.all(
+      sortedChapters.map(async (chapter) => {
+        const topics = await getChapterTopics(chapter.id);
+        return {
+          id: chapter.id,
+          name: chapter.name,
+          form: chapter.form,
+          order_index: chapter.orderIndex,
+          topics: [...topics]
+            .sort((a, b) => a.orderIndex - b.orderIndex)
+            .map((t) => ({
+              id: t.id,
+              name: t.name,
+              description: t.description,
+              difficulty_level: t.difficultyLevel,
+              time_estimate_minutes: t.timeEstimateMinutes,
+              order_index: t.orderIndex,
+            })),
+        };
       })
     );
 
     return NextResponse.json(
       {
-        subject: subjectData,
+        subject: { id: subject.id, name: subject.name },
         chapters: transformedChapters,
       },
       {
@@ -111,7 +91,7 @@ export async function GET(
   } catch (error) {
     logger.error('Error in chapters-with-topics API:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Unable to connect to the API. Please contact the administrator.' },
       { status: 500 }
     );
   }

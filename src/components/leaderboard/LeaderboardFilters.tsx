@@ -1,8 +1,4 @@
-import { logger } from '@/lib/logger';
-import React, { useEffect } from 'react';
-// import React, { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
-// import { Subject } from '@/types/topics';
+import React from 'react';
 
 interface LeaderboardFiltersProps {
   timeFrame: 'daily' | 'weekly' | 'allTime';
@@ -17,33 +13,6 @@ export default function LeaderboardFilters({
   // subjectFilter,
   // onSubjectFilterChange,
 }: LeaderboardFiltersProps) {
-  // const [subjects, setSubjects] = useState<Subject[]>([]);
-  useEffect(() => {
-    async function fetchSubjects() {
-      try {
-        // const { data, error } = await supabase
-        const { error } = await supabase
-          .from('subjects')
-          .select('id, name, slug')
-          .order('name');
-
-        if (error) {
-          logger.error('Error fetching subjects:', error);
-          return;
-        }
-
-        // if (data) {
-        //   // Convert to Subject type
-        //   setSubjects(data as Subject[]);
-        // }
-      } catch (err) {
-        logger.error('Failed to fetch subjects:', err);
-      }
-    }
-
-    fetchSubjects();
-  }, []);
-
   return (
     <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
       <div className="flex items-center space-x-2 md:space-x-4">

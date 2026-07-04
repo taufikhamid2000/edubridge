@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
+import { getSubjectsList } from '@/lib/myquiza';
 
 // Cache duration in seconds
 const CACHE_DURATION = 300; // 5 minutes
@@ -19,32 +19,33 @@ export async function GET(
       );
     }
 
-    // Fetch subject data - no authentication required
-    const { data, error } = await supabase
-      .from('subjects')
-      .select('id, name, slug, description, icon, category')
-      .eq('slug', slug)
-      .single();
+    // No by-slug lookup on MyQuiza's side — fetch the list and match locally.
+    const subjects = await getSubjectsList();
+    const subject = subjects.find((s) => s.slug === slug);
 
-    if (error) {
-      logger.error('Error fetching subject:', error);
+    if (!subject) {
       return NextResponse.json({ error: 'Subject not found' }, { status: 404 });
     }
 
-    if (!data) {
-      return NextResponse.json({ error: 'Subject not found' }, { status: 404 });
-    }
-
-    // Return response with cache headers
-    return NextResponse.json(data, {
-      headers: {
-        'Cache-Control': `public, s-maxage=${CACHE_DURATION}, stale-while-revalidate=${CACHE_DURATION * 2}`,
+    return NextResponse.json(
+      {
+        id: subject.id,
+        name: subject.name,
+        slug: subject.slug,
+        description: subject.description,
+        icon: subject.icon,
+        category: subject.category,
       },
-    });
+      {
+        headers: {
+          'Cache-Control': `public, s-maxage=${CACHE_DURATION}, stale-while-revalidate=${CACHE_DURATION * 2}`,
+        },
+      }
+    );
   } catch (error) {
     logger.error('Error in subject API:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Unable to connect to the API. Please contact the administrator.' },
       { status: 500 }
     );
   }
