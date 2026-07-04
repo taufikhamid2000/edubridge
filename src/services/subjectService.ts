@@ -226,7 +226,7 @@ export async function fetchSubjects(): Promise<{
 }
 
 /**
- * Creates a new subject
+ * Creates a new subject via MyQuiza (POST /api/v1/subjects, moderator-only)
  * @param subjectData The subject data to create
  * @returns A promise with the created subject ID or error
  */
@@ -240,36 +240,27 @@ export async function createSubject(subjectData: {
   error: Error | null;
 }> {
   try {
-    // Check admin access
-    const { success, error: accessError } = await checkAdminAccess();
-
-    if (!success) {
-      return { id: null, error: accessError };
-    }
-
-    // Generate a slug if not provided
-    if (!subjectData.slug) {
-      subjectData.slug = subjectData.name
+    const slug =
+      subjectData.slug ||
+      subjectData.name
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/(^-|-$)/g, '');
-    }
 
-    // Insert the new subject
-    const { data, error } = await supabase
-      .from('subjects')
-      .insert({
+    const res = await fetch('/api/admin/subjects', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
         name: subjectData.name,
         description: subjectData.description,
-        slug: subjectData.slug,
-        icon: subjectData.icon || 'default-icon',
-      })
-      .select('id')
-      .single();
+        slug,
+        icon: subjectData.icon || undefined,
+      }),
+    });
 
-    if (error) {
-      logger.error('Error creating subject:', error);
-      return { id: null, error };
+    const data = await res.json();
+    if (!res.ok) {
+      return { id: null, error: new Error(data.error || 'Failed to create subject') };
     }
 
     return { id: data.id, error: null };
@@ -281,7 +272,7 @@ export async function createSubject(subjectData: {
 }
 
 /**
- * Updates an existing subject
+ * Updates an existing subject via MyQuiza (PATCH /api/v1/subjects/{id})
  * @param id The ID of the subject to update
  * @param subjectData The updated subject data
  * @returns A promise with success status and error
@@ -299,22 +290,18 @@ export async function updateSubject(
   error: Error | null;
 }> {
   try {
-    // Check admin access
-    const { success, error: accessError } = await checkAdminAccess();
+    const res = await fetch(`/api/admin/subjects/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(subjectData),
+    });
 
-    if (!success) {
-      return { success: false, error: accessError };
-    }
-
-    // Update the subject
-    const { error } = await supabase
-      .from('subjects')
-      .update(subjectData)
-      .eq('id', id);
-
-    if (error) {
-      logger.error('Error updating subject:', error);
-      return { success: false, error };
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      return {
+        success: false,
+        error: new Error(data.error || 'Failed to update subject'),
+      };
     }
 
     return { success: true, error: null };
@@ -326,7 +313,9 @@ export async function updateSubject(
 }
 
 /**
- * Deletes a subject
+ * Deletes a subject via MyQuiza (DELETE /api/v1/subjects/{id}). Guarded
+ * server-side — returns a 409 (surfaced as an Error here) if any chapters
+ * still exist under this subject.
  * @param id The ID of the subject to delete
  * @returns A promise with success status and error
  */
@@ -335,19 +324,14 @@ export async function deleteSubject(id: string): Promise<{
   error: Error | null;
 }> {
   try {
-    // Check admin access
-    const { success, error: accessError } = await checkAdminAccess();
+    const res = await fetch(`/api/admin/subjects/${id}`, { method: 'DELETE' });
 
-    if (!success) {
-      return { success: false, error: accessError };
-    }
-
-    // Delete the subject
-    const { error } = await supabase.from('subjects').delete().eq('id', id);
-
-    if (error) {
-      logger.error('Error deleting subject:', error);
-      return { success: false, error };
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      return {
+        success: false,
+        error: new Error(data.error || 'Failed to delete subject'),
+      };
     }
 
     return { success: true, error: null };

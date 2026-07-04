@@ -7,6 +7,8 @@ import { useParams, useRouter } from 'next/navigation';
 import ContentEntityEdit, { FormField } from './ContentEntityEdit';
 import Link from 'next/link';
 import Image from 'next/image';
+import { updateSubject } from '@/services/subjectService';
+import { deleteChapter } from '@/services/chapterService';
 
 interface Subject {
   id: string;
@@ -210,30 +212,20 @@ export default function SubjectEditPage() {
 
   // Save subject
   const saveEntity = async (subject: Subject) => {
-    try {
-      const { error } = await supabase
-        .from('subjects')
-        .update({
-          name: subject.name,
-          description: subject.description,
-          icon: subject.icon || null,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', subject.id);
+    const { success, error } = await updateSubject(subject.id, {
+      name: subject.name,
+      description: subject.description,
+      icon: subject.icon || undefined,
+    });
 
-      if (error) {
-        return {
-          success: false,
-          error: new Error(`Failed to update subject: ${error.message}`),
-        };
-      }
-
-      return { success: true, error: null };
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      return { success: false, error: new Error(errorMessage) };
+    if (!success) {
+      return {
+        success: false,
+        error: new Error(`Failed to update subject: ${error?.message}`),
+      };
     }
+
+    return { success: true, error: null };
   };
 
   // Handle chapter deletion
@@ -246,46 +238,16 @@ export default function SubjectEditPage() {
       return;
     }
 
-    try {
-      // Check if there are topics associated with this chapter
-      const { data: topics, error: topicsError } = await supabase
-        .from('topics')
-        .select('id')
-        .eq('chapter_id', chapterId)
-        .limit(1);
+    const { success, error } = await deleteChapter(chapterId);
 
-      if (topicsError) {
-        throw new Error(
-          `Failed to check related topics: ${topicsError.message}`
-        );
-      }
-
-      if (topics && topics.length > 0) {
-        alert(
-          'Cannot delete a chapter with associated topics. Please delete the topics first.'
-        );
-        return;
-      }
-
-      const { error } = await supabase
-        .from('chapters')
-        .delete()
-        .eq('id', chapterId);
-
-      if (error) {
-        throw new Error(`Failed to delete chapter: ${error.message}`);
-      }
-
-      logger.log('Chapter deleted successfully');
-
-      // Update local state
-      setChapters(chapters.filter((chapter) => chapter.id !== chapterId));
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error occurred';
-      logger.error('Error deleting chapter:', errorMessage);
-      logger.error('Chapter deletion error details:', { error, chapterId });
+    if (!success) {
+      logger.error('Error deleting chapter:', error?.message);
+      alert(error?.message || 'Failed to delete chapter.');
+      return;
     }
+
+    logger.log('Chapter deleted successfully');
+    setChapters(chapters.filter((chapter) => chapter.id !== chapterId));
   };
 
   // Initialize the component

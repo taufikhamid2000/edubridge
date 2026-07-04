@@ -179,7 +179,18 @@ async function myquizaFetch<T>(
   });
 
   if (!res.ok) {
-    throw new Error(`MyQuiza ${res.status}: ${path}`);
+    // Include the response body's error detail when present (e.g. 409
+    // delete-guard responses tell the caller how many children are blocking
+    // the delete) while keeping the "MyQuiza {status}" prefix callers match
+    // on via .includes('403') etc.
+    let detail = '';
+    try {
+      const body = await res.json();
+      detail = body?.error || body?.message || '';
+    } catch {
+      // no JSON body — ignore
+    }
+    throw new Error(`MyQuiza ${res.status}: ${path}${detail ? ` — ${detail}` : ''}`);
   }
 
   // PATCH/DELETE may return 204 No Content or an empty body.
@@ -628,4 +639,106 @@ export interface MyQuizaAttempt {
 
 export function getMyAttempts(token: string | null) {
   return myquizaFetch<MyQuizaAttempt[]>('/api/v1/me/attempts', token);
+}
+
+// Content tree CRUD (moderator-only). Deletes are guarded server-side —
+// deleting a subject/chapter/topic with children returns 409 (subjects
+// FK-cascade all the way through quizzes/quiz_attempts/user_topic_progress,
+// so this is deliberate friction, not something to bypass).
+export interface SubjectPayload {
+  name: string;
+  slug: string;
+  description?: string;
+  icon?: string;
+  orderIndex?: number;
+  category?: string;
+  categoryPriority?: number;
+}
+
+export function createMyQuizaSubject(payload: SubjectPayload, token: string | null) {
+  return myquizaFetch<{ id: string }>('/api/v1/subjects', token, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+
+export function updateMyQuizaSubject(
+  id: string,
+  payload: Partial<SubjectPayload>,
+  token: string | null
+) {
+  return myquizaFetch<{ id: string }>(`/api/v1/subjects/${id}`, token, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  });
+}
+
+export function deleteMyQuizaSubject(id: string, token: string | null) {
+  return myquizaFetch<void>(`/api/v1/subjects/${id}`, token, {
+    method: 'DELETE',
+  });
+}
+
+export interface ChapterPayload {
+  subjectId: string;
+  name: string;
+  form: number;
+  orderIndex: number;
+}
+
+export function createMyQuizaChapter(payload: ChapterPayload, token: string | null) {
+  return myquizaFetch<{ id: string }>('/api/v1/chapters', token, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+
+export function updateMyQuizaChapter(
+  id: string,
+  payload: Partial<ChapterPayload>,
+  token: string | null
+) {
+  return myquizaFetch<{ id: string }>(`/api/v1/chapters/${id}`, token, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  });
+}
+
+export function deleteMyQuizaChapter(id: string, token: string | null) {
+  return myquizaFetch<void>(`/api/v1/chapters/${id}`, token, {
+    method: 'DELETE',
+  });
+}
+
+export interface TopicPayload {
+  chapterId: string;
+  name: string;
+  description?: string;
+  difficultyLevel?: string;
+  timeEstimateMinutes?: number;
+  orderIndex: number;
+}
+
+export function createMyQuizaTopic(payload: TopicPayload, token: string | null) {
+  return myquizaFetch<{ id: string }>('/api/v1/topics', token, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+
+export function updateMyQuizaTopic(
+  id: string,
+  payload: Partial<TopicPayload>,
+  token: string | null
+) {
+  return myquizaFetch<{ id: string }>(`/api/v1/topics/${id}`, token, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  });
+}
+
+export function deleteMyQuizaTopic(id: string, token: string | null) {
+  return myquizaFetch<void>(`/api/v1/topics/${id}`, token, {
+    method: 'DELETE',
+  });
 }

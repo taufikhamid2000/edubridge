@@ -6,6 +6,7 @@ import { logger } from '@/lib/logger';
 import { useParams, useRouter } from 'next/navigation';
 import ContentEntityEdit, { FormField } from './ContentEntityEdit';
 import Link from 'next/link';
+import { updateTopic } from '@/services/topicService';
 
 interface Topic {
   id: string;
@@ -134,32 +135,23 @@ export default function TopicEditPage() {
     }
   };
 
-  // Save topic
+  // Save topic. Note: this form's `title` field maps onto MyQuiza's `name`
+  // parameter (see updateTopic in services/topicService.ts).
   const saveEntity = async (topic: Topic) => {
-    try {
-      const { error } = await supabase
-        .from('topics')
-        .update({
-          title: topic.title,
-          chapter_id: topic.chapter_id,
-          order_index: Number(topic.order_index),
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', topic.id);
+    const { success, error } = await updateTopic(topic.id, {
+      title: topic.title,
+      chapter_id: topic.chapter_id,
+      order_index: Number(topic.order_index),
+    });
 
-      if (error) {
-        return {
-          success: false,
-          error: new Error(`Failed to update topic: ${error.message}`),
-        };
-      }
-
-      return { success: true, error: null };
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      return { success: false, error: new Error(errorMessage) };
+    if (!success) {
+      return {
+        success: false,
+        error: new Error(`Failed to update topic: ${error?.message}`),
+      };
     }
+
+    return { success: true, error: null };
   };
 
   // Handle quiz deletion

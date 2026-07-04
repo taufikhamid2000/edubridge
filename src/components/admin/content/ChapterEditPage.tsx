@@ -6,6 +6,8 @@ import { logger } from '@/lib/logger';
 import { useParams, useRouter } from 'next/navigation';
 import ContentEntityEdit, { FormField } from './ContentEntityEdit';
 import Link from 'next/link';
+import { updateChapter } from '@/services/chapterService';
+import { deleteTopic } from '@/services/topicService';
 
 interface Chapter {
   id: string;
@@ -140,34 +142,25 @@ export default function ChapterEditPage() {
       return null;
     }
   };
-  // Save chapter
+  // Save chapter. Note: MyQuiza's chapter contract has no `description`
+  // field (unlike subjects/topics), so it's not sent — this form field is
+  // effectively inert now.
   const saveEntity = async (chapter: Chapter) => {
-    try {
-      const { error } = await supabase
-        .from('chapters')
-        .update({
-          name: chapter.name,
-          description: chapter.description,
-          form: Number(chapter.form),
-          subject_id: chapter.subject_id,
-          order_index: Number(chapter.order_index),
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', chapter.id);
+    const { success, error } = await updateChapter(chapter.id, {
+      name: chapter.name,
+      subject_id: chapter.subject_id,
+      form: Number(chapter.form),
+      order_index: Number(chapter.order_index),
+    });
 
-      if (error) {
-        return {
-          success: false,
-          error: new Error(`Failed to update chapter: ${error.message}`),
-        };
-      }
-
-      return { success: true, error: null };
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      return { success: false, error: new Error(errorMessage) };
+    if (!success) {
+      return {
+        success: false,
+        error: new Error(`Failed to update chapter: ${error?.message}`),
+      };
     }
+
+    return { success: true, error: null };
   };
 
   // Handle topic deletion
@@ -180,46 +173,16 @@ export default function ChapterEditPage() {
       return;
     }
 
-    try {
-      // Check if there are quizzes associated with this topic
-      const { data: quizzes, error: quizzesError } = await supabase
-        .from('quizzes')
-        .select('id')
-        .eq('topic_id', topicId)
-        .limit(1);
+    const { success, error } = await deleteTopic(topicId);
 
-      if (quizzesError) {
-        throw new Error(
-          `Failed to check related quizzes: ${quizzesError.message}`
-        );
-      }
-
-      if (quizzes && quizzes.length > 0) {
-        alert(
-          'Cannot delete a topic with associated quizzes. Please delete the quizzes first.'
-        );
-        return;
-      }
-
-      const { error } = await supabase
-        .from('topics')
-        .delete()
-        .eq('id', topicId);
-
-      if (error) {
-        throw new Error(`Failed to delete topic: ${error.message}`);
-      }
-
-      logger.log('Topic deleted successfully');
-
-      // Update local state
-      setTopics(topics.filter((topic) => topic.id !== topicId));
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error occurred';
-      logger.error('Error deleting topic:', errorMessage);
-      logger.error('Topic deletion error details:', { error, topicId });
+    if (!success) {
+      logger.error('Error deleting topic:', error?.message);
+      alert(error?.message || 'Failed to delete topic.');
+      return;
     }
+
+    logger.log('Topic deleted successfully');
+    setTopics(topics.filter((topic) => topic.id !== topicId));
   };
 
   // Initialize the component

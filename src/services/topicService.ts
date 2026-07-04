@@ -97,7 +97,7 @@ export async function fetchAdminTopics(): Promise<{
 }
 
 /**
- * Creates a new topic
+ * Creates a new topic via MyQuiza (POST /api/v1/topics, moderator-only)
  * @param topicData The topic data to create
  * @returns A promise with the created topic ID or error
  */
@@ -110,13 +110,6 @@ export async function createTopic(topicData: {
   error: Error | null;
 }> {
   try {
-    // Check admin access
-    const { success, error: accessError } = await checkAdminAccess();
-
-    if (!success) {
-      return { id: null, error: accessError };
-    }
-
     // If order_index is not provided, get the max index for the chapter and add 1
     let orderIndex = topicData.order_index;
     if (orderIndex === undefined) {
@@ -136,20 +129,19 @@ export async function createTopic(topicData: {
       orderIndex = maxOrderData ? maxOrderData.order_index + 1 : 0;
     }
 
-    // Insert the new topic
-    const { data, error } = await supabase
-      .from('topics')
-      .insert({
+    const res = await fetch('/api/admin/topics', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
         name: topicData.name,
-        chapter_id: topicData.chapter_id,
-        order_index: orderIndex,
-      })
-      .select('id')
-      .single();
+        chapterId: topicData.chapter_id,
+        orderIndex,
+      }),
+    });
 
-    if (error) {
-      logger.error('Error creating topic:', error);
-      return { id: null, error };
+    const data = await res.json();
+    if (!res.ok) {
+      return { id: null, error: new Error(data.error || 'Failed to create topic') };
     }
 
     return { id: data.id, error: null };
@@ -161,7 +153,10 @@ export async function createTopic(topicData: {
 }
 
 /**
- * Updates an existing topic
+ * Updates an existing topic via MyQuiza (PATCH /api/v1/topics/{id}).
+ * `title`/`content` are the historical local field names (pre-dating a
+ * `name` standardization elsewhere); mapped onto MyQuiza's `name`/
+ * `description` fields.
  * @param id The ID of the topic to update
  * @param topicData The updated topic data
  * @returns A promise with success status and error
@@ -179,22 +174,23 @@ export async function updateTopic(
   error: Error | null;
 }> {
   try {
-    // Check admin access
-    const { success, error: accessError } = await checkAdminAccess();
+    const res = await fetch(`/api/admin/topics/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: topicData.title,
+        chapterId: topicData.chapter_id,
+        description: topicData.content,
+        orderIndex: topicData.order_index,
+      }),
+    });
 
-    if (!success) {
-      return { success: false, error: accessError };
-    }
-
-    // Update the topic
-    const { error } = await supabase
-      .from('topics')
-      .update(topicData)
-      .eq('id', id);
-
-    if (error) {
-      logger.error('Error updating topic:', error);
-      return { success: false, error };
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      return {
+        success: false,
+        error: new Error(data.error || 'Failed to update topic'),
+      };
     }
 
     return { success: true, error: null };
@@ -206,7 +202,9 @@ export async function updateTopic(
 }
 
 /**
- * Deletes a topic
+ * Deletes a topic via MyQuiza (DELETE /api/v1/topics/{id}). Guarded
+ * server-side — returns a 409 (surfaced as an Error here) if any quizzes
+ * still exist under this topic.
  * @param id The ID of the topic to delete
  * @returns A promise with success status and error
  */
@@ -215,38 +213,14 @@ export async function deleteTopic(id: string): Promise<{
   error: Error | null;
 }> {
   try {
-    // Check admin access
-    const { success, error: accessError } = await checkAdminAccess();
+    const res = await fetch(`/api/admin/topics/${id}`, { method: 'DELETE' });
 
-    if (!success) {
-      return { success: false, error: accessError };
-    }
-
-    // Check if there are quizzes associated with this topic
-    const { data: quizzes, error: quizzesError } = await supabase
-      .from('quizzes')
-      .select('id')
-      .eq('topic_id', id)
-      .limit(1);
-
-    if (quizzesError) {
-      logger.error('Error checking for related quizzes:', quizzesError);
-      return { success: false, error: quizzesError };
-    }
-
-    if (quizzes && quizzes.length > 0) {
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
       return {
         success: false,
-        error: new Error('Cannot delete topic with associated quizzes'),
+        error: new Error(data.error || 'Failed to delete topic'),
       };
-    }
-
-    // Delete the topic
-    const { error } = await supabase.from('topics').delete().eq('id', id);
-
-    if (error) {
-      logger.error('Error deleting topic:', error);
-      return { success: false, error };
     }
 
     return { success: true, error: null };

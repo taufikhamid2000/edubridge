@@ -95,12 +95,12 @@ export async function fetchAdminChapters(): Promise<{
 }
 
 /**
- * Creates a new chapter
+ * Creates a new chapter via MyQuiza (POST /api/v1/chapters, moderator-only)
  * @param chapterData The chapter data to create
  * @returns A promise with the created chapter ID or error
  */
 export async function createChapter(chapterData: {
-  name: string; // Previously called 'title'
+  name: string;
   subject_id: string;
   form: number;
   order_index?: number;
@@ -109,13 +109,6 @@ export async function createChapter(chapterData: {
   error: Error | null;
 }> {
   try {
-    // Check admin access
-    const { success, error: accessError } = await checkAdminAccess();
-
-    if (!success) {
-      return { id: null, error: accessError };
-    }
-
     // If order_index is not provided, get the max index for the subject and add 1
     let orderIndex = chapterData.order_index;
     if (orderIndex === undefined) {
@@ -136,21 +129,20 @@ export async function createChapter(chapterData: {
       orderIndex = maxOrderData ? maxOrderData.order_index + 1 : 0;
     }
 
-    // Insert the new chapter
-    const { data, error } = await supabase
-      .from('chapters')
-      .insert({
-        name: chapterData.name, // Previously called 'title'
-        subject_id: chapterData.subject_id,
+    const res = await fetch('/api/admin/chapters', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: chapterData.name,
+        subjectId: chapterData.subject_id,
         form: chapterData.form,
-        order_index: orderIndex,
-      })
-      .select('id')
-      .single();
+        orderIndex,
+      }),
+    });
 
-    if (error) {
-      logger.error('Error creating chapter:', error);
-      return { id: null, error };
+    const data = await res.json();
+    if (!res.ok) {
+      return { id: null, error: new Error(data.error || 'Failed to create chapter') };
     }
 
     return { id: data.id, error: null };
@@ -162,7 +154,7 @@ export async function createChapter(chapterData: {
 }
 
 /**
- * Updates an existing chapter
+ * Updates an existing chapter via MyQuiza (PATCH /api/v1/chapters/{id})
  * @param id The ID of the chapter to update
  * @param chapterData The updated chapter data
  * @returns A promise with success status and error
@@ -170,7 +162,7 @@ export async function createChapter(chapterData: {
 export async function updateChapter(
   id: string,
   chapterData: {
-    name?: string; // Previously called 'title'
+    name?: string;
     subject_id?: string;
     form?: number;
     order_index?: number;
@@ -180,22 +172,23 @@ export async function updateChapter(
   error: Error | null;
 }> {
   try {
-    // Check admin access
-    const { success, error: accessError } = await checkAdminAccess();
+    const res = await fetch(`/api/admin/chapters/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: chapterData.name,
+        subjectId: chapterData.subject_id,
+        form: chapterData.form,
+        orderIndex: chapterData.order_index,
+      }),
+    });
 
-    if (!success) {
-      return { success: false, error: accessError };
-    }
-
-    // Update the chapter
-    const { error } = await supabase
-      .from('chapters')
-      .update(chapterData)
-      .eq('id', id);
-
-    if (error) {
-      logger.error('Error updating chapter:', error);
-      return { success: false, error };
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      return {
+        success: false,
+        error: new Error(data.error || 'Failed to update chapter'),
+      };
     }
 
     return { success: true, error: null };
@@ -207,7 +200,9 @@ export async function updateChapter(
 }
 
 /**
- * Deletes a chapter
+ * Deletes a chapter via MyQuiza (DELETE /api/v1/chapters/{id}). Guarded
+ * server-side — returns a 409 (surfaced as an Error here) if any topics
+ * still exist under this chapter.
  * @param id The ID of the chapter to delete
  * @returns A promise with success status and error
  */
@@ -216,38 +211,14 @@ export async function deleteChapter(id: string): Promise<{
   error: Error | null;
 }> {
   try {
-    // Check admin access
-    const { success, error: accessError } = await checkAdminAccess();
+    const res = await fetch(`/api/admin/chapters/${id}`, { method: 'DELETE' });
 
-    if (!success) {
-      return { success: false, error: accessError };
-    }
-
-    // Check if there are topics associated with this chapter
-    const { data: topics, error: topicsError } = await supabase
-      .from('topics')
-      .select('id')
-      .eq('chapter_id', id)
-      .limit(1);
-
-    if (topicsError) {
-      logger.error('Error checking for related topics:', topicsError);
-      return { success: false, error: topicsError };
-    }
-
-    if (topics && topics.length > 0) {
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
       return {
         success: false,
-        error: new Error('Cannot delete chapter with associated topics'),
+        error: new Error(data.error || 'Failed to delete chapter'),
       };
-    }
-
-    // Delete the chapter
-    const { error } = await supabase.from('chapters').delete().eq('id', id);
-
-    if (error) {
-      logger.error('Error deleting chapter:', error);
-      return { success: false, error };
     }
 
     return { success: true, error: null };
