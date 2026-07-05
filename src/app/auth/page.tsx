@@ -64,7 +64,7 @@ export default function Auth() {
   };
 
   const inputClass =
-    'w-full px-3 py-2 pr-10 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 border-gray-600 dark:border-gray-300 bg-gray-700 dark:bg-white text-gray-100 dark:text-gray-900 placeholder-gray-400 dark:placeholder-gray-500';
+    'auth-input w-full px-3 py-2 pr-10 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 border-gray-600 dark:border-gray-300 bg-gray-700 dark:bg-white text-gray-100 dark:text-gray-900 placeholder-gray-400 dark:placeholder-gray-500';
 
   return (
     <section className="min-h-screen flex items-center justify-center bg-gray-900 dark:bg-gray-50 p-4">

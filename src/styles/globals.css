@@ -113,6 +113,32 @@ body {
   @apply btn p-2 rounded-full border border-gray-600 hover:bg-gray-800 dark:border-gray-300 dark:hover:bg-gray-100;
 }
 
+/* Browsers/password managers (Chrome's "Google Password Manager" autofill,
+   Safari, etc.) force their own background via the `-webkit-autofill`
+   pseudo-class, which ignores normal `background-color`. The box-shadow
+   inset trick paints over it so autofilled fields keep the auth form's
+   own colors instead of Chrome's default yellow/blue highlight. */
+.auth-input:-webkit-autofill,
+.auth-input:-webkit-autofill:hover,
+.auth-input:-webkit-autofill:focus,
+.auth-input:-webkit-autofill:active {
+  -webkit-text-fill-color: #f3f4f6;
+  box-shadow: 0 0 0 1000px #374151 inset;
+  -webkit-box-shadow: 0 0 0 1000px #374151 inset;
+  caret-color: #f3f4f6;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+.dark .auth-input:-webkit-autofill,
+.dark .auth-input:-webkit-autofill:hover,
+.dark .auth-input:-webkit-autofill:focus,
+.dark .auth-input:-webkit-autofill:active {
+  -webkit-text-fill-color: #111827;
+  box-shadow: 0 0 0 1000px #ffffff inset;
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset;
+  caret-color: #111827;
+}
+
 @layer components {
   .btn {
     @apply inline-block font-medium uppercase tracking-wide rounded-full shadow-md transition-all duration-300 ease-in-out px-6 py-2 sm:px-8 sm:py-3;
