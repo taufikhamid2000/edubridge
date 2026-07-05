@@ -36,22 +36,18 @@ export function useAdminStatus() {
 
         const userId = sessionData.session.user.id;
 
-        // Check if user has admin role
+        // Check if user has admin role. maybeSingle (not single) — most
+        // users have no row here at all, which is expected, not an error.
         const { data: roleData, error: roleError } = await supabase
           .from('user_roles')
           .select('role')
           .eq('user_id', userId)
-          .single();
+          .maybeSingle();
 
         if (roleError) {
-          if (roleError.code === 'PGRST116') {
-            // No matching row found - user has no role assigned
-            setIsAdmin(false);
-          } else {
-            logger.error('Error checking admin role:', roleError);
-            setError('Failed to check admin status');
-            setIsAdmin(false);
-          }
+          logger.error('Error checking admin role:', roleError);
+          setError('Failed to check admin status');
+          setIsAdmin(false);
           return;
         }
 

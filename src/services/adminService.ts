@@ -8,11 +8,13 @@ import { logger } from '@/lib/logger';
  */
 export async function isUserAdmin(userId: string): Promise<boolean> {
   try {
+    // maybeSingle — most users have no row here, which is expected, not
+    // an error.
     const { data, error } = await supabase
       .from('user_roles')
       .select('role')
       .eq('user_id', userId)
-      .single();
+      .maybeSingle();
 
     if (error) {
       logger.error('Error checking admin status:', error);
@@ -269,7 +271,8 @@ export async function fetchAdminUsers(): Promise<{
 }> {
   try {
     // First check if the user is an admin via a direct query
-    // This is necessary to enforce proper authorization
+    // This is necessary to enforce proper authorization. maybeSingle —
+    // most users have no row here, which is expected, not an error.
     const { data: userRoles, error: roleError } = await supabase
       .from('user_roles')
       .select('role')
@@ -277,14 +280,16 @@ export async function fetchAdminUsers(): Promise<{
         'user_id',
         (await supabase.auth.getSession()).data.session?.user?.id || ''
       )
-      .single();
+      .maybeSingle();
 
-    if (roleError || !userRoles || userRoles.role !== 'admin') {
-      logger.error('Admin access denied - user is not an admin', { roleError });
-      return {
-        data: null,
-        error: new Error('Admin access required'),
-      };
+    if (roleError) {
+      logger.error('Error checking admin role:', roleError);
+      return { data: null, error: new Error('Admin access required') };
+    }
+
+    if (!userRoles || userRoles.role !== 'admin') {
+      // Normal case for most users — not an error, don't log as one.
+      return { data: null, error: new Error('Admin access required') };
     }
 
     // User is confirmed as admin, proceed with fetch    // Get users and their roles - users first

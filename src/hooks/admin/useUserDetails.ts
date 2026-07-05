@@ -51,12 +51,13 @@ export function useUserDetails(userId: string) {
           return;
         }
 
-        // Fetch user role
+        // Fetch user role. maybeSingle — a user may legitimately have no
+        // row here, which is expected, not an error.
         const { data: roleData, error: roleError } = await supabase
           .from('user_roles')
           .select('role')
           .eq('user_id', userId)
-          .single();
+          .maybeSingle();
 
         if (roleError) {
           logger.warn('Error fetching user role:', roleError);

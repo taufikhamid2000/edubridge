@@ -72,11 +72,12 @@ export async function POST(request: Request) {
         }
 
         // Check if user has admin privileges - USING ADMIN CLIENT TO BYPASS RLS
+        // maybeSingle — most users have no row here, which is expected.
         const { data: userRoles } = await supabaseAdmin
           .from('user_roles')
           .select('role')
           .eq('user_id', session.user.id)
-          .single();
+          .maybeSingle();
 
         if (!userRoles || userRoles.role !== 'admin') {
           return NextResponse.json(

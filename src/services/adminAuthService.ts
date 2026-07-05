@@ -31,22 +31,17 @@ export async function verifyAdminAccess(): Promise<{
       };
     }
 
-    // Check if the user is an admin via a direct query
+    // Check if the user is an admin via a direct query. maybeSingle — most
+    // users have no row here at all, which is expected, not an error.
     const { data: userRoles, error: roleError } = await supabase
       .from('user_roles')
       .select('role')
       .eq('user_id', userId)
-      .single();
-
-    // Debug role check
-    // logger.log('User role check:', {
-    //   userId,
-    //   hasRoleData: !!userRoles,
-    //   role: userRoles?.role,
-    //   hasError: !!roleError,
-    // });
+      .maybeSingle();
 
     if (roleError) {
+      // A genuine query error (not "no row found" — maybeSingle returns
+      // null for that, not an error).
       logger.error('Error checking admin role:', roleError);
       return {
         isAdmin: false,
@@ -56,9 +51,7 @@ export async function verifyAdminAccess(): Promise<{
     }
 
     if (!userRoles || userRoles.role !== 'admin') {
-      logger.error('Admin access denied - user is not an admin', {
-        role: userRoles?.role,
-      });
+      // Normal case for most users — not an error, don't log as one.
       return {
         isAdmin: false,
         userId,

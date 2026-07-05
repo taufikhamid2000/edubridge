@@ -41,24 +41,17 @@ export default function AdminPage() {
 
         // Check admin status
         try {
-          // Use regular supabase client for role check
+          // Use regular supabase client for role check. maybeSingle — most
+          // users have no row here, which is expected, not an error.
           const { data: adminData, error: adminError } = await supabase
             .from('user_roles')
             .select('role')
             .eq('user_id', session.user.id)
-            .single();
+            .maybeSingle();
 
           if (adminError) {
-            // Handle specific error codes
-            if (adminError.code === 'PGRST116') {
-              // No matching row found - user has no role assigned
-              logger.info('User has no admin role assigned');
-              setIsAdmin(false);
-            } else {
-              // Other database errors
-              logger.error('Database error checking admin status:', adminError);
-              setIsAdmin(false);
-            }
+            logger.error('Database error checking admin status:', adminError);
+            setIsAdmin(false);
           } else {
             // Successfully retrieved user role
             const roleValue = (adminData?.role || '').toLowerCase();

@@ -22,15 +22,16 @@ export async function checkAdminPermission(): Promise<{
 
     const userId = sessionData.session.user.id;
 
-    // Check user roles (from user_roles table)
+    // Check user roles (from user_roles table). maybeSingle — most users
+    // have no row here, which is expected, not an error.
     const { data: roleData, error: roleError } = await supabase
       .from('user_roles')
       .select('role')
       .eq('user_id', userId)
-      .single();
+      .maybeSingle();
 
     if (roleError) {
-      // If there's no role entry, the user is definitely not an admin
+      // A genuine query error — treat conservatively as not-admin.
       return { isAuthorized: false, userId };
     }
 
@@ -44,7 +45,7 @@ export async function checkAdminPermission(): Promise<{
         .from('user_profiles')
         .select('school_role')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
 
       const schoolRole = (profileData?.school_role || '').toLowerCase();
       const isTeacher = schoolRole === 'teacher' || schoolRole === 'admin';

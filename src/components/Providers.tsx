@@ -82,6 +82,17 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         }, 100);
       } else if (event === 'SIGNED_OUT') {
         logger.info('User signed out');
+        // Catches session loss detected via the browser's native storage
+        // event too (e.g. clearing localStorage/cookies manually, or
+        // signing out in another tab) — Supabase fires SIGNED_OUT for that
+        // case as well as an explicit signOut() call. No extra network
+        // request here; this reuses the event this listener already gets.
+        const protectedPrefixes = ['/dashboard', '/profile', '/admin'];
+        if (
+          protectedPrefixes.some((p) => window.location.pathname.startsWith(p))
+        ) {
+          window.location.assign('/auth');
+        }
       } else if (event === 'USER_UPDATED') {
         logger.info('User data updated');
       } else if (event === 'PASSWORD_RECOVERY') {

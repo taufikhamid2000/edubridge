@@ -34,12 +34,13 @@ export async function GET() {
     }
 
     // Check if user has admin privileges - using admin client to bypass RLS
-    // This is secure because we're still checking if the user is logged in
+    // This is secure because we're still checking if the user is logged in.
+    // maybeSingle — most users have no row here, which is expected.
     const { data: userRoles } = await supabaseAdmin
       .from('user_roles')
       .select('role')
       .eq('user_id', session.user.id)
-      .single();
+      .maybeSingle();
 
     if (!userRoles || userRoles.role !== 'admin') {
       logger.warn(
@@ -149,12 +150,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Check if user has admin privileges
+    // Check if user has admin privileges. maybeSingle — most users have
+    // no row here, which is expected.
     const { data: userRoles } = await supabase
       .from('user_roles')
       .select('role')
       .eq('user_id', session.user.id)
-      .single();
+      .maybeSingle();
 
     if (!userRoles || userRoles.role !== 'admin') {
       return NextResponse.json(

@@ -1,16 +1,13 @@
 'use client';
 
 import { useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { signOut } from '@/lib/auth';
 
 export default function LogoutPage() {
   useEffect(() => {
-    const logout = async () => {
-      await supabase.auth.signOut();
-      window.location.href = '/auth';
-    };
-
-    logout();
+    // Shared with Header and profile settings — same implementation,
+    // same destination (/auth).
+    signOut();
   }, []);
 
   return (

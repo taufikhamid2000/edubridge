@@ -47,11 +47,13 @@ export default function AdminContentPage() {
       };
     }
 
+    // maybeSingle — most users have no row here, which is expected, not
+    // an error.
     const { data, error } = await supabase
       .from('user_roles')
       .select('role')
       .eq('user_id', session.user.id)
-      .single();
+      .maybeSingle();
 
     if (error) {
       return { isAdmin: false, message: 'Error checking admin status' };

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { User } from '@/types/users';
 import { updateUserProfile } from '@/services/profileService';
 import { supabase } from '@/lib/supabase';
+import { signOut } from '@/lib/auth';
 import { logger } from '@/lib/logger';
 import Image from 'next/image';
 
@@ -176,8 +177,9 @@ export default function ProfileSettings({ user }: ProfileSettingsProps) {
   // Handle sign out
   const handleSignOut = async () => {
     try {
-      await supabase.auth.signOut();
-      window.location.href = '/auth';
+      // Shared with Header's sign-out — same implementation, same
+      // destination (/auth), so all sign-out entry points behave identically.
+      await signOut();
     } catch (err) {
       logger.error('Error signing out:', err);
       setErrorMessage('Failed to sign out. Please try again.');

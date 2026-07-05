@@ -42,11 +42,12 @@ export const signOut = async () => {
       localStorage.removeItem('supabase.auth.token');
     }
 
-    // Delay to ensure signout operations complete
-    logger.log('Redirecting to homepage...');
+    logger.log('Redirecting to /auth...');
 
-    // Use a hard redirect that won't be caught by Next.js router
-    document.location.href = '/';
+    // Use a hard redirect that won't be caught by Next.js router. Standardized
+    // to /auth everywhere sign-out happens (Header, profile settings, and the
+    // dedicated /auth/logout page all now land in the same place).
+    document.location.href = '/auth';
     return true; // Signal that signout completed successfully
   } catch (error) {
     logger.error('Error signing out:', error);
