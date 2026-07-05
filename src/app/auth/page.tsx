@@ -32,13 +32,17 @@ export default function Auth() {
     try {
       if (mode === 'signup') {
         // TODO(auth): No email verification / confirmation flow yet.
-        // Supabase signUp() is called as-is and any address is accepted
-        // immediately — add a transactional email provider (e.g. SendGrid)
-        // and gate dashboard access on a confirmed email before allowing
-        // real accounts to rely on this.
-        const { error: err } = await supabase.auth.signUp({ email, password });
+        // Email confirmation is disabled on the Supabase project, so
+        // signUp() returns a session immediately and everyone can sign in
+        // right away — add a transactional email provider (e.g. SendGrid)
+        // and gate dashboard access on a confirmed email if this changes.
+        const { data, error: err } = await supabase.auth.signUp({ email, password });
         if (err) { setError(err.message); return; }
-        setError('Check your email to confirm your account.');
+        if (!data.session) {
+          setError('Check your email to confirm your account.');
+          return;
+        }
+        window.location.assign('/dashboard');
       } else {
         const { error: err } = await supabase.auth.signInWithPassword({ email, password });
         if (err) { setError(err.message); return; }
