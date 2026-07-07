@@ -3,7 +3,7 @@ import { supabase } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
-import { getMyStats, getMe } from '@/lib/myquiza';
+import { getMyStats, getMe, getSubjectsList } from '@/lib/myquiza';
 
 // Cache duration in seconds
 const CACHE_DURATION = 300; // 5 minutes
@@ -99,19 +99,17 @@ export async function GET() {
 
     // Fetch data in parallel for optimal performance
     const [
-      { data: subjectsData, error: subjectsError },
+      subjectsList,
       { data: userData, error: userError },
       userStatsData,
       meData,
     ] = await Promise.all([
-      // Fetch subjects directly from the base table (avoids stale materialized view)
-      supabase
-        .from('subjects')
-        .select(
-          'id, name, slug, description, icon, category, category_priority, order_index'
-        )
-        .order('category_priority', { ascending: true })
-        .order('order_index', { ascending: true }),
+      // Subjects now come from MyQuiza (categoryPriority shipped on their
+      // /api/v1/subjects response) rather than a direct Supabase read.
+      getSubjectsList().catch((err) => {
+        logger.error('Error fetching subjects from MyQuiza:', err);
+        return null;
+      }),
 
       // display_name/streak stay on Supabase — MyQuiza doesn't touch streak
       isAuthenticated
@@ -142,8 +140,7 @@ export async function GET() {
     ]);
 
     // Handle fetch errors
-    if (subjectsError) {
-      logger.error('Error fetching subjects in dashboard API:', subjectsError);
+    if (!subjectsList) {
       return NextResponse.json(
         { error: 'Failed to load subjects' },
         { status: 500 }
@@ -159,12 +156,18 @@ export async function GET() {
       );
     }
 
-    // Process subjects data server-side
-    const processedSubjects = (subjectsData || []).map((subject) => ({
-      ...subject,
+    // Process subjects data server-side (MyQuiza's response is already
+    // sorted by categoryPriority/orderIndex/name; map camelCase -> the
+    // snake_case shape the rest of the dashboard response uses)
+    const processedSubjects = subjectsList.map((subject) => ({
+      id: subject.id,
+      name: subject.name,
+      slug: subject.slug,
+      description: subject.description,
+      icon: subject.icon,
       category: subject.category || 'Uncategorized',
-      category_priority: subject.category_priority ?? 999,
-      order_index: subject.order_index ?? 999,
+      category_priority: subject.categoryPriority ?? 999,
+      order_index: subject.orderIndex ?? 999,
     }));
 
     // Extract unique categories server-side

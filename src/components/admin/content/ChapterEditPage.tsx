@@ -142,12 +142,10 @@ export default function ChapterEditPage() {
       return null;
     }
   };
-  // Save chapter. Note: MyQuiza's chapter contract has no `description`
-  // field (unlike subjects/topics), so it's not sent — this form field is
-  // effectively inert now.
   const saveEntity = async (chapter: Chapter) => {
     const { success, error } = await updateChapter(chapter.id, {
       name: chapter.name,
+      description: chapter.description,
       subject_id: chapter.subject_id,
       form: Number(chapter.form),
       order_index: Number(chapter.order_index),

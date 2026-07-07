@@ -10,7 +10,7 @@ export async function PATCH(
   try {
     const { id } = await params;
     const body = await request.json();
-    const { subjectId, name, form, orderIndex } = body;
+    const { subjectId, name, form, orderIndex, description } = body;
 
     const token = await getSessionToken();
     if (!token) {
@@ -19,7 +19,7 @@ export async function PATCH(
 
     const chapter = await updateMyQuizaChapter(
       id,
-      { subjectId, name, form, orderIndex },
+      { subjectId, name, form, orderIndex, description },
       token
     );
     return NextResponse.json(chapter);

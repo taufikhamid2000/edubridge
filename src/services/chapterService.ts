@@ -101,6 +101,7 @@ export async function fetchAdminChapters(): Promise<{
  */
 export async function createChapter(chapterData: {
   name: string;
+  description?: string;
   subject_id: string;
   form: number;
   order_index?: number;
@@ -134,6 +135,7 @@ export async function createChapter(chapterData: {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         name: chapterData.name,
+        description: chapterData.description,
         subjectId: chapterData.subject_id,
         form: chapterData.form,
         orderIndex,
@@ -163,6 +165,7 @@ export async function updateChapter(
   id: string,
   chapterData: {
     name?: string;
+    description?: string;
     subject_id?: string;
     form?: number;
     order_index?: number;
@@ -177,6 +180,7 @@ export async function updateChapter(
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         name: chapterData.name,
+        description: chapterData.description,
         subjectId: chapterData.subject_id,
         form: chapterData.form,
         orderIndex: chapterData.order_index,

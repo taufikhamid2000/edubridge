@@ -384,7 +384,8 @@ export function getMyAchievements(token: string | null) {
   return myquizaFetch<MyQuizaAchievement[]>('/api/v1/me/achievements', token);
 }
 
-// Moderator-only (viewing another user's achievements, not a public profile call).
+// Public — achievement badges aren't sensitive, and profile pages need to
+// show other users' earned badges. Safe to call with token: null.
 export function getUserAchievements(userId: string, token: string | null) {
   return myquizaFetch<MyQuizaAchievement[]>(
     `/api/v1/users/${userId}/achievements`,
@@ -684,6 +685,7 @@ export interface ChapterPayload {
   name: string;
   form: number;
   orderIndex: number;
+  description?: string;
 }
 
 export function createMyQuizaChapter(payload: ChapterPayload, token: string | null) {
@@ -756,6 +758,7 @@ export interface MyQuizaSubjectListEntry {
   category: string | null;
   orderIndex: number;
   isDisabled: boolean;
+  categoryPriority: number | null;
 }
 
 export interface MyQuizaChapterListEntry {
@@ -764,6 +767,7 @@ export interface MyQuizaChapterListEntry {
   name: string;
   form: number;
   orderIndex: number;
+  description: string | null;
 }
 
 export interface MyQuizaTopicListEntry {
@@ -792,4 +796,66 @@ export function getChapterTopics(chapterId: string) {
     `/api/v1/chapters/${chapterId}/topics`,
     null
   );
+}
+
+// Reverse lookup: topic -> its parent chapter/subject. No single-topic-detail
+// endpoint otherwise exists — only nested lists under a chapter.
+export interface MyQuizaTopicBreadcrumb {
+  id: string;
+  name: string;
+  chapterId: string | null;
+  chapterName: string | null;
+  subjectId: string | null;
+  subjectName: string | null;
+}
+
+export function getTopicBreadcrumb(topicId: string) {
+  return myquizaFetch<MyQuizaTopicBreadcrumb>(
+    `/api/v1/topics/${topicId}/breadcrumb`,
+    null
+  );
+}
+
+// Full nested subjects -> chapters -> topics tree in one call, for admin UIs
+// that would otherwise fan out into subjects * chapters individual requests.
+// Moderator-only; includes disabled subjects.
+export interface MyQuizaTopicTreeEntry {
+  id: string;
+  name: string;
+  orderIndex: number;
+}
+
+export interface MyQuizaChapterTreeEntry {
+  id: string;
+  name: string;
+  form: number;
+  orderIndex: number;
+  topics: MyQuizaTopicTreeEntry[];
+}
+
+export interface MyQuizaSubjectTreeEntry {
+  id: string;
+  name: string;
+  slug: string;
+  isDisabled: boolean;
+  chapters: MyQuizaChapterTreeEntry[];
+}
+
+export function getContentTree(token: string | null) {
+  return myquizaFetch<MyQuizaSubjectTreeEntry[]>('/api/v1/content-tree', token);
+}
+
+// Cross-quiz moderator dashboard aggregate — every other audit endpoint is
+// scoped to a single quiz/question/answer, so this avoids an admin UI fan-out.
+export interface MyQuizaAuditSummary {
+  unresolvedQuizComments: number;
+  unresolvedQuestionComments: number;
+  unresolvedAnswerComments: number;
+  verifiedToday: number;
+  unverifiedToday: number;
+  rejectedToday: number;
+}
+
+export function getAuditSummary(token: string | null) {
+  return myquizaFetch<MyQuizaAuditSummary>('/api/v1/admin/audit-summary', token);
 }

@@ -6,7 +6,7 @@ import { getSessionToken } from '@/lib/serverSession';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { subjectId, name, form, orderIndex } = body;
+    const { subjectId, name, form, orderIndex, description } = body;
 
     if (!subjectId || !name || form === undefined || orderIndex === undefined) {
       return NextResponse.json(
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     }
 
     const chapter = await createMyQuizaChapter(
-      { subjectId, name, form, orderIndex },
+      { subjectId, name, form, orderIndex, description },
       token
     );
     return NextResponse.json(chapter);

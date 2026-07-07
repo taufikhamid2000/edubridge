@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
-import { getTopicQuizzes } from '@/lib/myquiza';
+import {
+  getTopicQuizzes,
+  getTopicBreadcrumb,
+  getSubjectChapters,
+  getChapterTopics,
+  getSubjectsList,
+} from '@/lib/myquiza';
 
 export async function GET(
   request: NextRequest,
@@ -17,61 +22,37 @@ export async function GET(
       );
     }
 
-    logger.log(`Fetching topic data for topic ID: ${topicId}`); // Single optimized query to get topic with chapter, subject, and quizzes
-    const { data: topicData, error: topicError } = await supabase
-      .from('topics')
-      .select(
-        `
-        id,
-        name,
-        description,
-        difficulty_level,
-        time_estimate_minutes,
-        order_index,
-        chapter_id,
-        chapters:chapters!inner (
-          id,
-          name,
-          form,
-          order_index,
-          subjects:subjects!inner (
-            id,
-            name,
-            slug,
-            description,
-            icon,
-            category,
-            category_priority,
-            order_index
-          )
-        )
-      `
-      )
-      .eq('id', topicId)
-      .single();
+    logger.log(`Fetching topic data for topic ID: ${topicId}`);
 
-    if (topicError) {
-      logger.error('Error fetching topic data:', topicError);
-      return NextResponse.json(
-        { error: 'Failed to fetch topic data' },
-        { status: 500 }
-      );
+    // Resolve topic -> chapter -> subject ancestry via MyQuiza's breadcrumb
+    // endpoint, then pull full chapter/topic/subject detail from the
+    // already-migrated list endpoints (breadcrumb itself is intentionally
+    // thin — id/name pairs only).
+    let breadcrumb;
+    try {
+      breadcrumb = await getTopicBreadcrumb(topicId);
+    } catch (err) {
+      logger.error('Error fetching topic breadcrumb:', err);
+      return NextResponse.json({ error: 'Topic not found' }, { status: 404 });
     }
+
+    if (!breadcrumb.chapterId || !breadcrumb.subjectId) {
+      return NextResponse.json({ error: 'Topic not found' }, { status: 404 });
+    }
+
+    const [chapters, topics, subjects] = await Promise.all([
+      getSubjectChapters(breadcrumb.subjectId),
+      getChapterTopics(breadcrumb.chapterId),
+      getSubjectsList(),
+    ]);
+
+    const chapter = chapters.find((c) => c.id === breadcrumb.chapterId) ?? null;
+    const topicData = topics.find((t) => t.id === topicId) ?? null;
+    const subject = subjects.find((s) => s.id === breadcrumb.subjectId) ?? null;
 
     if (!topicData) {
       return NextResponse.json({ error: 'Topic not found' }, { status: 404 });
     }
-
-    // Extract and structure the response
-    const chapter = Array.isArray(topicData.chapters)
-      ? topicData.chapters[0]
-      : topicData.chapters;
-
-    const subject = chapter?.subjects
-      ? Array.isArray(chapter.subjects)
-        ? chapter.subjects[0]
-        : chapter.subjects
-      : null;
 
     // Fetch verified quizzes from MyQuiza API (topic may not exist there yet)
     let processedQuizzes: {
@@ -101,10 +82,10 @@ export async function GET(
         id: topicData.id,
         name: topicData.name,
         description: topicData.description,
-        difficulty_level: topicData.difficulty_level,
-        time_estimate_minutes: topicData.time_estimate_minutes,
-        order_index: topicData.order_index,
-        chapter_id: topicData.chapter_id,
+        difficulty_level: topicData.difficultyLevel,
+        time_estimate_minutes: topicData.timeEstimateMinutes,
+        order_index: topicData.orderIndex,
+        chapter_id: topicData.chapterId,
         chapters: [], // Keep for compatibility
       },
       chapter: chapter
@@ -112,7 +93,7 @@ export async function GET(
             id: chapter.id,
             name: chapter.name,
             form: chapter.form,
-            order_index: chapter.order_index,
+            order_index: chapter.orderIndex,
           }
         : null,
       subject: subject
@@ -123,8 +104,8 @@ export async function GET(
             description: subject.description,
             icon: subject.icon,
             category: subject.category,
-            category_priority: subject.category_priority,
-            order_index: subject.order_index,
+            category_priority: subject.categoryPriority,
+            order_index: subject.orderIndex,
           }
         : null,
       quizzes: processedQuizzes,
