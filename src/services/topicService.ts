@@ -2,6 +2,7 @@ import { supabase } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
 import { checkAdminAccess } from './adminAuthService';
 import { Topic as TopicType, Chapter, Subject, Quiz } from '@/types/topics';
+import type { MyQuizaSubjectTreeEntry } from '@/lib/myquiza';
 
 /**
  * Interface for Topic structure
@@ -12,12 +13,16 @@ export interface Topic {
   name: string;
   order_index: number;
   created_at: string;
-  updated_at: string;
+  // Not returned by MyQuiza's content-tree (and not rendered anywhere in
+  // the admin UI) — kept optional rather than backfilled.
+  updated_at?: string;
   quiz_count?: number;
 }
 
 /**
- * Fetches all topics with quiz counts
+ * Fetches all topics with quiz counts, via MyQuiza's content-tree endpoint
+ * (GET /api/admin/content-tree) — one call replaces the previous full-table
+ * topics read plus a separate all-quizzes count query.
  * @returns A promise with topics data and error status
  */
 export async function fetchAdminTopics(): Promise<{
@@ -32,52 +37,36 @@ export async function fetchAdminTopics(): Promise<{
       return { data: null, error };
     }
 
-    // User is confirmed as admin, proceed with fetch
-    logger.log('Fetching topics as admin...');
+    logger.log('Fetching topics as admin via content-tree...');
 
-    // Get all topics
-    const { data: topics, error: topicsError } = await supabase
-      .from('topics')
-      .select('*')
-      .order('order_index', { ascending: true });
+    const res = await fetch('/api/admin/content-tree');
+    const tree = await res.json();
 
-    if (topicsError) {
-      logger.error('Error fetching topics:', topicsError);
+    if (!res.ok) {
+      logger.error('Error fetching content tree:', tree);
       return {
         data: null,
-        error: new Error(topicsError.message || 'Failed to fetch topics'),
+        error: new Error(tree.error || 'Failed to fetch topics'),
       };
     }
-    logger.log('Topics fetched successfully:', { count: topics?.length });
 
-    // Create a map to store quiz counts per topic
-    const topicQuizCounts: Record<string, number> = {};
+    const formattedTopics: Topic[] = (tree as MyQuizaSubjectTreeEntry[]).flatMap(
+      (subject) =>
+        subject.chapters.flatMap((chapter) =>
+          chapter.topics.map((topic) => ({
+            id: topic.id,
+            chapter_id: chapter.id,
+            name: topic.name,
+            order_index: topic.orderIndex,
+            created_at: topic.createdAt,
+            quiz_count: topic.quizCount,
+          }))
+        )
+    );
 
-    try {
-      // Get all quizzes with their topic IDs to count them
-      const { data: quizzes } = await supabase
-        .from('quizzes')
-        .select('topic_id');
-
-      if (quizzes && quizzes.length > 0) {
-        // Count quizzes by topic
-        quizzes.forEach((quiz) => {
-          if (quiz.topic_id) {
-            topicQuizCounts[quiz.topic_id] =
-              (topicQuizCounts[quiz.topic_id] || 0) + 1;
-          }
-        });
-      }
-    } catch (error) {
-      logger.error('Error calculating quiz counts:', error);
-      // Continue with basic data
-    }
-
-    // Format the topics with quiz counts
-    const formattedTopics = topics.map((topic) => ({
-      ...topic,
-      quiz_count: topicQuizCounts[topic.id] || 0,
-    }));
+    logger.log('Topics fetched successfully:', {
+      count: formattedTopics.length,
+    });
 
     return { data: formattedTopics, error: null };
   } catch (error) {

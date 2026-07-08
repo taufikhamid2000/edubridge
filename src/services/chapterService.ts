@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
 import { checkAdminAccess } from './adminAuthService';
+import type { MyQuizaSubjectTreeEntry } from '@/lib/myquiza';
 
 /**
  * Interface for Chapter structure
@@ -11,13 +12,17 @@ export interface Chapter {
   name: string; // Was previously called 'title', standardized as part of field naming conventions
   form: number;
   order_index: number;
-  created_at: string;
-  updated_at: string;
+  // Not returned by MyQuiza's content-tree (and not rendered anywhere in
+  // the admin UI) — kept optional rather than backfilled.
+  created_at?: string;
+  updated_at?: string;
   topic_count?: number;
 }
 
 /**
- * Fetches all chapters with topic counts
+ * Fetches all chapters with topic counts, via MyQuiza's content-tree
+ * endpoint (GET /api/admin/content-tree) — one call replaces the previous
+ * full-table chapters read plus a separate all-topics count query.
  * @returns A promise with chapters data and error status
  */
 export async function fetchAdminChapters(): Promise<{
@@ -31,51 +36,34 @@ export async function fetchAdminChapters(): Promise<{
     if (!success) {
       return { data: null, error };
     } // User is confirmed as admin, proceed with fetch
-    logger.log('Fetching chapters as admin...');
+    logger.log('Fetching chapters as admin via content-tree...');
 
-    // Get all chapters
-    const { data: chapters, error: chaptersError } = await supabase
-      .from('chapters')
-      .select('*')
-      .order('name', { ascending: true });
+    const res = await fetch('/api/admin/content-tree');
+    const tree = await res.json();
 
-    if (chaptersError) {
-      logger.error('Error fetching chapters:', chaptersError);
+    if (!res.ok) {
+      logger.error('Error fetching content tree:', tree);
       return {
         data: null,
-        error: new Error(chaptersError.message || 'Failed to fetch chapters'),
+        error: new Error(tree.error || 'Failed to fetch chapters'),
       };
     }
-    logger.log('Chapters fetched successfully:', { count: chapters?.length });
 
-    // Create a map to store topic counts per chapter
-    const chapterTopicCounts: Record<string, number> = {};
+    const formattedChapters: Chapter[] = (tree as MyQuizaSubjectTreeEntry[]).flatMap(
+      (subject) =>
+        subject.chapters.map((chapter) => ({
+          id: chapter.id,
+          subject_id: subject.id,
+          name: chapter.name,
+          form: chapter.form,
+          order_index: chapter.orderIndex,
+          topic_count: chapter.topics.length,
+        }))
+    );
 
-    try {
-      // Get all topics with their chapter IDs to count them
-      const { data: topics } = await supabase
-        .from('topics')
-        .select('chapter_id');
-
-      if (topics && topics.length > 0) {
-        // Count topics by chapter
-        topics.forEach((topic) => {
-          if (topic.chapter_id) {
-            chapterTopicCounts[topic.chapter_id] =
-              (chapterTopicCounts[topic.chapter_id] || 0) + 1;
-          }
-        });
-      }
-    } catch (error) {
-      logger.error('Error calculating topic counts:', error);
-      // Continue with basic data
-    }
-
-    // Format the chapters with topic counts
-    const formattedChapters = chapters.map((chapter) => ({
-      ...chapter,
-      topic_count: chapterTopicCounts[chapter.id] || 0,
-    }));
+    logger.log('Chapters fetched successfully:', {
+      count: formattedChapters.length,
+    });
 
     return { data: formattedChapters, error: null };
   } catch (error) {

@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
 import { checkAdminAccess } from './adminAuthService';
+import type { MyQuizaSubjectTreeEntry } from '@/lib/myquiza';
 
 /**
  * Interface for Subject data structure
@@ -67,24 +68,9 @@ export interface SubjectWithChaptersAndTopics {
 }
 
 /**
- * Interface for nested subject data from database
- */
-interface SubjectWithNested {
-  id: string;
-  name: string;
-  description: string;
-  chapters?: {
-    id: string;
-    topics?: {
-      id: string;
-      quizzes?: { id: string }[];
-    }[];
-  }[];
-}
-
-/**
- * Fetches all subjects with their related topic and quiz counts (OPTIMIZED VERSION)
- * This replaces multiple N+1 queries with a single JOIN query
+ * Fetches all subjects with their related topic and quiz counts, via
+ * MyQuiza's content-tree endpoint (GET /api/admin/content-tree) — one call
+ * replaces what used to be a Supabase nested-join query.
  * @returns A promise with subjects data and error status
  */
 export async function fetchAdminSubjects(): Promise<{
@@ -99,80 +85,31 @@ export async function fetchAdminSubjects(): Promise<{
       return { data: null, error };
     }
 
-    // User is confirmed as admin, proceed with fetch
-    logger.log('Fetching subjects as admin with optimized query...');
+    logger.log('Fetching subjects as admin via content-tree...');
 
-    // OPTIMIZED: Single query with JOINs to get all data at once
-    // This replaces ~50+ individual queries with 1 query
-    const { data: subjectsData, error: subjectsError } = await supabase.from(
-      'subjects'
-    ).select(`
-        id,
-        name,
-        description,
-        chapters(
-          id,
-          topics(
-            id,
-            quizzes(id)
-          )
-        )
-      `);
+    const res = await fetch('/api/admin/content-tree');
+    const tree = await res.json();
 
-    if (subjectsError) {
-      logger.error('Error fetching subjects with nested data:', subjectsError);
-
-      // Fallback: Get subjects without counts if JOIN fails
-      const { data: subjects } = await supabase
-        .from('subjects')
-        .select('id, name, description');
-
-      if (subjects) {
-        const formattedSubjects = subjects.map((subject) => ({
-          ...subject,
-          topic_count: 0,
-          quiz_count: 0,
-        }));
-        return { data: formattedSubjects, error: null };
-      }
-
+    if (!res.ok) {
+      logger.error('Error fetching content tree:', tree);
       return {
         data: null,
-        error: new Error(subjectsError.message || 'Failed to fetch subjects'),
+        error: new Error(tree.error || 'Failed to fetch subjects'),
       };
     }
 
-    logger.log('Subjects with nested data fetched successfully:', {
-      count: subjectsData?.length,
-    });
-
-    // Process the nested data to calculate counts efficiently
-    const formattedSubjects =
-      subjectsData?.map((subject: SubjectWithNested) => {
-        let topicCount = 0;
-        let quizCount = 0;
-
-        if (subject.chapters) {
-          subject.chapters.forEach((chapter) => {
-            if (chapter.topics) {
-              topicCount += chapter.topics.length;
-              chapter.topics.forEach((topic) => {
-                if (topic.quizzes) {
-                  quizCount += topic.quizzes.length;
-                }
-              });
-            }
-          });
-        }
-
-        return {
-          id: subject.id,
-          name: subject.name,
-          description: subject.description,
-          topic_count: topicCount,
-          quiz_count: quizCount,
-        };
-      }) || [];
+    const formattedSubjects = (tree as MyQuizaSubjectTreeEntry[]).map(
+      (subject) => ({
+        id: subject.id,
+        name: subject.name,
+        description: subject.description || '',
+        topic_count: subject.chapters.reduce(
+          (sum, chapter) => sum + chapter.topics.length,
+          0
+        ),
+        quiz_count: subject.quizCount,
+      })
+    );
 
     return { data: formattedSubjects, error: null };
   } catch (error) {

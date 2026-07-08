@@ -823,6 +823,8 @@ export interface MyQuizaTopicTreeEntry {
   id: string;
   name: string;
   orderIndex: number;
+  createdAt: string;
+  quizCount: number;
 }
 
 export interface MyQuizaChapterTreeEntry {
@@ -830,6 +832,8 @@ export interface MyQuizaChapterTreeEntry {
   name: string;
   form: number;
   orderIndex: number;
+  description: string | null;
+  quizCount: number;
   topics: MyQuizaTopicTreeEntry[];
 }
 
@@ -837,7 +841,9 @@ export interface MyQuizaSubjectTreeEntry {
   id: string;
   name: string;
   slug: string;
+  description: string | null;
   isDisabled: boolean;
+  quizCount: number;
   chapters: MyQuizaChapterTreeEntry[];
 }
 
@@ -854,8 +860,32 @@ export interface MyQuizaAuditSummary {
   verifiedToday: number;
   unverifiedToday: number;
   rejectedToday: number;
+  unverifiedQuizCount: number;
 }
 
 export function getAuditSummary(token: string | null) {
   return myquizaFetch<MyQuizaAuditSummary>('/api/v1/admin/audit-summary', token);
+}
+
+// Review queue: all unverified quizzes with ancestry + a rolled-up
+// unresolved-comment count, replacing an admin-side N+1 (one comment-count
+// query per quiz).
+export interface MyQuizaUnverifiedQuiz {
+  id: string;
+  name: string;
+  topicId: string;
+  topicName: string | null;
+  chapterId: string | null;
+  chapterName: string | null;
+  subjectId: string | null;
+  subjectName: string | null;
+  createdAt: string | null;
+  unresolvedCommentCount: number;
+}
+
+export function getUnverifiedQuizzes(token: string | null) {
+  return myquizaFetch<MyQuizaUnverifiedQuiz[]>(
+    '/api/v1/admin/quizzes/unverified',
+    token
+  );
 }

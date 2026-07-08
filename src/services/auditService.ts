@@ -9,11 +9,10 @@
 // MyQuiza's comment response has no author/admin_user info, so
 // admin_user_id/admin_user are left blank/undefined on the mapped result.
 //
-// getQuizzesNeedingReview/getAuditDashboardStats are NOT migrated: the
-// dashboard stats need an aggregate endpoint across all quizzes that
-// MyQuiza hasn't exposed (their comment/log/verify endpoints are all
-// scoped to one quiz at a time) — these still read Supabase directly.
-import { supabase } from '@/lib/supabase';
+// getQuizzesNeedingReview/getAuditDashboardStats now come from MyQuiza too,
+// via GET /api/admin/audit-summary (proxies /api/v1/admin/audit-summary +
+// /api/v1/admin/quizzes/unverified) — replaces the old Supabase queries
+// plus an admin-side N+1 (one comment-count query per quiz).
 import { logger } from '@/lib/logger';
 import {
   QuizAuditComment,
@@ -287,42 +286,46 @@ export async function getQuizVerificationHistory(
   }
 }
 
+interface AuditSummaryResponse {
+  summary: {
+    unresolvedQuizComments: number;
+    unresolvedQuestionComments: number;
+    unresolvedAnswerComments: number;
+    verifiedToday: number;
+    unverifiedToday: number;
+    rejectedToday: number;
+    unverifiedQuizCount: number;
+  };
+  unverifiedQuizzes: Array<{
+    id: string;
+    name: string;
+    topicId: string;
+    createdAt: string | null;
+    unresolvedCommentCount: number;
+  }>;
+}
+
+function mapUnverifiedQuiz(
+  q: AuditSummaryResponse['unverifiedQuizzes'][number]
+): QuizWithAudit {
+  return {
+    id: q.id,
+    topic_id: q.topicId,
+    name: q.name,
+    created_by: '',
+    created_at: q.createdAt || '',
+    verified: false,
+    unresolved_comments_count: q.unresolvedCommentCount,
+  };
+}
+
 /**
  * Get quizzes that need review (unverified with activity)
  */
 export async function getQuizzesNeedingReview(): Promise<QuizWithAudit[]> {
   try {
-    const { data, error } = await supabase
-      .from('quizzes')
-      .select(
-        `
-        *,
-        topics(name, chapters(subjects(name)))
-      `
-      )
-      .eq('verified', false)
-      .order('created_at', { ascending: false })
-      .limit(20);
-
-    if (error) throw error;
-
-    // For each quiz, get comment counts
-    const quizzesWithAudit: QuizWithAudit[] = await Promise.all(
-      (data || []).map(async (quiz) => {
-        const { count: commentCount } = await supabase
-          .from('quiz_audit_comments')
-          .select('*', { count: 'exact', head: true })
-          .eq('quiz_id', quiz.id)
-          .eq('is_resolved', false);
-
-        return {
-          ...quiz,
-          unresolved_comments_count: commentCount || 0,
-        };
-      })
-    );
-
-    return quizzesWithAudit;
+    const data = await fetchJson<AuditSummaryResponse>('/api/admin/audit-summary');
+    return data.unverifiedQuizzes.map(mapUnverifiedQuiz);
   } catch (error) {
     logger.error('Error fetching quizzes needing review:', error);
     return [];
@@ -334,44 +337,20 @@ export async function getQuizzesNeedingReview(): Promise<QuizWithAudit[]> {
  */
 export async function getAuditDashboardStats(): Promise<AuditDashboardStats> {
   try {
-    // Get unverified quizzes count
-    const { count: unverifiedCount } = await supabase
-      .from('quizzes')
-      .select('*', { count: 'exact', head: true })
-      .eq('verified', false);
-
-    // Get pending comments count
-    const { count: pendingCommentsCount } = await supabase
-      .from('quiz_audit_comments')
-      .select('*', { count: 'exact', head: true })
-      .eq('is_resolved', false);
-
-    // Get today's verification stats
-    const today = new Date().toISOString().split('T')[0];
-
-    const { count: verifiedTodayCount } = await supabase
-      .from('quiz_verification_log')
-      .select('*', { count: 'exact', head: true })
-      .eq('action', 'verified')
-      .gte('created_at', `${today}T00:00:00.000Z`)
-      .lt('created_at', `${today}T23:59:59.999Z`);
-
-    const { count: rejectedTodayCount } = await supabase
-      .from('quiz_verification_log')
-      .select('*', { count: 'exact', head: true })
-      .eq('action', 'rejected')
-      .gte('created_at', `${today}T00:00:00.000Z`)
-      .lt('created_at', `${today}T23:59:59.999Z`);
-
-    // Get quizzes needing review
-    const quizzesNeedingReview = await getQuizzesNeedingReview();
+    const data = await fetchJson<AuditSummaryResponse>('/api/admin/audit-summary');
+    const pendingComments =
+      data.summary.unresolvedQuizComments +
+      data.summary.unresolvedQuestionComments +
+      data.summary.unresolvedAnswerComments;
 
     return {
-      total_unverified_quizzes: unverifiedCount || 0,
-      total_pending_comments: pendingCommentsCount || 0,
-      total_verified_today: verifiedTodayCount || 0,
-      total_rejected_today: rejectedTodayCount || 0,
-      quizzes_needing_review: quizzesNeedingReview.slice(0, 5), // Top 5 for dashboard
+      total_unverified_quizzes: data.summary.unverifiedQuizCount,
+      total_pending_comments: pendingComments,
+      total_verified_today: data.summary.verifiedToday,
+      total_rejected_today: data.summary.rejectedToday,
+      quizzes_needing_review: data.unverifiedQuizzes
+        .slice(0, 5) // Top 5 for dashboard
+        .map(mapUnverifiedQuiz),
     };
   } catch (error) {
     logger.error('Error fetching audit dashboard stats:', error);
