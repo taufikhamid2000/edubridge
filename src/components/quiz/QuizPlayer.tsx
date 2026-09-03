@@ -7,6 +7,7 @@ import QuizResults from './QuizResults';
 import { useRouter } from 'next/navigation';
 import { submitQuizAttempt } from '@/services/quizService';
 import { logger } from '@/lib/logger';
+import { supabase } from '@/lib/supabase';
 
 // Fisher-Yates shuffle algorithm
 function shuffleArray<T>(array: T[]): T[] {
@@ -124,7 +125,27 @@ export default function QuizPlayer({
   const [quizStarted, setQuizStarted] = useState(false);
   const [shuffledQuestions, setShuffledQuestions] = useState<Question[]>([]);
   const [loadingTimeout, setLoadingTimeout] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [showSignInGate, setShowSignInGate] = useState(false);
   const router = useRouter();
+
+  // Track whether the visitor is signed in — anonymous visitors can take the
+  // quiz, but submitting requires a session (server rejects with 401 otherwise).
+  useEffect(() => {
+    let cancelled = false;
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!cancelled) setIsAuthenticated(!!session);
+    });
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(!!session);
+    });
+    return () => {
+      cancelled = true;
+      subscription.unsubscribe();
+    };
+  }, []);
   // Initialize shuffled questions when component mounts or questions change
   useEffect(() => {
     logger.log('QuizPlayer: questions prop changed', {
@@ -289,6 +310,10 @@ export default function QuizPlayer({
     }
   };
   const handleQuizSubmit = async () => {
+    if (!isAuthenticated) {
+      setShowSignInGate(true);
+      return;
+    }
     try {
       // Format answers for submission
       const formattedAnswers = Object.entries(answers).map(
@@ -360,6 +385,20 @@ export default function QuizPlayer({
                 </div>
               </div>
             </div>
+          </div>
+        )}
+
+        {!isAuthenticated && (
+          <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg text-sm text-blue-800 dark:text-blue-200">
+            You&apos;re playing as a guest.{' '}
+            <button
+              type="button"
+              onClick={() => router.push('/auth')}
+              className="underline font-medium hover:text-blue-600 dark:hover:text-blue-100"
+            >
+              Sign in
+            </button>{' '}
+            to save your score and XP.
           </div>
         )}
 
@@ -483,7 +522,36 @@ export default function QuizPlayer({
   const currentQuestion = shuffledQuestions[currentQuestionIndex];
 
   return (
-    <div className="bg-gray-800 dark:bg-white rounded-lg shadow-md p-6">
+    <div className="bg-gray-800 dark:bg-white rounded-lg shadow-md p-6 relative">
+      {showSignInGate && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-sm w-full p-6">
+            <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-gray-100">
+              Sign in to save your score and XP
+            </h3>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">
+              You&apos;re browsing as a guest, so this attempt can&apos;t be
+              submitted or scored. Sign in to record your result and earn XP.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setShowSignInGate(false)}
+                className="px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
+              >
+                Keep reviewing
+              </button>
+              <button
+                type="button"
+                onClick={() => router.push('/auth')}
+                className="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700"
+              >
+                Sign in
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-bold">{quizName}</h2>
         {timeLimit && (

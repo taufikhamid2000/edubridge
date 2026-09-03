@@ -54,9 +54,8 @@ export default function PlayQuizPage() {
 
         const { data: { session }, error: authError } = authResult;
 
-        if (authError || !session?.user) {
-          window.location.assign('/auth');
-          return;
+        if (authError) {
+          logger.warn('Session check error while loading quiz:', authError);
         }
 
         if (quizResult.error || !quizResult.quiz) {
@@ -69,7 +68,7 @@ export default function PlayQuizPage() {
           questions: quizResult.questions?.length ?? 0,
         });
 
-        setUserId(session.user.id);
+        setUserId(session?.user?.id ?? null);
         setQuiz(quizResult.quiz);
         setQuestions(quizResult.questions || []);
         setTopicContext(quizResult.topicContext);
@@ -106,7 +105,7 @@ export default function PlayQuizPage() {
     );
   }
 
-  if (error || !quiz || !userId) {
+  if (error || !quiz) {
     return (
       <div className="container mx-auto py-8 px-4">
         <div className="max-w-3xl mx-auto">
@@ -141,7 +140,7 @@ export default function PlayQuizPage() {
               ? quiz.timeLimit / 60
               : DEFAULT_QUIZ_TIME_LIMIT_MINUTES
           }
-          userId={userId}
+          userId={userId ?? undefined}
           subject={subject}
           topic={topic}
           topicContext={topicContext}
