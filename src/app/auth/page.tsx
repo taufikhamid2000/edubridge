@@ -1,15 +1,18 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
+import { AuthBrandingPanel } from '@/components/auth/auth-branding-panel';
+import { LogoMark } from '@/components/auth/logo-mark';
+import { PasswordInput } from '@/components/auth/password-input';
+import { Spinner } from '@/components/auth/spinner';
 
 export default function Auth() {
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -37,7 +40,10 @@ export default function Auth() {
         // right away — add a transactional email provider (e.g. SendGrid)
         // and gate dashboard access on a confirmed email if this changes.
         const { data, error: err } = await supabase.auth.signUp({ email, password });
-        if (err) { setError(err.message); return; }
+        if (err) {
+          setError(err.message);
+          return;
+        }
         if (!data.session) {
           setError('Check your email to confirm your account.');
           return;
@@ -45,7 +51,10 @@ export default function Auth() {
         window.location.assign('/dashboard');
       } else {
         const { error: err } = await supabase.auth.signInWithPassword({ email, password });
-        if (err) { setError(err.message); return; }
+        if (err) {
+          setError(err.message);
+          return;
+        }
         window.location.assign('/dashboard');
       }
     } catch {
@@ -67,135 +76,134 @@ export default function Auth() {
     if (err) setError(err.message);
   };
 
+  const errorId = 'auth-form-error';
   const inputClass =
-    'auth-input w-full px-3 py-2 pr-10 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 border-gray-600 dark:border-gray-300 bg-gray-700 dark:bg-white text-gray-100 dark:text-gray-900 placeholder-gray-400 dark:placeholder-gray-500';
+    'auth-input rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder-foreground/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring';
+
+  const title = mode === 'signin' ? 'Welcome back' : 'Create an account';
+  const subtitle =
+    mode === 'signin' ? 'Sign in to continue your learning journey.' : 'Start tracking your progress today.';
 
   return (
-    <section className="min-h-screen flex items-center justify-center bg-gray-900 dark:bg-gray-50 p-4">
-      <div className="w-full max-w-md bg-gray-800 dark:bg-white rounded-lg shadow-xl p-8">
-        <h1 className="text-2xl font-semibold text-center mb-6">
-          {mode === 'signin' ? 'Welcome back' : 'Create an account'}
-        </h1>
+    <div className="flex min-h-screen flex-1 md:items-stretch">
+      <AuthBrandingPanel />
 
-        {error && (
-          <p className="text-sm text-red-500 mb-4">{error}</p>
-        )}
+      <div className="flex flex-1 flex-col items-center justify-center gap-6 bg-muted px-4 py-12">
+        <Link href="/" className="flex items-center gap-2 md:hidden">
+          <LogoMark size={28} />
+          <span className="text-lg font-semibold text-foreground">EduBridge</span>
+        </Link>
 
-        <button
-          type="button"
-          onClick={handleGoogle}
-          className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors"
-        >
-          Continue with Google
-        </button>
+        <div className="w-full max-w-sm animate-page-in rounded-2xl border border-border bg-background p-8">
+          <h1 className="text-xl font-semibold text-foreground">{title}</h1>
+          <p className="mb-6 text-sm text-foreground/60">{subtitle}</p>
 
-        <div className="flex items-center gap-2 my-10">
-          <hr className="flex-grow border-t border-gray-600 dark:border-gray-300" />
-          <span className="text-gray-400 dark:text-gray-500">or</span>
-          <hr className="flex-grow border-t border-gray-600 dark:border-gray-300" />
-        </div>
-
-        <form onSubmit={handleSubmit} className="flex flex-col gap-8">
-          <div className="flex flex-col gap-2">
-            <label htmlFor="email" className="text-gray-300 dark:text-gray-700">Email</label>
+          <form onSubmit={handleSubmit} className="flex flex-col gap-3">
             <input
               id="email"
               type="email"
+              placeholder="Email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              aria-invalid={error ? true : undefined}
+              aria-describedby={error ? errorId : undefined}
               className={inputClass}
             />
-          </div>
 
-          <div className="flex flex-col gap-2">
-            <label htmlFor="password" className="text-gray-300 dark:text-gray-700">Password</label>
-            <div className="relative">
-              <input
-                id="password"
-                type={showPassword ? 'text' : 'password'}
+            <PasswordInput
+              id="password"
+              name="password"
+              placeholder="Password"
+              required
+              autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
+              value={password}
+              onChange={setPassword}
+              ariaInvalid={!!error}
+              ariaDescribedBy={error ? errorId : undefined}
+              className={inputClass}
+            />
+
+            {mode === 'signup' && (
+              <PasswordInput
+                id="confirm"
+                name="confirm"
+                placeholder="Confirm password"
                 required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="new-password"
+                value={confirm}
+                onChange={setConfirm}
+                showLabel="Show confirm password"
+                hideLabel="Hide confirm password"
+                ariaInvalid={!!error}
+                ariaDescribedBy={error ? errorId : undefined}
                 className={inputClass}
               />
-              <button
-                type="button"
-                onClick={() => setShowPassword((v) => !v)}
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
-                className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 dark:text-gray-500 hover:text-gray-200 dark:hover:text-gray-700"
-              >
-                {showPassword ? (
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" />
-                    <path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.742L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.064 7 9.542 7 .847 0 1.669-.105 2.454-.303z" />
-                  </svg>
-                ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                    <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
-                  </svg>
-                )}
-              </button>
-            </div>
+            )}
+
+            {error && (
+              <p id={errorId} role="alert" className="text-sm text-destructive">
+                {error}
+              </p>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="mt-2 inline-flex cursor-pointer items-center justify-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50 active:scale-[0.97] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+            >
+              {loading && <Spinner />}
+              {loading ? (mode === 'signup' ? 'Creating account…' : 'Signing in…') : mode === 'signup' ? 'Sign up' : 'Sign in'}
+            </button>
+          </form>
+
+          <div className="my-4 flex items-center gap-3">
+            <div className="h-px flex-1 bg-border" />
+            <span className="text-xs text-foreground/40">or</span>
+            <div className="h-px flex-1 bg-border" />
           </div>
 
-          {mode === 'signup' && (
-            <div className="flex flex-col gap-2">
-              <label htmlFor="confirm" className="text-gray-300 dark:text-gray-700">Confirm Password</label>
-              <div className="relative">
-                <input
-                  id="confirm"
-                  type={showConfirm ? 'text' : 'password'}
-                  required
-                  value={confirm}
-                  onChange={(e) => setConfirm(e.target.value)}
-                  className={inputClass}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirm((v) => !v)}
-                  aria-label={showConfirm ? 'Hide password' : 'Show password'}
-                  className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 dark:text-gray-500 hover:text-gray-200 dark:hover:text-gray-700"
-                >
-                  {showConfirm ? (
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" />
-                      <path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.742L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.064 7 9.542 7 .847 0 1.669-.105 2.454-.303z" />
-                    </svg>
-                  ) : (
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                      <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
-                    </svg>
-                  )}
-                </button>
-              </div>
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors disabled:opacity-50 mt-8"
-          >
-            {loading
-              ? mode === 'signup' ? 'Creating…' : 'Signing in…'
-              : mode === 'signin' ? 'Sign In' : 'Sign Up'}
-          </button>
-        </form>
-
-        <p className="text-center text-sm mt-6">
-          {mode === 'signin' ? "Don't have an account?" : 'Already have an account?'}{' '}
           <button
             type="button"
-            onClick={() => { setMode(mode === 'signin' ? 'signup' : 'signin'); setError(null); }}
-            className="underline text-blue-600 dark:text-blue-400 hover:text-blue-800"
+            onClick={handleGoogle}
+            className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-full border border-border bg-background px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
           >
-            {mode === 'signin' ? 'Sign Up' : 'Sign In'}
+            <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                fill="#4285F4"
+                d="M23.49 12.27c0-.79-.07-1.54-.2-2.27H12v4.51h6.47c-.29 1.48-1.14 2.73-2.4 3.58v3h3.86c2.26-2.09 3.56-5.17 3.56-8.82Z"
+              />
+              <path
+                fill="#34A853"
+                d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.86-3c-1.08.72-2.45 1.15-4.07 1.15-3.13 0-5.78-2.11-6.73-4.96H1.29v3.09C3.26 21.3 7.31 24 12 24Z"
+              />
+              <path
+                fill="#FBBC05"
+                d="M5.27 14.28A7.2 7.2 0 0 1 4.89 12c0-.79.14-1.56.38-2.28V6.63H1.29A11.98 11.98 0 0 0 0 12c0 1.94.46 3.77 1.29 5.37l3.98-3.09Z"
+              />
+              <path
+                fill="#EA4335"
+                d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.94 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.63l3.98 3.09C6.22 6.86 8.87 4.75 12 4.75Z"
+              />
+            </svg>
+            Continue with Google
           </button>
-        </p>
+
+          <p className="mt-6 text-center text-sm text-foreground/60">
+            {mode === 'signin' ? "Don't have an account?" : 'Already have an account?'}{' '}
+            <button
+              type="button"
+              onClick={() => {
+                setMode(mode === 'signin' ? 'signup' : 'signin');
+                setError(null);
+              }}
+              className="cursor-pointer font-medium text-primary underline-offset-4 hover:underline"
+            >
+              {mode === 'signin' ? 'Sign up' : 'Sign in'}
+            </button>
+          </p>
+        </div>
       </div>
-    </section>
+    </div>
   );
 }

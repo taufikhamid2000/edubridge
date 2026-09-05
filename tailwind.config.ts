@@ -14,6 +14,22 @@ const config: Config = {
         foreground: 'var(--foreground)',
         headerBg: 'var(--header-bg)',
         primaryText: 'var(--primary-text)',
+        muted: 'var(--muted)',
+        border: 'var(--border)',
+        primary: {
+          DEFAULT: 'var(--primary)',
+          foreground: 'var(--primary-foreground)',
+        },
+        secondary: 'var(--secondary)',
+        accent: {
+          DEFAULT: 'var(--accent)',
+          foreground: 'var(--accent-foreground)',
+        },
+        destructive: {
+          DEFAULT: 'var(--destructive)',
+          foreground: 'var(--destructive-foreground)',
+        },
+        ring: 'var(--ring)',
       },
     },
   },
