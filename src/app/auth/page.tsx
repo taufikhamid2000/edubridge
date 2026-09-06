@@ -64,6 +64,23 @@ export default function Auth() {
     }
   };
 
+  const handleDemo = async () => {
+    setError(null);
+    setLoading(true);
+    try {
+      const { error: err } = await supabase.auth.signInAnonymously();
+      if (err) {
+        setError(err.message);
+        return;
+      }
+      window.location.assign('/dashboard');
+    } catch {
+      setError('Unable to connect to the API. Please contact the administrator.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleGoogle = async () => {
     const { error: err } = await supabase.auth.signInWithOAuth({
       provider: 'google',
@@ -187,6 +204,16 @@ export default function Auth() {
               />
             </svg>
             Continue with Google
+          </button>
+
+          <button
+            type="button"
+            onClick={handleDemo}
+            disabled={loading}
+            className="mt-3 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-full border border-primary/40 bg-primary/5 px-5 py-2.5 text-sm font-medium text-primary transition-colors hover:bg-primary/10 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+          >
+            {loading && <Spinner />}
+            Try the demo — no account needed
           </button>
 
           <p className="mt-6 text-center text-sm text-foreground/60">

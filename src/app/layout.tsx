@@ -1,6 +1,4 @@
 import '../styles/globals.css';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 import Providers from '@/components/Providers';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { validateEnvironment } from '@/lib/env-check';
@@ -29,11 +27,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Providers>
-          <ErrorBoundary>
-            <Header />
-            <main>{children}</main>
-            <Footer />
-          </ErrorBoundary>
+          <ErrorBoundary>{children}</ErrorBoundary>
         </Providers>
       </body>
     </html>
