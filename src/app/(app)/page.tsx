@@ -10,7 +10,7 @@ import LoadingState from '@/components/LoadingState';
  * Root route ("/"). Not a public marketing page: unauthenticated visitors
  * are sent to /auth, authenticated visitors are sent straight to /dashboard.
  * The original marketing/pitch content that used to live here has been
- * preserved at /welcome (linked from the About page).
+ * folded into the About page (/about).
  */
 export default function RootPage() {
   const router = useRouter();
