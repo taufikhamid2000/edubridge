@@ -3,9 +3,12 @@ import { logger } from '@/lib/logger';
 
 import { useEffect } from 'react';
 import Head from 'next/head';
+import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 
 export default function AboutPage() {
+  const router = useRouter();
+
   // Check session on page load to prevent unintended logout
   useEffect(() => {
     const checkSession = async () => {
@@ -86,14 +89,23 @@ export default function AboutPage() {
           <h2 className="text-2xl font-semibold mb-4">Learn More</h2>
           <p className="mb-4 text-gray-300 dark:text-gray-700">
             Want to dive deeper into the EduBridge concept and vision? Read our
-            detailed research document:
+            detailed research document, or browse the full pitch — market
+            opportunity, roadmap, revenue model, risks, and success metrics:
           </p>
-          <button
-            onClick={openResearchPDF}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
-          >
-            Read Our Research Paper 📄
-          </button>
+          <div className="flex flex-wrap gap-3">
+            <button
+              onClick={openResearchPDF}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+            >
+              Read Our Research Paper 📄
+            </button>
+            <button
+              onClick={() => router.push('/welcome')}
+              className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+            >
+              View Full Vision & Roadmap 🚀
+            </button>
+          </div>
         </section>
       </div>
     </>
