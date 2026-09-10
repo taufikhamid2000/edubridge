@@ -3,11 +3,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
 import fs from 'fs';
 import path from 'path';
-import type { SupabaseClient } from '@supabase/supabase-js';
-
 // For building, we need placeholders
 // These will be properly initialized at runtime
-let supabaseClient: SupabaseClient<any, any, any> | null = null;
+let supabaseClient: typeof import('@/lib/supabase').supabase | null = null;
 let adminChecker: ((userId: string) => Promise<boolean>) | null = null;
 
 // Only attempt to import when not in build phase
