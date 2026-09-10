@@ -7,7 +7,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 
 // For building, we need placeholders
 // These will be properly initialized at runtime
-let supabaseClient: SupabaseClient | null = null;
+let supabaseClient: SupabaseClient<any, any, any> | null = null;
 let adminChecker: ((userId: string) => Promise<boolean>) | null = null;
 
 // Only attempt to import when not in build phase

@@ -66,6 +66,7 @@ export async function GET() {
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
+        db: { schema: 'edubridge' },
         cookies: {
           get: (name) => {
             const cookie = cookieStore.get(name);

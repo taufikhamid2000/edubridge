@@ -25,7 +25,8 @@ if (!supabaseUrl || !supabaseAnonKey) {
  * source of stale-session desync; it has been removed in favor of the
  * library's built-in handling.
  */
-export const supabase = createClient<any>(supabaseUrl, supabaseAnonKey, {
+export const supabase = createClient<any, 'edubridge'>(supabaseUrl, supabaseAnonKey, {
+  db: { schema: 'edubridge' },
   auth: {
     autoRefreshToken: true,
     persistSession: true,
@@ -64,7 +65,8 @@ function getSupabaseAdminClient(): SupabaseClient<any, any, any> {
     );
   }
 
-  _supabaseAdminClient = createClient<any>(adminUrl, serviceRoleKey, {
+  _supabaseAdminClient = createClient<any, 'edubridge'>(adminUrl, serviceRoleKey, {
+    db: { schema: 'edubridge' },
     auth: {
       autoRefreshToken: false,
       persistSession: false,
