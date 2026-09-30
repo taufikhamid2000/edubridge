@@ -1,6 +1,6 @@
 name: CI
 
-# Lint + unit tests on every push to master and on PRs.
+# Lint + unit tests on every push to main and on PRs.
 # Type-checking is enforced separately at build/deploy time: next.config.mjs
 # has typescript.ignoreBuildErrors=false, so the Vercel build fails on type
 # errors. (A standalone `tsc --noEmit` here would also flag the quarantined
@@ -8,7 +8,7 @@ name: CI
 
 on:
   push:
-    branches: [master]
+    branches: [main]
   pull_request:
 
 jobs:
